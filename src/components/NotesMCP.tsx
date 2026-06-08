@@ -73,9 +73,6 @@ export function NotesMCP() {
     <section id="mcp" className="section">
       <div className="wrap">
         <Reveal>
-          <span className="chip" style={{ color: "var(--japan-2,#e9b949)", borderColor: "var(--japan-2,#e9b949)" }}>
-            ◆ {t("mcp_tag")}
-          </span>
           <h2 className="h-display glow-japan" style={{ fontSize: "clamp(2.2rem, 6vw, 4.2rem)", margin: "0.8rem 0 0.6rem" }}>
             {t("mcp_title")}
           </h2>
@@ -167,7 +164,6 @@ export function NotesMCP() {
                 </div>
               ))}
             </div>
-            <p style={{ color: "var(--muted)", fontSize: "0.82rem", marginTop: "1rem", opacity: 0.8 }}>* {t("mcp_note")}</p>
           </div>
         </Reveal>
       </div>

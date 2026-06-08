@@ -10,48 +10,35 @@ import {
 } from "react";
 
 /**
- * Etapas del viaje, mapeadas al progreso de scroll [0..1].
- * Alineadas con las 7 secciones full-height:
- *   espacio  -> Hero, About
- *   japón    -> Experiencia, Educación, MCP
- *   brainrot -> Proyectos, Contacto
- * Estos rangos definen la ETIQUETA de etapa (Nav). Las transiciones visuales
- * (cross-fade) viven en TRANSITIONS y son la ÚNICA fuente para los pesos.
+ * Carta estelar: el viaje es un único cosmos. La página tiene SECTION_COUNT
+ * secciones full-height; cada una ocupa una "zona" del progreso de scroll
+ * [0..1] y enciende su constelación al pasar por su centro.
+ *
+ * Orden de secciones (debe coincidir con page.tsx y con CONSTELLATIONS):
+ *   0 Hero · 1 About · 2 Experiencia · 3 Educación · 4 Proyectos · 5 Contacto
+ * (El MCP vive en su propia ruta /utn-frt-mcp, fuera de este viaje.)
  */
-export const STAGES = {
-  space: [0.0, 0.24] as const,
-  japan: [0.24, 0.66] as const,
-  brainrot: [0.66, 1.0] as const,
-};
-
-/** Ventanas de cross-fade entre mundos (fuente única para pesos y color). */
-export const TRANSITIONS = {
-  spaceJapan: [0.16, 0.3] as const,
-  japanBrain: [0.6, 0.74] as const,
-};
-
-export type StageName = keyof typeof STAGES;
+export const SECTION_COUNT = 6;
 
 export function smoothstep(edge0: number, edge1: number, x: number): number {
   const t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
   return t * t * (3 - 2 * t);
 }
 
-export interface StageWeights {
-  space: number;
-  japan: number;
-  brain: number;
+/** Centro de la zona de scroll de una sección. */
+export function sectionCenter(index: number): number {
+  return (index + 0.5) / SECTION_COUNT;
 }
 
-/** Pesos [0..1] de cada mundo para un progreso dado (suman ~1 con cross-fade). */
-export function stageWeights(p: number): StageWeights {
-  const toJapan = smoothstep(TRANSITIONS.spaceJapan[0], TRANSITIONS.spaceJapan[1], p);
-  const brain = smoothstep(TRANSITIONS.japanBrain[0], TRANSITIONS.japanBrain[1], p);
-  return {
-    space: 1 - toJapan,
-    japan: toJapan * (1 - brain),
-    brain,
-  };
+/**
+ * Peso [0..1] de una constelación: 1 en el centro de su sección, cae a 0 a
+ * ±halfWidth. Con halfWidth ~ 1/SECTION_COUNT las constelaciones contiguas se
+ * funden suavemente (cross-fade), por eso el viaje se siente continuo.
+ */
+export function bumpWeight(p: number, center: number, halfWidth = 0.16): number {
+  const d = Math.abs(p - center) / halfWidth;
+  const t = Math.max(0, 1 - d);
+  return t * t * (3 - 2 * t);
 }
 
 /** Singleton leído por el render loop 3D (evita re-renders en cada scroll). */
@@ -59,19 +46,6 @@ const state = { progress: 0 };
 
 export function getScrollProgress(): number {
   return state.progress;
-}
-
-/** Devuelve la etapa activa para un progreso dado. */
-export function stageForProgress(p: number): StageName {
-  if (p < STAGES.space[1]) return "space";
-  if (p < STAGES.japan[1]) return "japan";
-  return "brainrot";
-}
-
-/** Normaliza el progreso dentro de una etapa a [0..1]. */
-export function localProgress(p: number, stage: StageName): number {
-  const [a, b] = STAGES[stage];
-  return Math.min(1, Math.max(0, (p - a) / (b - a)));
 }
 
 const ProgressCtx = createContext<number>(0);

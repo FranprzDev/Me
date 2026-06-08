@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { CV } from "@/data/cv";
 import { PROJECTS } from "@/data/projects";
 import { useI18n } from "@/lib/i18n";
@@ -11,7 +12,7 @@ export function Hero() {
     <section id="top" className="section" style={{ alignItems: "center", textAlign: "center" }}>
       <div className="wrap" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1.4rem" }}>
         <Reveal>
-          <span className="eyebrow accent-space">宇 · {tl(CV.location)} · {CV.timezone}</span>
+          <span className="eyebrow">{tl(CV.location)}</span>
         </Reveal>
         <Reveal delay={0.05}>
           <h1 className="h-display glow-space" style={{ fontSize: "clamp(2.8rem, 9vw, 6.5rem)", margin: 0 }}>
@@ -25,29 +26,26 @@ export function Hero() {
         </Reveal>
         <Reveal delay={0.2}>
           <p style={{ maxWidth: 620, color: "var(--muted)", lineHeight: 1.7 }}>
-            {tl(CV.summary).slice(0, 180)}…
+            {tl(CV.summary)}
           </p>
         </Reveal>
         <Reveal delay={0.28}>
           <div style={{ display: "flex", gap: "0.8rem", flexWrap: "wrap", justifyContent: "center" }}>
-            <a
-              href="#mcp"
+            <Link
+              href="/utn-frt-mcp"
               className="glass tilt-card"
               style={{ padding: "0.8rem 1.4rem", color: "var(--fg)", fontWeight: 600 }}
             >
               {t("hero_cta_mcp")} →
-            </a>
-            <a
-              href="#experience"
-              className="glass-soft tilt-card"
-              style={{ padding: "0.8rem 1.4rem", color: "var(--muted)" }}
-            >
-              {t("hero_cta_exp")}
-            </a>
+            </Link>
           </div>
         </Reveal>
         <Reveal delay={0.5}>
-          <p className="eyebrow" style={{ marginTop: "2rem", opacity: 0.7 }}>↓ {t("hero_scroll")}</p>
+          <div className="scroll-cue" aria-hidden style={{ marginTop: "2.4rem" }}>
+            <span>⌄</span>
+            <span>⌄</span>
+            <span>⌄</span>
+          </div>
         </Reveal>
       </div>
     </section>
@@ -60,7 +58,6 @@ export function About() {
     <section id="about" className="section">
       <div className="wrap">
         <Reveal>
-          <span className="eyebrow accent-space">宇</span>
           <h2 className="h-display" style={{ fontSize: "clamp(2rem, 5vw, 3.4rem)", margin: "0.4rem 0 1.4rem" }}>
             {t("about_title")}
           </h2>
@@ -83,7 +80,6 @@ export function Experience() {
     <section id="experience" className="section">
       <div className="wrap">
         <Reveal>
-          <span className="eyebrow accent-japan">久</span>
           <h2 className="h-display" style={{ fontSize: "clamp(2rem, 5vw, 3.4rem)", margin: "0.4rem 0 2rem" }}>
             {t("exp_title")}
           </h2>
@@ -115,7 +111,6 @@ export function Education() {
     <section id="education" className="section">
       <div className="wrap">
         <Reveal>
-          <span className="eyebrow accent-japan">久</span>
           <h2 className="h-display" style={{ fontSize: "clamp(2rem, 5vw, 3.4rem)", margin: "0.4rem 0 2rem" }}>
             {t("edu_title")}
           </h2>
@@ -178,7 +173,6 @@ export function Projects() {
     <section id="projects" className="section">
       <div className="wrap">
         <Reveal>
-          <span className="eyebrow accent-brain">🧠</span>
           <h2 className="h-display glow-brain" style={{ fontSize: "clamp(2rem, 5vw, 3.4rem)", margin: "0.4rem 0 2rem" }}>
             {t("proj_title")}
           </h2>
@@ -227,13 +221,11 @@ export function Contact() {
   const items = [
     { label: "Email", value: CV.email, href: `mailto:${CV.email}` },
     { label: "LinkedIn", value: "in/franprzdev", href: CV.linkedin },
-    { label: "Tel", value: CV.phone, href: `tel:${CV.phone.replace(/[^+\d]/g, "")}` },
   ];
   return (
     <section id="contact" className="section" style={{ minHeight: "80svh" }}>
       <div className="wrap" style={{ textAlign: "center" }}>
         <Reveal>
-          <span className="eyebrow accent-brain">🧠</span>
           <h2 className="h-display glow-brain" style={{ fontSize: "clamp(2.2rem, 6vw, 4rem)", margin: "0.4rem 0 0.8rem" }}>
             {t("contact_title")}
           </h2>
@@ -255,15 +247,11 @@ export function Contact() {
 }
 
 export function Footer() {
-  const { t } = useI18n();
   return (
     <footer className="content-layer" style={{ padding: "2.5rem 1.5rem", textAlign: "center" }}>
       <div className="divider" style={{ maxWidth: 600, margin: "0 auto 1.5rem" }} />
-      <p className="eyebrow" style={{ marginBottom: "0.5rem" }}>
-        宇 → 久 → 🧠 · {t("footer_journey")}
-      </p>
       <p style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
-        © {new Date().getFullYear()} {CV.name} · {t("footer_built")} Next.js + React Three Fiber
+        © {new Date().getFullYear()} {CV.name}
       </p>
     </footer>
   );

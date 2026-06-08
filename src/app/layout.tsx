@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Cormorant_Garamond, Shippori_Mincho } from "next/fon
 import "./globals.css";
 import { I18nProvider } from "@/lib/i18n";
 import { ScrollProvider } from "@/lib/scroll";
+import { SiteChrome } from "@/components/SiteChrome";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -39,7 +40,10 @@ export default function RootLayout({
     >
       <body className="min-h-full">
         <I18nProvider>
-          <ScrollProvider>{children}</ScrollProvider>
+          <ScrollProvider>
+            <SiteChrome />
+            {children}
+          </ScrollProvider>
         </I18nProvider>
       </body>
     </html>

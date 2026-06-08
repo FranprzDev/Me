@@ -42,7 +42,6 @@ export interface CV {
   title: Localized<string>;
   location: Localized<string>;
   timezone: string;
-  phone: string;
   email: string;
   linkedin: string;
   summary: Localized<string>;
@@ -63,13 +62,12 @@ export const CV: CV = {
     en: "Cruz Alta — Tucumán, Argentina",
   },
   timezone: "GMT-3",
-  phone: "+54 9 381 541-2480",
   email: "franciscoperezdeveloper@gmail.com",
   linkedin: "https://linkedin.com/in/franprzdev",
 
   summary: {
-    es: "Estudiante de 4to año de Ingeniería en Sistemas de Información, con 2 años de experiencia en la industria y enfoque en el desarrollo de código limpio, robusto y escalable. Me he mostrado versátil, evolucionando de desarrollador fullstack hacia la IA aplicada a proyectos reales, y cuento con experiencia dando charlas y cursos, disfrutando compartir lo aprendido de manera clara y responsable.",
-    en: "Fourth-year Information Systems Engineering student with 2 years of industry experience and a focus on clean, robust and scalable code. I've proven versatile, evolving from a fullstack developer toward AI applied to real projects, and I have experience giving talks and courses, enjoying sharing what I learn in a clear and responsible way.",
+    es: "Estudiante de Ingeniería en Sistemas de Información, con 3 años de experiencia en la industria y enfoque en el desarrollo de código limpio, robusto y escalable.",
+    en: "Information Systems Engineering student with 3 years of industry experience and a focus on clean, robust and scalable code.",
   },
 
   highlights: [

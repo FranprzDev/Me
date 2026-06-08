@@ -1,29 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
-import { useScrollProgress, stageForProgress } from "@/lib/scroll";
-
-const STAGE_LABEL: Record<string, { txt: string; cls: string }> = {
-  space: { txt: "宇 · Espacial", cls: "accent-space" },
-  japan: { txt: "久 · Japón", cls: "accent-japan" },
-  brainrot: { txt: "🧠 · Brainrot", cls: "accent-brain" },
-};
+import { useScrollProgress } from "@/lib/scroll";
 
 export function Nav() {
   const { t, lang, toggle } = useI18n();
   const progress = useScrollProgress();
-  const stage = stageForProgress(progress);
-  const label = STAGE_LABEL[stage];
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Hrefs absolutos: el Nav vive en el layout (todas las rutas). Los anclas a
+  // secciones del home llevan "/" delante para funcionar desde /utn-frt-mcp.
   const links: { href: string; key: Parameters<typeof t>[0] }[] = [
-    { href: "#about", key: "nav_about" },
-    { href: "#experience", key: "nav_experience" },
-    { href: "#education", key: "nav_education" },
-    { href: "#mcp", key: "nav_mcp" },
-    { href: "#projects", key: "nav_projects" },
-    { href: "#contact", key: "nav_contact" },
+    { href: "/#about", key: "nav_about" },
+    { href: "/#experience", key: "nav_experience" },
+    { href: "/#education", key: "nav_education" },
+    { href: "/#projects", key: "nav_projects" },
+    { href: "/#contact", key: "nav_contact" },
   ];
 
   return (
@@ -41,8 +35,8 @@ export function Nav() {
             "linear-gradient(90deg, var(--space), var(--japan), var(--brain))",
           transition: "width 0.1s linear",
         }}
-      />
-      <nav
+        />
+        <nav
         className="content-layer"
         style={{
           position: "fixed",
@@ -55,27 +49,24 @@ export function Nav() {
           justifyContent: "space-between",
           padding: "0.9rem 1.25rem",
         }}
-      >
-        <a href="#top" className="h-display" style={{ fontSize: "1.15rem", fontWeight: 600 }}>
-          FP<span className={label.cls}>.</span>
-        </a>
+        >
+        <Link href="/" className="h-display" style={{ fontSize: "1.15rem", fontWeight: 600 }}>
+          FP.
+        </Link>
 
         <div className="glass-soft" style={{ display: "none", gap: "1.1rem", padding: "0.5rem 1.1rem" }} data-desktop-nav>
           {links.map((l) => (
-            <a key={l.href} href={l.href} className="link-underline" style={{ fontSize: "0.85rem", color: "var(--muted)" }}>
+            <Link key={l.href} href={l.href} className="link-underline" style={{ fontSize: "0.85rem", color: "var(--muted)" }}>
               {t(l.key)}
-            </a>
+            </Link>
           ))}
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
-          <span className={`chip ${label.cls}`} style={{ borderColor: "currentColor" }}>
-            {label.txt}
-          </span>
           <button
             onClick={toggle}
             className="chip"
-            style={{ cursor: "pointer", color: "var(--fg)" }}
+            style={{ cursor: "pointer", color: "var(--fg)", background: "rgba(255,255,255,0.05)" }}
             aria-label="Toggle language"
           >
             {lang === "es" ? "ES · 🇦🇷" : "EN · 🇬🇧"}
@@ -111,14 +102,14 @@ export function Nav() {
           }}
         >
           {links.map((l) => (
-            <a
+            <Link
               key={l.href}
               href={l.href}
               onClick={() => setMenuOpen(false)}
               style={{ padding: "0.6rem 0.4rem", color: "var(--fg)", fontSize: "0.95rem" }}
             >
               {t(l.key)}
-            </a>
+            </Link>
           ))}
         </div>
       )}
