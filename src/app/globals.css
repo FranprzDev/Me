@@ -2,16 +2,22 @@
 
 :root {
   --bg: #05060f;
+  /* Fondo de la escena 3D (lo actualiza el render loop). Definido por defecto
+     para que html/body nunca muestren blanco antes de que arranque WebGL. */
+  --scene-bg: #040612;
   --fg: #f4f4f8;
   --muted: #c2c2da;
 
-  /* acentos por mundo */
-  --space: #5b8cff;
-  --space-2: #9b7bff;
-  --japan: #e0484e;
-  --japan-2: #e9b949;
-  --brain: #39ff14;
-  --brain-2: #ff2bd6;
+  /* Paleta unificada "carta estelar": una sola familia espacial.
+     Las claves japan/brain se conservan como alias hacia tonos del espacio
+     para mantener coherentes las clases existentes (azul · violeta · dorado). */
+  --space: #5b8cff; /* azul estelar (primario) */
+  --space-2: #9b7bff; /* violeta nebulosa */
+  --star: #e9c270; /* dorado estelar (destacados / academia) */
+  --japan: #9b7bff; /* alias -> violeta */
+  --japan-2: #e9c270; /* alias -> dorado estelar */
+  --brain: #7aa2ff; /* alias -> azul claro */
+  --brain-2: #b388ff; /* alias -> violeta claro */
 }
 
 @theme inline {
@@ -33,10 +39,11 @@
 
 html {
   scroll-behavior: smooth;
+  background: var(--scene-bg, var(--bg));
 }
 
 body {
-  background: var(--bg);
+  background: var(--scene-bg, var(--bg));
   color: var(--fg);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
   margin: 0;
@@ -44,24 +51,57 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* El canvas 3D vive en z-0; el contenido por encima. */
+/* El canvas 3D vive en z-0; el contenido por encima. La sombra suave mejora la
+   legibilidad del texto sobre las estrellas/constelaciones del fondo. */
 .content-layer {
   position: relative;
   z-index: 10;
+  text-shadow: 0 1px 16px rgba(2, 4, 12, 0.7);
 }
 
 .section {
-  min-height: 100svh;
+  min-height: 70svh;
   width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 6rem 1.5rem;
+  padding: 3rem 1.5rem;
 }
 
 @media (min-width: 768px) {
   .section {
-    padding: 7rem 2.5rem;
+    padding: 4rem 2.5rem;
+  }
+}
+
+/* Indicador de scroll: flechas que laten hacia abajo. */
+.scroll-cue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--space);
+}
+.scroll-cue span {
+  font-size: 1.5rem;
+  line-height: 0.55;
+  opacity: 0.35;
+  animation: scrollBounce 1.6s ease-in-out infinite;
+}
+.scroll-cue span:nth-child(2) {
+  opacity: 0.65;
+  animation-delay: 0.15s;
+}
+.scroll-cue span:nth-child(3) {
+  opacity: 1;
+  animation-delay: 0.3s;
+}
+@keyframes scrollBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
   }
 }
 
@@ -110,10 +150,10 @@ body {
   text-shadow: 0 0 30px rgba(91, 140, 255, 0.5);
 }
 .glow-japan {
-  text-shadow: 0 0 30px rgba(224, 72, 78, 0.45);
+  text-shadow: 0 0 30px rgba(155, 123, 255, 0.5);
 }
 .glow-brain {
-  text-shadow: 0 0 22px rgba(57, 255, 20, 0.55), 0 0 44px rgba(255, 43, 214, 0.4);
+  text-shadow: 0 0 22px rgba(122, 162, 255, 0.5), 0 0 44px rgba(179, 136, 255, 0.4);
 }
 
 .accent-space {
@@ -200,5 +240,8 @@ button:focus-visible {
   }
   .tilt-card:hover {
     transform: none;
+  }
+  .scroll-cue span {
+    animation: none;
   }
 }

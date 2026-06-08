@@ -21,9 +21,7 @@ const UI = {
   nav_projects: { es: "Proyectos", en: "Projects" },
   nav_contact: { es: "Contacto", en: "Contact" },
 
-  hero_scroll: { es: "Bajá para iniciar el viaje", en: "Scroll to begin the journey" },
-  hero_cta_mcp: { es: "Conectar el MCP", en: "Connect the MCP" },
-  hero_cta_exp: { es: "Ver experiencia", en: "View experience" },
+  hero_cta_mcp: { es: "Conecta mi cerebro", en: "Connect my brain" },
 
   about_title: { es: "Sobre mí", en: "About me" },
 
@@ -34,7 +32,6 @@ const UI = {
   edu_certs: { es: "Certificaciones", en: "Certifications" },
   edu_highlights: { es: "Participaciones destacadas", en: "Highlights" },
 
-  mcp_tag: { es: "Próximamente · En vivo", en: "Coming soon · Live" },
   mcp_title: { es: "Presentando el UTN-FRT-MCP", en: "Introducing the UTN-FRT-MCP" },
   mcp_subtitle: {
     es: "Mis apuntes de la UTN-FRT, accesibles desde tu propia CLI. Sin descargas, sin vueltas.",
@@ -50,16 +47,12 @@ const UI = {
   mcp_stat_levels: { es: "Niveles", en: "Levels" },
   mcp_stat_subjects: { es: "Materias", en: "Subjects" },
   mcp_stat_notes: { es: "Apuntes", en: "Notes" },
-  mcp_note: {
-    es: "El contenido se irá completando. La estructura ya está viva.",
-    en: "Content is being filled in. The structure is already live.",
-  },
 
   proj_title: { es: "Proyectos & logros", en: "Projects & achievements" },
 
   contact_title: { es: "Hablemos", en: "Let's talk" },
   contact_subtitle: {
-    es: "¿Un proyecto, una charla o simplemente saludar? Estoy a un mensaje.",
+    es: "Un proyecto, una charla o simplemente saludar? Estoy a un mensaje.",
     en: "A project, a talk, or just to say hi? I'm one message away.",
   },
 
@@ -88,14 +81,12 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       // Restaurar idioma guardado tras montar (no disponible en SSR).
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setLangState(saved);
-      document.documentElement.lang = saved;
     }
   }, []);
 
   const setLang = (l: Lang) => {
     setLangState(l);
     window.localStorage.setItem("lang", l);
-    document.documentElement.lang = l;
   };
 
   const value = useMemo<I18nCtx>(
