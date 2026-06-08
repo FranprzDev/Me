@@ -14,7 +14,6 @@ type Dict = Record<Lang, string>;
 
 /** Strings de UI (el contenido real vive en data/cv.ts y notes-index.json). */
 const UI = {
-  nav_about: { es: "Sobre mí", en: "About" },
   nav_experience: { es: "Experiencia", en: "Experience" },
   nav_education: { es: "Educación", en: "Education" },
   nav_mcp: { es: "UTN-FRT-MCP", en: "UTN-FRT-MCP" },
@@ -22,8 +21,6 @@ const UI = {
   nav_contact: { es: "Contacto", en: "Contact" },
 
   hero_cta_mcp: { es: "Conecta mi cerebro", en: "Connect my brain" },
-
-  about_title: { es: "Sobre mí", en: "About me" },
 
   exp_title: { es: "Experiencia profesional", en: "Professional experience" },
   exp_present: { es: "Presente", en: "Present" },
@@ -50,10 +47,10 @@ const UI = {
 
   proj_title: { es: "Proyectos & logros", en: "Projects & achievements" },
 
-  contact_title: { es: "Hablemos", en: "Let's talk" },
+  contact_title: { es: "Charlemos", en: "Let's chat" },
   contact_subtitle: {
-    es: "Un proyecto, una charla o simplemente saludar? Estoy a un mensaje.",
-    en: "A project, a talk, or just to say hi? I'm one message away.",
+    es: "¿Un proyecto, una propuesta, o alguna duda? Escribime :)",
+    en: "A project, a proposal, or a question? Drop me a line :)",
   },
 
   footer_built: { es: "Hecho con", en: "Built with" },

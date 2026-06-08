@@ -44,6 +44,8 @@ export interface CV {
   timezone: string;
   email: string;
   linkedin: string;
+  /** Número de WhatsApp en formato internacional sin signos (para wa.me). */
+  whatsapp: string;
   summary: Localized<string>;
   highlights: Highlight[];
   experience: ExperienceItem[];
@@ -64,6 +66,7 @@ export const CV: CV = {
   timezone: "GMT-3",
   email: "franciscoperezdeveloper@gmail.com",
   linkedin: "https://linkedin.com/in/franprzdev",
+  whatsapp: "5493815412480",
 
   summary: {
     es: "Estudiante de Ingeniería en Sistemas de Información, con 3 años de experiencia en la industria y enfoque en el desarrollo de código limpio, robusto y escalable.",

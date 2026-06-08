@@ -1,6 +1,5 @@
 import {
   Hero,
-  About,
   Experience,
   Education,
   Projects,
@@ -12,7 +11,6 @@ export default function Home() {
   return (
     <main className="content-layer">
       <Hero />
-      <About />
       <Experience />
       <Education />
       <Projects />

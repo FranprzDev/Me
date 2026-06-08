@@ -13,7 +13,6 @@ export function Nav() {
   // Hrefs absolutos: el Nav vive en el layout (todas las rutas). Los anclas a
   // secciones del home llevan "/" delante para funcionar desde /utn-frt-mcp.
   const links: { href: string; key: Parameters<typeof t>[0] }[] = [
-    { href: "/#about", key: "nav_about" },
     { href: "/#experience", key: "nav_experience" },
     { href: "/#education", key: "nav_education" },
     { href: "/#projects", key: "nav_projects" },
