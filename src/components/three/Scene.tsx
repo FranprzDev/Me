@@ -6,6 +6,9 @@
    para inicializar buffers de partículas/estrellas: es intencional. */
 /* eslint-disable react-hooks/immutability, react-hooks/purity */
 
+// Debe ir ANTES de @react-three/fiber: parchea console.warn para silenciar el
+// warning de THREE.Clock deprecado que R3F dispara al crear su clock interno.
+import "@/lib/silenceR3FClockWarning";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Stars } from "@react-three/drei";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
@@ -147,7 +150,11 @@ function ConstellationGroup({
   reduced: boolean;
 }) {
   const center = useMemo(() => sectionCenter(data.sectionIndex), [data.sectionIndex]);
-  const ppn = reduced ? 10 : 24;
+  const ambient = data.ambient ?? false;
+  const hero = data.hero ?? false;
+  // Las ambientales son decorado lejano: menos partículas por nodo (más baratas).
+  // `particlesPerNode` permite bajarlo en constelaciones con muchos nodos (palabra).
+  const ppn = data.particlesPerNode ?? (ambient ? (reduced ? 5 : 10) : reduced ? 10 : 24);
 
   const { group, pointsMat, lineMat, geo, home, target, phase, count } = useMemo(() => {
     const count = data.nodes.length * ppn;
@@ -224,9 +231,27 @@ function ConstellationGroup({
     };
   }, [group, pointsMat, lineMat]);
 
+  // Estado dormido: cuando una constelación de sección está lejos de su zona no
+  // hace falta tocar sus partículas. Evita ese trabajo una vez apagada.
+  const sleeping = useRef(false);
+
   useFrame(() => {
-    const w = bumpWeight(pRef.current, center);
-    const e = w * w * (3 - 2 * w); // easing del ensamblado
+    // Ambientales: siempre ensambladas (w = 1). De sección: peso según scroll.
+    const w = ambient ? 1 : bumpWeight(pRef.current, center);
+
+    // Early-out: dormida y ya invisible -> no animamos sus partículas. Con más
+    // constelaciones en escena esto recorta CPU del render loop notablemente.
+    if (!ambient && w < 0.002) {
+      if (!sleeping.current) {
+        pointsMat.opacity = 0;
+        lineMat.opacity = 0;
+        sleeping.current = true;
+      }
+      return;
+    }
+    sleeping.current = false;
+
+    const e = ambient ? 1 : w * w * (3 - 2 * w); // easing del ensamblado
     const t = performance.now() * 0.001;
     const pos = geo.attributes.position.array as Float32Array;
     for (let k = 0; k < count; k++) {
@@ -240,11 +265,25 @@ function ConstellationGroup({
       pos[k * 3 + 2] = home[k * 3 + 2] + (0 - home[k * 3 + 2]) * e;
     }
     geo.attributes.position.needsUpdate = true;
-    // Pico de opacidad bajo: las constelaciones quedan de fondo y no compiten
-    // con el texto en primer plano.
-    pointsMat.opacity = 0.06 + 0.5 * w;
-    pointsMat.size = 0.13 + 0.12 * w;
-    lineMat.opacity = 0.32 * e;
+
+    if (ambient) {
+      // Decorado lejano: muy tenue y constante, con un leve latido para que no
+      // se sienta estático. Nunca compite por la atención.
+      const pulse = reduced ? 0 : Math.sin(t * 0.4 + phase[0]) * 0.02;
+      pointsMat.opacity = 0.09 + pulse;
+      pointsMat.size = 0.1;
+      lineMat.opacity = 0.1 + pulse;
+    } else if (hero) {
+      // Protagonista (la palabra "CHARLEMOS"): brilla como título de la sección.
+      pointsMat.opacity = 0.1 + 0.75 * w;
+      pointsMat.size = 0.14 + 0.16 * w;
+      lineMat.opacity = 0.6 * e;
+    } else {
+      // Pico de opacidad bajo: quedan de fondo y no compiten con el texto.
+      pointsMat.opacity = 0.04 + 0.34 * w;
+      pointsMat.size = 0.12 + 0.12 * w;
+      lineMat.opacity = 0.26 * e;
+    }
   });
 
   return <primitive object={group} />;
@@ -353,6 +392,16 @@ function Rig({ reduced, minimal }: { reduced: boolean; minimal: boolean }) {
 export default function Scene({ minimal = false }: { minimal?: boolean }) {
   const reduced = useReducedMotion();
   const [dpr, setDpr] = useState<[number, number]>([1, 1.5]);
+  // Pausamos el loop cuando la pestaña queda oculta: no tiene sentido animar
+  // estrellas que nadie ve (ahorra GPU/CPU y batería en segundo plano).
+  const [frameloop, setFrameloop] = useState<"always" | "never">("always");
+
+  useEffect(() => {
+    const onVis = () =>
+      setFrameloop(document.visibilityState === "hidden" ? "never" : "always");
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
 
   useEffect(() => {
     // DPR adaptativo: en pantallas chicas bajamos resolución por performance.
@@ -381,7 +430,7 @@ export default function Scene({ minimal = false }: { minimal?: boolean }) {
       <Canvas
         camera={{ position: [0, 0.3, 6], fov: 60 }}
         dpr={dpr}
-        frameloop="always"
+        frameloop={frameloop}
         // Debounce del resize: re-mide tras 50ms en lugar de en cada píxel.
         resize={{ scroll: false, debounce: { scroll: 0, resize: 50 } }}
         // alpha:false -> canvas OPACO. Sin transparencia no hay flash blanco.

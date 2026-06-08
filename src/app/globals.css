@@ -40,6 +40,16 @@
 html {
   scroll-behavior: smooth;
   background: var(--scene-bg, var(--bg));
+
+  /* Snap por secciones: cada gesto de rueda ancla a la sección y el viaje se
+     siente como ir "de una estación a otra" (no scroll continuo y tosco).
+     `proximity` (no `mandatory`) deja leer libremente las secciones más altas
+     que el viewport, p.ej. Educación, sin atrapar el contenido. */
+  scroll-snap-type: y proximity;
+
+  /* Scrollbar integrado a la paleta estelar (Firefox). */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(123, 150, 255, 0.4) transparent;
 }
 
 body {
@@ -51,6 +61,26 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Scrollbar integrado (WebKit/Chromium): fino, translúcido y con la gradiente
+   espacial; flota sobre el cosmos sin romper la estética. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--space), var(--space-2));
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--brain), var(--space-2));
+  background-clip: padding-box;
+}
+
 /* El canvas 3D vive en z-0; el contenido por encima. La sombra suave mejora la
    legibilidad del texto sobre las estrellas/constelaciones del fondo. */
 .content-layer {
@@ -60,12 +90,18 @@ body {
 }
 
 .section {
-  min-height: 70svh;
+  min-height: 100svh;
   width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 3rem 1.5rem;
+  /* Punto de anclaje del snap: el borde superior de cada sección. Sin
+     `scroll-snap-stop: always` a propósito —ese forzaba una parada dura en cada
+     borde y hacía que la rueda se sintiera "atascada". Con `proximity` (en html)
+     y sólo `align: start`, dentro de la sección el scroll es libre/normal y al
+     acercarse a un borde ancla suave a la siguiente "estación". */
+  scroll-snap-align: start;
 }
 
 @media (min-width: 768px) {

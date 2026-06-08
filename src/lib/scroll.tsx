@@ -15,10 +15,10 @@ import {
  * [0..1] y enciende su constelación al pasar por su centro.
  *
  * Orden de secciones (debe coincidir con page.tsx y con CONSTELLATIONS):
- *   0 Hero · 1 About · 2 Experiencia · 3 Educación · 4 Proyectos · 5 Contacto
+ *   0 Hero · 1 Experiencia · 2 Educación · 3 Proyectos · 4 Contacto
  * (El MCP vive en su propia ruta /utn-frt-mcp, fuera de este viaje.)
  */
-export const SECTION_COUNT = 6;
+export const SECTION_COUNT = 5;
 
 export function smoothstep(edge0: number, edge1: number, x: number): number {
   const t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));

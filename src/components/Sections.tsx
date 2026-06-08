@@ -5,6 +5,7 @@ import { CV } from "@/data/cv";
 import { PROJECTS } from "@/data/projects";
 import { useI18n } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
+import { ContactConstellations } from "@/components/ContactConstellations";
 
 export function Hero() {
   const { t, tl } = useI18n();
@@ -45,28 +46,6 @@ export function Hero() {
             <span>⌄</span>
             <span>⌄</span>
             <span>⌄</span>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-export function About() {
-  const { t, tl } = useI18n();
-  return (
-    <section id="about" className="section">
-      <div className="wrap">
-        <Reveal>
-          <h2 className="h-display" style={{ fontSize: "clamp(2rem, 5vw, 3.4rem)", margin: "0.4rem 0 1.4rem" }}>
-            {t("about_title")}
-          </h2>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <div className="glass" style={{ padding: "1.8rem", maxWidth: 760 }}>
-            <p style={{ fontSize: "1.15rem", lineHeight: 1.8, color: "var(--fg)", margin: 0 }}>
-              {tl(CV.summary)}
-            </p>
           </div>
         </Reveal>
       </div>
@@ -218,29 +197,25 @@ export function Projects() {
 
 export function Contact() {
   const { t } = useI18n();
-  const items = [
-    { label: "Email", value: CV.email, href: `mailto:${CV.email}` },
-    { label: "LinkedIn", value: "in/franprzdev", href: CV.linkedin },
-  ];
   return (
-    <section id="contact" className="section" style={{ minHeight: "80svh" }}>
+    <section id="contact" className="section" style={{ minHeight: "100svh", justifyContent: "center" }}>
       <div className="wrap" style={{ textAlign: "center" }}>
+        {/* El título de la sección es la constelación "CHARLEMOS" que se ensambla
+            en el canvas 3D de fondo. Lo declaramos como heading oculto para
+            lectores de pantalla y el esquema del documento. */}
+        <h2 className="sr-only">{t("contact_title")}</h2>
+
+        {/* Espacio reservado para que la palabra-constelación 3D respire arriba. */}
+        <div aria-hidden style={{ height: "clamp(110px, 22vh, 220px)" }} />
+
         <Reveal>
-          <h2 className="h-display glow-brain" style={{ fontSize: "clamp(2.2rem, 6vw, 4rem)", margin: "0.4rem 0 0.8rem" }}>
-            {t("contact_title")}
-          </h2>
-          <p style={{ color: "var(--muted)", maxWidth: 540, margin: "0 auto 2rem" }}>{t("contact_subtitle")}</p>
+          <p style={{ color: "var(--muted)", maxWidth: 560, margin: "0 auto", fontSize: "1.05rem" }}>
+            {t("contact_subtitle")}
+          </p>
         </Reveal>
-        <div style={{ display: "flex", gap: "0.9rem", flexWrap: "wrap", justifyContent: "center" }}>
-          {items.map((it, i) => (
-            <Reveal key={it.label} delay={i * 0.06}>
-              <a href={it.href} target="_blank" rel="noreferrer" className="glass tilt-card" style={{ padding: "1rem 1.4rem", display: "block", textAlign: "left", minWidth: 200 }}>
-                <span className="eyebrow">{it.label}</span>
-                <p style={{ margin: "0.3rem 0 0", color: "var(--fg)", fontWeight: 600 }}>{it.value}</p>
-              </a>
-            </Reveal>
-          ))}
-        </div>
+        <Reveal delay={0.1}>
+          <ContactConstellations />
+        </Reveal>
       </div>
     </section>
   );
