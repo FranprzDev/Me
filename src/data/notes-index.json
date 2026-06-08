@@ -1,0 +1,1388 @@
+{
+  "generatedAt": "2026-06-07T09:42:25.735Z",
+  "totals": {
+    "levels": 5,
+    "subjects": 32,
+    "notes": 32
+  },
+  "levels": [
+    {
+      "id": "1er-nivel",
+      "label": "1er Nivel (Primer Año)",
+      "subjects": [
+        {
+          "id": "1er-nivel/algebra-y-geometria-analitica",
+          "subjectId": "algebra-y-geometria-analitica",
+          "name": "Álgebra y Geometría Analítica",
+          "fileCount": 1
+        },
+        {
+          "id": "1er-nivel/algoritmos-y-estructura-de-datos",
+          "subjectId": "algoritmos-y-estructura-de-datos",
+          "name": "Algoritmos y Estructura de Datos",
+          "fileCount": 1
+        },
+        {
+          "id": "1er-nivel/analisis-matematico-i",
+          "subjectId": "analisis-matematico-i",
+          "name": "Análisis Matemático I",
+          "fileCount": 1
+        },
+        {
+          "id": "1er-nivel/arquitectura-de-computadoras",
+          "subjectId": "arquitectura-de-computadoras",
+          "name": "Arquitectura de Computadoras",
+          "fileCount": 1
+        },
+        {
+          "id": "1er-nivel/fisica-i",
+          "subjectId": "fisica-i",
+          "name": "Física I",
+          "fileCount": 1
+        },
+        {
+          "id": "1er-nivel/ingenieria-y-sociedad",
+          "subjectId": "ingenieria-y-sociedad",
+          "name": "Ingeniería y Sociedad",
+          "fileCount": 1
+        },
+        {
+          "id": "1er-nivel/matematica-discreta",
+          "subjectId": "matematica-discreta",
+          "name": "Matemática Discreta",
+          "fileCount": 1
+        },
+        {
+          "id": "1er-nivel/sistemas-de-representacion-dibujo",
+          "subjectId": "sistemas-de-representacion-dibujo",
+          "name": "Sistemas de Representación (Dibujo)",
+          "fileCount": 1
+        },
+        {
+          "id": "1er-nivel/sistemas-y-organizaciones",
+          "subjectId": "sistemas-y-organizaciones",
+          "name": "Sistemas y Organizaciones",
+          "fileCount": 1
+        }
+      ]
+    },
+    {
+      "id": "2do-nivel",
+      "label": "2do Nivel (Segundo Año)",
+      "subjects": [
+        {
+          "id": "2do-nivel/analisis-de-sistemas",
+          "subjectId": "analisis-de-sistemas",
+          "name": "Análisis de Sistemas",
+          "fileCount": 1
+        },
+        {
+          "id": "2do-nivel/analisis-matematico-ii",
+          "subjectId": "analisis-matematico-ii",
+          "name": "Análisis Matemático II",
+          "fileCount": 1
+        },
+        {
+          "id": "2do-nivel/fisica-ii",
+          "subjectId": "fisica-ii",
+          "name": "Física II",
+          "fileCount": 1
+        },
+        {
+          "id": "2do-nivel/ingles-i",
+          "subjectId": "ingles-i",
+          "name": "Inglés I",
+          "fileCount": 1
+        },
+        {
+          "id": "2do-nivel/paradigmas-de-programacion",
+          "subjectId": "paradigmas-de-programacion",
+          "name": "Paradigmas de Programación",
+          "fileCount": 1
+        },
+        {
+          "id": "2do-nivel/sintaxis-y-semantica-de-los-lenguajes",
+          "subjectId": "sintaxis-y-semantica-de-los-lenguajes",
+          "name": "Sintaxis y Semántica de los Lenguajes",
+          "fileCount": 1
+        },
+        {
+          "id": "2do-nivel/sistemas-operativos",
+          "subjectId": "sistemas-operativos",
+          "name": "Sistemas Operativos",
+          "fileCount": 1
+        }
+      ]
+    },
+    {
+      "id": "3er-nivel",
+      "label": "3er Nivel (Tercer Año)",
+      "subjects": [
+        {
+          "id": "3er-nivel/comunicaciones",
+          "subjectId": "comunicaciones",
+          "name": "Comunicaciones",
+          "fileCount": 1
+        },
+        {
+          "id": "3er-nivel/diseno-de-sistemas",
+          "subjectId": "diseno-de-sistemas",
+          "name": "Diseño de Sistemas",
+          "fileCount": 1
+        },
+        {
+          "id": "3er-nivel/economia",
+          "subjectId": "economia",
+          "name": "Economía",
+          "fileCount": 1
+        },
+        {
+          "id": "3er-nivel/electiva-gestion-de-procesos-de-negocios",
+          "subjectId": "electiva-gestion-de-procesos-de-negocios",
+          "name": "[Electiva] Gestión de Procesos de Negocios",
+          "fileCount": 1
+        },
+        {
+          "id": "3er-nivel/electiva-seguridad-informatica",
+          "subjectId": "electiva-seguridad-informatica",
+          "name": "[Electiva] Seguridad Informática",
+          "fileCount": 1
+        },
+        {
+          "id": "3er-nivel/gestion-de-datos",
+          "subjectId": "gestion-de-datos",
+          "name": "Gestión de Datos",
+          "fileCount": 1
+        },
+        {
+          "id": "3er-nivel/matematica-superior",
+          "subjectId": "matematica-superior",
+          "name": "Matemática Superior",
+          "fileCount": 1
+        },
+        {
+          "id": "3er-nivel/probabilidad-y-estadistica",
+          "subjectId": "probabilidad-y-estadistica",
+          "name": "Probabilidad y Estadística",
+          "fileCount": 1
+        },
+        {
+          "id": "3er-nivel/seminario-de-integracion-profesional",
+          "subjectId": "seminario-de-integracion-profesional",
+          "name": "Seminario de Integración Profesional",
+          "fileCount": 1
+        }
+      ]
+    },
+    {
+      "id": "4to-nivel",
+      "label": "4to Nivel (Cuarto Año)",
+      "subjects": [
+        {
+          "id": "4to-nivel/administracion-de-recursos",
+          "subjectId": "administracion-de-recursos",
+          "name": "Administración de Recursos",
+          "fileCount": 1
+        },
+        {
+          "id": "4to-nivel/ingenieria-de-software",
+          "subjectId": "ingenieria-de-software",
+          "name": "Ingeniería de Software",
+          "fileCount": 1
+        },
+        {
+          "id": "4to-nivel/investigacion-operativa",
+          "subjectId": "investigacion-operativa",
+          "name": "Investigación Operativa",
+          "fileCount": 1
+        },
+        {
+          "id": "4to-nivel/legislacion",
+          "subjectId": "legislacion",
+          "name": "Legislación",
+          "fileCount": 1
+        },
+        {
+          "id": "4to-nivel/redes",
+          "subjectId": "redes",
+          "name": "Redes",
+          "fileCount": 1
+        },
+        {
+          "id": "4to-nivel/simulacion",
+          "subjectId": "simulacion",
+          "name": "Simulación",
+          "fileCount": 1
+        }
+      ]
+    },
+    {
+      "id": "5to-nivel",
+      "label": "5to Nivel (Quinto Año)",
+      "subjects": [
+        {
+          "id": "5to-nivel/electiva-calidad-de-software",
+          "subjectId": "electiva-calidad-de-software",
+          "name": "[Electiva] Calidad de Software",
+          "fileCount": 1
+        }
+      ]
+    }
+  ],
+  "subjects": [
+    {
+      "id": "1er-nivel/algebra-y-geometria-analitica",
+      "subjectId": "algebra-y-geometria-analitica",
+      "name": "Álgebra y Geometría Analítica",
+      "level": "1er-nivel",
+      "levelLabel": "1er Nivel (Primer Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "1er-nivel/algebra-y-geometria-analitica/algebra-y-geometria-analitica",
+          "title": "Álgebra y Geometría Analítica",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "1er-nivel/algoritmos-y-estructura-de-datos",
+      "subjectId": "algoritmos-y-estructura-de-datos",
+      "name": "Algoritmos y Estructura de Datos",
+      "level": "1er-nivel",
+      "levelLabel": "1er Nivel (Primer Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "1er-nivel/algoritmos-y-estructura-de-datos/algoritmos-y-estructura-de-datos",
+          "title": "Algoritmos y Estructura de Datos",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "1er-nivel/analisis-matematico-i",
+      "subjectId": "analisis-matematico-i",
+      "name": "Análisis Matemático I",
+      "level": "1er-nivel",
+      "levelLabel": "1er Nivel (Primer Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "1er-nivel/analisis-matematico-i/analisis-matematico-i",
+          "title": "Análisis Matemático I",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "1er-nivel/arquitectura-de-computadoras",
+      "subjectId": "arquitectura-de-computadoras",
+      "name": "Arquitectura de Computadoras",
+      "level": "1er-nivel",
+      "levelLabel": "1er Nivel (Primer Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "1er-nivel/arquitectura-de-computadoras/arquitectura-de-computadoras",
+          "title": "Arquitectura de Computadoras",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "1er-nivel/fisica-i",
+      "subjectId": "fisica-i",
+      "name": "Física I",
+      "level": "1er-nivel",
+      "levelLabel": "1er Nivel (Primer Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "1er-nivel/fisica-i/fisica-i",
+          "title": "Física I",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "1er-nivel/ingenieria-y-sociedad",
+      "subjectId": "ingenieria-y-sociedad",
+      "name": "Ingeniería y Sociedad",
+      "level": "1er-nivel",
+      "levelLabel": "1er Nivel (Primer Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "1er-nivel/ingenieria-y-sociedad/ingenieria-y-sociedad",
+          "title": "Ingeniería y Sociedad",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "1er-nivel/matematica-discreta",
+      "subjectId": "matematica-discreta",
+      "name": "Matemática Discreta",
+      "level": "1er-nivel",
+      "levelLabel": "1er Nivel (Primer Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "1er-nivel/matematica-discreta/matematica-discreta",
+          "title": "Matemática Discreta",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "1er-nivel/sistemas-de-representacion-dibujo",
+      "subjectId": "sistemas-de-representacion-dibujo",
+      "name": "Sistemas de Representación (Dibujo)",
+      "level": "1er-nivel",
+      "levelLabel": "1er Nivel (Primer Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "1er-nivel/sistemas-de-representacion-dibujo/sistemas-de-representacion-dibujo",
+          "title": "Sistemas de Representación (Dibujo)",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "1er-nivel/sistemas-y-organizaciones",
+      "subjectId": "sistemas-y-organizaciones",
+      "name": "Sistemas y Organizaciones",
+      "level": "1er-nivel",
+      "levelLabel": "1er Nivel (Primer Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "1er-nivel/sistemas-y-organizaciones/sistemas-y-organizaciones",
+          "title": "Sistemas y Organizaciones",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "2do-nivel/analisis-de-sistemas",
+      "subjectId": "analisis-de-sistemas",
+      "name": "Análisis de Sistemas",
+      "level": "2do-nivel",
+      "levelLabel": "2do Nivel (Segundo Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "2do-nivel/analisis-de-sistemas/analisis-de-sistemas",
+          "title": "Análisis de Sistemas",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "2do-nivel/analisis-matematico-ii",
+      "subjectId": "analisis-matematico-ii",
+      "name": "Análisis Matemático II",
+      "level": "2do-nivel",
+      "levelLabel": "2do Nivel (Segundo Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "2do-nivel/analisis-matematico-ii/analisis-matematico-ii",
+          "title": "Análisis Matemático II",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "2do-nivel/fisica-ii",
+      "subjectId": "fisica-ii",
+      "name": "Física II",
+      "level": "2do-nivel",
+      "levelLabel": "2do Nivel (Segundo Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "2do-nivel/fisica-ii/fisica-ii",
+          "title": "Física II",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "2do-nivel/ingles-i",
+      "subjectId": "ingles-i",
+      "name": "Inglés I",
+      "level": "2do-nivel",
+      "levelLabel": "2do Nivel (Segundo Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "2do-nivel/ingles-i/ingles-i",
+          "title": "Inglés I",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "2do-nivel/paradigmas-de-programacion",
+      "subjectId": "paradigmas-de-programacion",
+      "name": "Paradigmas de Programación",
+      "level": "2do-nivel",
+      "levelLabel": "2do Nivel (Segundo Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "2do-nivel/paradigmas-de-programacion/paradigmas-de-programacion",
+          "title": "Paradigmas de Programación",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "2do-nivel/sintaxis-y-semantica-de-los-lenguajes",
+      "subjectId": "sintaxis-y-semantica-de-los-lenguajes",
+      "name": "Sintaxis y Semántica de los Lenguajes",
+      "level": "2do-nivel",
+      "levelLabel": "2do Nivel (Segundo Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "2do-nivel/sintaxis-y-semantica-de-los-lenguajes/sintaxis-y-semantica-de-los-lenguajes",
+          "title": "Sintaxis y Semántica de los Lenguajes",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "2do-nivel/sistemas-operativos",
+      "subjectId": "sistemas-operativos",
+      "name": "Sistemas Operativos",
+      "level": "2do-nivel",
+      "levelLabel": "2do Nivel (Segundo Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "2do-nivel/sistemas-operativos/sistemas-operativos",
+          "title": "Sistemas Operativos",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "3er-nivel/comunicaciones",
+      "subjectId": "comunicaciones",
+      "name": "Comunicaciones",
+      "level": "3er-nivel",
+      "levelLabel": "3er Nivel (Tercer Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "3er-nivel/comunicaciones/comunicaciones",
+          "title": "Comunicaciones",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "3er-nivel/diseno-de-sistemas",
+      "subjectId": "diseno-de-sistemas",
+      "name": "Diseño de Sistemas",
+      "level": "3er-nivel",
+      "levelLabel": "3er Nivel (Tercer Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "3er-nivel/diseno-de-sistemas/diseno-de-sistemas",
+          "title": "Diseño de Sistemas",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "3er-nivel/economia",
+      "subjectId": "economia",
+      "name": "Economía",
+      "level": "3er-nivel",
+      "levelLabel": "3er Nivel (Tercer Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "3er-nivel/economia/economia",
+          "title": "Economía",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "3er-nivel/electiva-gestion-de-procesos-de-negocios",
+      "subjectId": "electiva-gestion-de-procesos-de-negocios",
+      "name": "[Electiva] Gestión de Procesos de Negocios",
+      "level": "3er-nivel",
+      "levelLabel": "3er Nivel (Tercer Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "3er-nivel/electiva-gestion-de-procesos-de-negocios/electiva-gestion-de-procesos-de-negocios",
+          "title": "[Electiva] Gestión de Procesos de Negocios",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "3er-nivel/electiva-seguridad-informatica",
+      "subjectId": "electiva-seguridad-informatica",
+      "name": "[Electiva] Seguridad Informática",
+      "level": "3er-nivel",
+      "levelLabel": "3er Nivel (Tercer Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "3er-nivel/electiva-seguridad-informatica/electiva-seguridad-informatica",
+          "title": "[Electiva] Seguridad Informática",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "3er-nivel/gestion-de-datos",
+      "subjectId": "gestion-de-datos",
+      "name": "Gestión de Datos",
+      "level": "3er-nivel",
+      "levelLabel": "3er Nivel (Tercer Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "3er-nivel/gestion-de-datos/gestion-de-datos",
+          "title": "Gestión de Datos",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "3er-nivel/matematica-superior",
+      "subjectId": "matematica-superior",
+      "name": "Matemática Superior",
+      "level": "3er-nivel",
+      "levelLabel": "3er Nivel (Tercer Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "3er-nivel/matematica-superior/matematica-superior",
+          "title": "Matemática Superior",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "3er-nivel/probabilidad-y-estadistica",
+      "subjectId": "probabilidad-y-estadistica",
+      "name": "Probabilidad y Estadística",
+      "level": "3er-nivel",
+      "levelLabel": "3er Nivel (Tercer Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "3er-nivel/probabilidad-y-estadistica/probabilidad-y-estadistica",
+          "title": "Probabilidad y Estadística",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "3er-nivel/seminario-de-integracion-profesional",
+      "subjectId": "seminario-de-integracion-profesional",
+      "name": "Seminario de Integración Profesional",
+      "level": "3er-nivel",
+      "levelLabel": "3er Nivel (Tercer Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "3er-nivel/seminario-de-integracion-profesional/seminario-de-integracion-profesional",
+          "title": "Seminario de Integración Profesional",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "4to-nivel/administracion-de-recursos",
+      "subjectId": "administracion-de-recursos",
+      "name": "Administración de Recursos",
+      "level": "4to-nivel",
+      "levelLabel": "4to Nivel (Cuarto Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "4to-nivel/administracion-de-recursos/administracion-de-recursos",
+          "title": "Administración de Recursos",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "4to-nivel/ingenieria-de-software",
+      "subjectId": "ingenieria-de-software",
+      "name": "Ingeniería de Software",
+      "level": "4to-nivel",
+      "levelLabel": "4to Nivel (Cuarto Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "4to-nivel/ingenieria-de-software/ingenieria-de-software",
+          "title": "Ingeniería de Software",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "4to-nivel/investigacion-operativa",
+      "subjectId": "investigacion-operativa",
+      "name": "Investigación Operativa",
+      "level": "4to-nivel",
+      "levelLabel": "4to Nivel (Cuarto Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "4to-nivel/investigacion-operativa/investigacion-operativa",
+          "title": "Investigación Operativa",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "4to-nivel/legislacion",
+      "subjectId": "legislacion",
+      "name": "Legislación",
+      "level": "4to-nivel",
+      "levelLabel": "4to Nivel (Cuarto Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "4to-nivel/legislacion/legislacion",
+          "title": "Legislación",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "4to-nivel/redes",
+      "subjectId": "redes",
+      "name": "Redes",
+      "level": "4to-nivel",
+      "levelLabel": "4to Nivel (Cuarto Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "4to-nivel/redes/redes",
+          "title": "Redes",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "4to-nivel/simulacion",
+      "subjectId": "simulacion",
+      "name": "Simulación",
+      "level": "4to-nivel",
+      "levelLabel": "4to Nivel (Cuarto Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "4to-nivel/simulacion/simulacion",
+          "title": "Simulación",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    },
+    {
+      "id": "5to-nivel/electiva-calidad-de-software",
+      "subjectId": "electiva-calidad-de-software",
+      "name": "[Electiva] Calidad de Software",
+      "level": "5to-nivel",
+      "levelLabel": "5to Nivel (Quinto Año)",
+      "fileCount": 1,
+      "files": [
+        {
+          "id": "5to-nivel/electiva-calidad-de-software/electiva-calidad-de-software",
+          "title": "[Electiva] Calidad de Software",
+          "type": "md",
+          "status": "pendiente"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "id": "1er-nivel/algebra-y-geometria-analitica/algebra-y-geometria-analitica",
+      "title": "Álgebra y Geometría Analítica",
+      "level": "1er-nivel",
+      "levelLabel": "1er Nivel (Primer Año)",
+      "subject": "Álgebra y Geometría Analítica",
+      "subjectId": "algebra-y-geometria-analitica",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "algebra-y-geometria-analitica.md",
+      "url": null,
+      "description": "",
+      "content": "# Álgebra y Geometría Analítica\n\n> Apunte de **Álgebra y Geometría Analítica** — 1er Nivel (Primer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Álgebra y Geometría Analítica\n\n> Apunte de **Álgebra y Geometría Analítica** — 1er Nivel (Primer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "1er-nivel/algoritmos-y-estructura-de-datos/algoritmos-y-estructura-de-datos",
+      "title": "Algoritmos y Estructura de Datos",
+      "level": "1er-nivel",
+      "levelLabel": "1er Nivel (Primer Año)",
+      "subject": "Algoritmos y Estructura de Datos",
+      "subjectId": "algoritmos-y-estructura-de-datos",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "algoritmos-y-estructura-de-datos.md",
+      "url": null,
+      "description": "",
+      "content": "# Algoritmos y Estructura de Datos\n\n> Apunte de **Algoritmos y Estructura de Datos** — 1er Nivel (Primer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Algoritmos y Estructura de Datos\n\n> Apunte de **Algoritmos y Estructura de Datos** — 1er Nivel (Primer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "1er-nivel/analisis-matematico-i/analisis-matematico-i",
+      "title": "Análisis Matemático I",
+      "level": "1er-nivel",
+      "levelLabel": "1er Nivel (Primer Año)",
+      "subject": "Análisis Matemático I",
+      "subjectId": "analisis-matematico-i",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "analisis-matematico-i.md",
+      "url": null,
+      "description": "",
+      "content": "# Análisis Matemático I\n\n> Apunte de **Análisis Matemático I** — 1er Nivel (Primer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Análisis Matemático I\n\n> Apunte de **Análisis Matemático I** — 1er Nivel (Primer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "1er-nivel/arquitectura-de-computadoras/arquitectura-de-computadoras",
+      "title": "Arquitectura de Computadoras",
+      "level": "1er-nivel",
+      "levelLabel": "1er Nivel (Primer Año)",
+      "subject": "Arquitectura de Computadoras",
+      "subjectId": "arquitectura-de-computadoras",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "arquitectura-de-computadoras.md",
+      "url": null,
+      "description": "",
+      "content": "# Arquitectura de Computadoras\n\n> Apunte de **Arquitectura de Computadoras** — 1er Nivel (Primer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Arquitectura de Computadoras\n\n> Apunte de **Arquitectura de Computadoras** — 1er Nivel (Primer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "1er-nivel/fisica-i/fisica-i",
+      "title": "Física I",
+      "level": "1er-nivel",
+      "levelLabel": "1er Nivel (Primer Año)",
+      "subject": "Física I",
+      "subjectId": "fisica-i",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "fisica-i.md",
+      "url": null,
+      "description": "",
+      "content": "# Física I\n\n> Apunte de **Física I** — 1er Nivel (Primer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Física I\n\n> Apunte de **Física I** — 1er Nivel (Primer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "1er-nivel/ingenieria-y-sociedad/ingenieria-y-sociedad",
+      "title": "Ingeniería y Sociedad",
+      "level": "1er-nivel",
+      "levelLabel": "1er Nivel (Primer Año)",
+      "subject": "Ingeniería y Sociedad",
+      "subjectId": "ingenieria-y-sociedad",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "ingenieria-y-sociedad.md",
+      "url": null,
+      "description": "",
+      "content": "# Ingeniería y Sociedad\n\n> Apunte de **Ingeniería y Sociedad** — 1er Nivel (Primer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Ingeniería y Sociedad\n\n> Apunte de **Ingeniería y Sociedad** — 1er Nivel (Primer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "1er-nivel/matematica-discreta/matematica-discreta",
+      "title": "Matemática Discreta",
+      "level": "1er-nivel",
+      "levelLabel": "1er Nivel (Primer Año)",
+      "subject": "Matemática Discreta",
+      "subjectId": "matematica-discreta",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "matematica-discreta.md",
+      "url": null,
+      "description": "",
+      "content": "# Matemática Discreta\n\n> Apunte de **Matemática Discreta** — 1er Nivel (Primer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Matemática Discreta\n\n> Apunte de **Matemática Discreta** — 1er Nivel (Primer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "1er-nivel/sistemas-de-representacion-dibujo/sistemas-de-representacion-dibujo",
+      "title": "Sistemas de Representación (Dibujo)",
+      "level": "1er-nivel",
+      "levelLabel": "1er Nivel (Primer Año)",
+      "subject": "Sistemas de Representación (Dibujo)",
+      "subjectId": "sistemas-de-representacion-dibujo",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "sistemas-de-representacion-dibujo.md",
+      "url": null,
+      "description": "",
+      "content": "# Sistemas de Representación (Dibujo)\n\n> Apunte de **Sistemas de Representación (Dibujo)** — 1er Nivel (Primer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Sistemas de Representación (Dibujo)\n\n> Apunte de **Sistemas de Representación (Dibujo)** — 1er Nivel (Primer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "1er-nivel/sistemas-y-organizaciones/sistemas-y-organizaciones",
+      "title": "Sistemas y Organizaciones",
+      "level": "1er-nivel",
+      "levelLabel": "1er Nivel (Primer Año)",
+      "subject": "Sistemas y Organizaciones",
+      "subjectId": "sistemas-y-organizaciones",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "sistemas-y-organizaciones.md",
+      "url": null,
+      "description": "",
+      "content": "# Sistemas y Organizaciones\n\n> Apunte de **Sistemas y Organizaciones** — 1er Nivel (Primer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Sistemas y Organizaciones\n\n> Apunte de **Sistemas y Organizaciones** — 1er Nivel (Primer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "2do-nivel/analisis-de-sistemas/analisis-de-sistemas",
+      "title": "Análisis de Sistemas",
+      "level": "2do-nivel",
+      "levelLabel": "2do Nivel (Segundo Año)",
+      "subject": "Análisis de Sistemas",
+      "subjectId": "analisis-de-sistemas",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "analisis-de-sistemas.md",
+      "url": null,
+      "description": "",
+      "content": "# Análisis de Sistemas\n\n> Apunte de **Análisis de Sistemas** — 2do Nivel (Segundo Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Análisis de Sistemas\n\n> Apunte de **Análisis de Sistemas** — 2do Nivel (Segundo Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "2do-nivel/analisis-matematico-ii/analisis-matematico-ii",
+      "title": "Análisis Matemático II",
+      "level": "2do-nivel",
+      "levelLabel": "2do Nivel (Segundo Año)",
+      "subject": "Análisis Matemático II",
+      "subjectId": "analisis-matematico-ii",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "analisis-matematico-ii.md",
+      "url": null,
+      "description": "",
+      "content": "# Análisis Matemático II\n\n> Apunte de **Análisis Matemático II** — 2do Nivel (Segundo Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Análisis Matemático II\n\n> Apunte de **Análisis Matemático II** — 2do Nivel (Segundo Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "2do-nivel/fisica-ii/fisica-ii",
+      "title": "Física II",
+      "level": "2do-nivel",
+      "levelLabel": "2do Nivel (Segundo Año)",
+      "subject": "Física II",
+      "subjectId": "fisica-ii",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "fisica-ii.md",
+      "url": null,
+      "description": "",
+      "content": "# Física II\n\n> Apunte de **Física II** — 2do Nivel (Segundo Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Física II\n\n> Apunte de **Física II** — 2do Nivel (Segundo Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "2do-nivel/ingles-i/ingles-i",
+      "title": "Inglés I",
+      "level": "2do-nivel",
+      "levelLabel": "2do Nivel (Segundo Año)",
+      "subject": "Inglés I",
+      "subjectId": "ingles-i",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "ingles-i.md",
+      "url": null,
+      "description": "",
+      "content": "# Inglés I\n\n> Apunte de **Inglés I** — 2do Nivel (Segundo Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Inglés I\n\n> Apunte de **Inglés I** — 2do Nivel (Segundo Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "2do-nivel/paradigmas-de-programacion/paradigmas-de-programacion",
+      "title": "Paradigmas de Programación",
+      "level": "2do-nivel",
+      "levelLabel": "2do Nivel (Segundo Año)",
+      "subject": "Paradigmas de Programación",
+      "subjectId": "paradigmas-de-programacion",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "paradigmas-de-programacion.md",
+      "url": null,
+      "description": "",
+      "content": "# Paradigmas de Programación\n\n> Apunte de **Paradigmas de Programación** — 2do Nivel (Segundo Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Paradigmas de Programación\n\n> Apunte de **Paradigmas de Programación** — 2do Nivel (Segundo Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "2do-nivel/sintaxis-y-semantica-de-los-lenguajes/sintaxis-y-semantica-de-los-lenguajes",
+      "title": "Sintaxis y Semántica de los Lenguajes",
+      "level": "2do-nivel",
+      "levelLabel": "2do Nivel (Segundo Año)",
+      "subject": "Sintaxis y Semántica de los Lenguajes",
+      "subjectId": "sintaxis-y-semantica-de-los-lenguajes",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "sintaxis-y-semantica-de-los-lenguajes.md",
+      "url": null,
+      "description": "",
+      "content": "# Sintaxis y Semántica de los Lenguajes\n\n> Apunte de **Sintaxis y Semántica de los Lenguajes** — 2do Nivel (Segundo Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Sintaxis y Semántica de los Lenguajes\n\n> Apunte de **Sintaxis y Semántica de los Lenguajes** — 2do Nivel (Segundo Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "2do-nivel/sistemas-operativos/sistemas-operativos",
+      "title": "Sistemas Operativos",
+      "level": "2do-nivel",
+      "levelLabel": "2do Nivel (Segundo Año)",
+      "subject": "Sistemas Operativos",
+      "subjectId": "sistemas-operativos",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "sistemas-operativos.md",
+      "url": null,
+      "description": "",
+      "content": "# Sistemas Operativos\n\n> Apunte de **Sistemas Operativos** — 2do Nivel (Segundo Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Sistemas Operativos\n\n> Apunte de **Sistemas Operativos** — 2do Nivel (Segundo Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "3er-nivel/comunicaciones/comunicaciones",
+      "title": "Comunicaciones",
+      "level": "3er-nivel",
+      "levelLabel": "3er Nivel (Tercer Año)",
+      "subject": "Comunicaciones",
+      "subjectId": "comunicaciones",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "comunicaciones.md",
+      "url": null,
+      "description": "",
+      "content": "# Comunicaciones\n\n> Apunte de **Comunicaciones** — 3er Nivel (Tercer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Comunicaciones\n\n> Apunte de **Comunicaciones** — 3er Nivel (Tercer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "3er-nivel/diseno-de-sistemas/diseno-de-sistemas",
+      "title": "Diseño de Sistemas",
+      "level": "3er-nivel",
+      "levelLabel": "3er Nivel (Tercer Año)",
+      "subject": "Diseño de Sistemas",
+      "subjectId": "diseno-de-sistemas",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "diseno-de-sistemas.md",
+      "url": null,
+      "description": "",
+      "content": "# Diseño de Sistemas\n\n> Apunte de **Diseño de Sistemas** — 3er Nivel (Tercer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Diseño de Sistemas\n\n> Apunte de **Diseño de Sistemas** — 3er Nivel (Tercer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "3er-nivel/economia/economia",
+      "title": "Economía",
+      "level": "3er-nivel",
+      "levelLabel": "3er Nivel (Tercer Año)",
+      "subject": "Economía",
+      "subjectId": "economia",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "economia.md",
+      "url": null,
+      "description": "",
+      "content": "# Economía\n\n> Apunte de **Economía** — 3er Nivel (Tercer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Economía\n\n> Apunte de **Economía** — 3er Nivel (Tercer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "3er-nivel/electiva-gestion-de-procesos-de-negocios/electiva-gestion-de-procesos-de-negocios",
+      "title": "[Electiva] Gestión de Procesos de Negocios",
+      "level": "3er-nivel",
+      "levelLabel": "3er Nivel (Tercer Año)",
+      "subject": "[Electiva] Gestión de Procesos de Negocios",
+      "subjectId": "electiva-gestion-de-procesos-de-negocios",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "electiva-gestion-de-procesos-de-negocios.md",
+      "url": null,
+      "description": "",
+      "content": "# [Electiva] Gestión de Procesos de Negocios\n\n> Apunte de **[Electiva] Gestión de Procesos de Negocios** — 3er Nivel (Tercer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# [Electiva] Gestión de Procesos de Negocios\n\n> Apunte de **[Electiva] Gestión de Procesos de Negocios** — 3er Nivel (Tercer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "3er-nivel/electiva-seguridad-informatica/electiva-seguridad-informatica",
+      "title": "[Electiva] Seguridad Informática",
+      "level": "3er-nivel",
+      "levelLabel": "3er Nivel (Tercer Año)",
+      "subject": "[Electiva] Seguridad Informática",
+      "subjectId": "electiva-seguridad-informatica",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "electiva-seguridad-informatica.md",
+      "url": null,
+      "description": "",
+      "content": "# [Electiva] Seguridad Informática\n\n> Apunte de **[Electiva] Seguridad Informática** — 3er Nivel (Tercer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# [Electiva] Seguridad Informática\n\n> Apunte de **[Electiva] Seguridad Informática** — 3er Nivel (Tercer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "3er-nivel/gestion-de-datos/gestion-de-datos",
+      "title": "Gestión de Datos",
+      "level": "3er-nivel",
+      "levelLabel": "3er Nivel (Tercer Año)",
+      "subject": "Gestión de Datos",
+      "subjectId": "gestion-de-datos",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "gestion-de-datos.md",
+      "url": null,
+      "description": "",
+      "content": "# Gestión de Datos\n\n> Apunte de **Gestión de Datos** — 3er Nivel (Tercer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Gestión de Datos\n\n> Apunte de **Gestión de Datos** — 3er Nivel (Tercer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "3er-nivel/matematica-superior/matematica-superior",
+      "title": "Matemática Superior",
+      "level": "3er-nivel",
+      "levelLabel": "3er Nivel (Tercer Año)",
+      "subject": "Matemática Superior",
+      "subjectId": "matematica-superior",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "matematica-superior.md",
+      "url": null,
+      "description": "",
+      "content": "# Matemática Superior\n\n> Apunte de **Matemática Superior** — 3er Nivel (Tercer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Matemática Superior\n\n> Apunte de **Matemática Superior** — 3er Nivel (Tercer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "3er-nivel/probabilidad-y-estadistica/probabilidad-y-estadistica",
+      "title": "Probabilidad y Estadística",
+      "level": "3er-nivel",
+      "levelLabel": "3er Nivel (Tercer Año)",
+      "subject": "Probabilidad y Estadística",
+      "subjectId": "probabilidad-y-estadistica",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "probabilidad-y-estadistica.md",
+      "url": null,
+      "description": "",
+      "content": "# Probabilidad y Estadística\n\n> Apunte de **Probabilidad y Estadística** — 3er Nivel (Tercer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Probabilidad y Estadística\n\n> Apunte de **Probabilidad y Estadística** — 3er Nivel (Tercer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "3er-nivel/seminario-de-integracion-profesional/seminario-de-integracion-profesional",
+      "title": "Seminario de Integración Profesional",
+      "level": "3er-nivel",
+      "levelLabel": "3er Nivel (Tercer Año)",
+      "subject": "Seminario de Integración Profesional",
+      "subjectId": "seminario-de-integracion-profesional",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "seminario-de-integracion-profesional.md",
+      "url": null,
+      "description": "",
+      "content": "# Seminario de Integración Profesional\n\n> Apunte de **Seminario de Integración Profesional** — 3er Nivel (Tercer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Seminario de Integración Profesional\n\n> Apunte de **Seminario de Integración Profesional** — 3er Nivel (Tercer Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "4to-nivel/administracion-de-recursos/administracion-de-recursos",
+      "title": "Administración de Recursos",
+      "level": "4to-nivel",
+      "levelLabel": "4to Nivel (Cuarto Año)",
+      "subject": "Administración de Recursos",
+      "subjectId": "administracion-de-recursos",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "administracion-de-recursos.md",
+      "url": null,
+      "description": "",
+      "content": "# Administración de Recursos\n\n> Apunte de **Administración de Recursos** — 4to Nivel (Cuarto Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Administración de Recursos\n\n> Apunte de **Administración de Recursos** — 4to Nivel (Cuarto Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "4to-nivel/ingenieria-de-software/ingenieria-de-software",
+      "title": "Ingeniería de Software",
+      "level": "4to-nivel",
+      "levelLabel": "4to Nivel (Cuarto Año)",
+      "subject": "Ingeniería de Software",
+      "subjectId": "ingenieria-de-software",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "ingenieria-de-software.md",
+      "url": null,
+      "description": "",
+      "content": "# Ingeniería de Software\n\n> Apunte de **Ingeniería de Software** — 4to Nivel (Cuarto Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Ingeniería de Software\n\n> Apunte de **Ingeniería de Software** — 4to Nivel (Cuarto Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "4to-nivel/investigacion-operativa/investigacion-operativa",
+      "title": "Investigación Operativa",
+      "level": "4to-nivel",
+      "levelLabel": "4to Nivel (Cuarto Año)",
+      "subject": "Investigación Operativa",
+      "subjectId": "investigacion-operativa",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "investigacion-operativa.md",
+      "url": null,
+      "description": "",
+      "content": "# Investigación Operativa\n\n> Apunte de **Investigación Operativa** — 4to Nivel (Cuarto Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Investigación Operativa\n\n> Apunte de **Investigación Operativa** — 4to Nivel (Cuarto Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "4to-nivel/legislacion/legislacion",
+      "title": "Legislación",
+      "level": "4to-nivel",
+      "levelLabel": "4to Nivel (Cuarto Año)",
+      "subject": "Legislación",
+      "subjectId": "legislacion",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "legislacion.md",
+      "url": null,
+      "description": "",
+      "content": "# Legislación\n\n> Apunte de **Legislación** — 4to Nivel (Cuarto Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Legislación\n\n> Apunte de **Legislación** — 4to Nivel (Cuarto Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "4to-nivel/redes/redes",
+      "title": "Redes",
+      "level": "4to-nivel",
+      "levelLabel": "4to Nivel (Cuarto Año)",
+      "subject": "Redes",
+      "subjectId": "redes",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "redes.md",
+      "url": null,
+      "description": "",
+      "content": "# Redes\n\n> Apunte de **Redes** — 4to Nivel (Cuarto Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Redes\n\n> Apunte de **Redes** — 4to Nivel (Cuarto Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "4to-nivel/simulacion/simulacion",
+      "title": "Simulación",
+      "level": "4to-nivel",
+      "levelLabel": "4to Nivel (Cuarto Año)",
+      "subject": "Simulación",
+      "subjectId": "simulacion",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "simulacion.md",
+      "url": null,
+      "description": "",
+      "content": "# Simulación\n\n> Apunte de **Simulación** — 4to Nivel (Cuarto Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# Simulación\n\n> Apunte de **Simulación** — 4to Nivel (Cuarto Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    },
+    {
+      "id": "5to-nivel/electiva-calidad-de-software/electiva-calidad-de-software",
+      "title": "[Electiva] Calidad de Software",
+      "level": "5to-nivel",
+      "levelLabel": "5to Nivel (Quinto Año)",
+      "subject": "[Electiva] Calidad de Software",
+      "subjectId": "electiva-calidad-de-software",
+      "type": "md",
+      "tags": [
+        "utn-frt",
+        "ing-sistemas"
+      ],
+      "updated": "2026-06-07",
+      "status": "pendiente",
+      "fileName": "electiva-calidad-de-software.md",
+      "url": null,
+      "description": "",
+      "content": "# [Electiva] Calidad de Software\n\n> Apunte de **[Electiva] Calidad de Software** — 5to Nivel (Quinto Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._",
+      "text": "# [Electiva] Calidad de Software\n\n> Apunte de **[Electiva] Calidad de Software** — 5to Nivel (Quinto Año) · UTN-FRT, Ingeniería en Sistemas de Información.\n\n_Contenido pendiente de carga._"
+    }
+  ]
+}

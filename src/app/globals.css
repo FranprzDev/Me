@@ -1,0 +1,204 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #05060f;
+  --fg: #f4f4f8;
+  --muted: #c2c2da;
+
+  /* acentos por mundo */
+  --space: #5b8cff;
+  --space-2: #9b7bff;
+  --japan: #e0484e;
+  --japan-2: #e9b949;
+  --brain: #39ff14;
+  --brain-2: #ff2bd6;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-space: var(--space);
+  --color-japan: var(--japan);
+  --color-brain: var(--brain);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-serif);
+  --font-jp: var(--font-jp);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  margin: 0;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* El canvas 3D vive en z-0; el contenido por encima. */
+.content-layer {
+  position: relative;
+  z-index: 10;
+}
+
+.section {
+  min-height: 100svh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding: 7rem 2.5rem;
+  }
+}
+
+.wrap {
+  width: 100%;
+  max-width: 1040px;
+  margin-inline: auto;
+}
+
+/* Tarjeta de vidrio */
+.glass {
+  background: rgba(15, 16, 32, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+}
+
+.glass-soft {
+  background: rgba(15, 16, 32, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0.9rem;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-family: var(--font-geist-mono), monospace;
+}
+
+.h-display {
+  font-family: var(--font-serif), Georgia, serif;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+.jp {
+  font-family: var(--font-jp), serif;
+}
+
+.glow-space {
+  text-shadow: 0 0 30px rgba(91, 140, 255, 0.5);
+}
+.glow-japan {
+  text-shadow: 0 0 30px rgba(224, 72, 78, 0.45);
+}
+.glow-brain {
+  text-shadow: 0 0 22px rgba(57, 255, 20, 0.55), 0 0 44px rgba(255, 43, 214, 0.4);
+}
+
+.accent-space {
+  color: var(--space);
+}
+.accent-japan {
+  color: var(--japan);
+}
+.accent-brain {
+  color: var(--brain);
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.18),
+    transparent
+  );
+}
+
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 1px;
+  background: currentColor;
+  transition: width 0.25s ease;
+}
+.link-underline:hover::after {
+  width: 100%;
+}
+
+.tilt-card {
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.tilt-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 18px 50px -20px rgba(0, 0, 0, 0.8);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  font-family: var(--font-geist-mono), monospace;
+}
+
+.code-block {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.82rem;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.7rem;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+  color: #d7e3ff;
+}
+
+/* Foco visible accesible para teclado */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--space);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .tilt-card:hover {
+    transform: none;
+  }
+}
