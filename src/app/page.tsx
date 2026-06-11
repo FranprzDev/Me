@@ -4,7 +4,6 @@ import {
   Education,
   Projects,
   Contact,
-  Footer,
 } from "@/components/Sections";
 
 export default function Home() {
@@ -15,7 +14,6 @@ export default function Home() {
       <Education />
       <Projects />
       <Contact />
-      <Footer />
     </main>
   );
 }

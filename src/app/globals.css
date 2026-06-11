@@ -110,6 +110,33 @@ body {
   }
 }
 
+@media (max-width: 767px) {
+  .contact-stage {
+    min-height: calc(100svh - 4.5rem);
+    row-gap: 0.4rem;
+  }
+
+  .contact-stage .contact-space {
+    height: clamp(68px, 9vh, 110px) !important;
+  }
+
+  .contact-stage .contact-constellations {
+    margin-top: 1.35rem;
+  }
+
+  .contact-stage .contact-constellations .cc-link {
+    transform-origin: center top;
+  }
+
+  .contact-stage .contact-constellations svg {
+    transform: scale(0.9);
+  }
+
+  .contact-stage .contact-constellations .cc-caption {
+    font-size: 0.74rem;
+  }
+}
+
 /* Indicador de scroll: flechas que laten hacia abajo. */
 .scroll-cue {
   display: flex;

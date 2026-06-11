@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CV } from "@/data/cv";
 import { NotesMCP } from "@/components/NotesMCP";
-import { Footer } from "@/components/Sections";
 
 export const metadata: Metadata = {
   title: "UTN-FRT-MCP — Apuntes de la UTN-FRT en tu CLI",
@@ -28,7 +28,12 @@ export default function UtnFrtMcpPage() {
         </Link>
       </div>
       <NotesMCP />
-      <Footer />
+      <footer className="content-layer" style={{ padding: "2.5rem 1.5rem", textAlign: "center" }}>
+        <div className="divider" style={{ maxWidth: 600, margin: "0 auto 1.5rem" }} />
+        <p style={{ color: "var(--muted)", fontSize: "0.85rem", margin: 0 }}>
+          © {new Date().getFullYear()} {CV.name}
+        </p>
+      </footer>
     </main>
   );
 }
