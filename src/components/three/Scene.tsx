@@ -15,7 +15,8 @@ import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { useMemo, useRef, useState, useEffect, type RefObject } from "react";
 import * as THREE from "three";
 import { getScrollProgress, sectionCenter, bumpWeight } from "@/lib/scroll";
-import { CONSTELLATIONS, type Constellation } from "@/data/constellations";
+import { getConstellations, type Constellation } from "@/data/constellations";
+import { useI18n } from "@/lib/i18n";
 
 // Fondo de respaldo: clear-color del WebGL y fallback CSS. Siempre oscuro para
 // que NUNCA aparezca un flash blanco (p.ej. al redimensionar).
@@ -291,6 +292,7 @@ function ConstellationGroup({
 
 function Rig({ reduced, minimal }: { reduced: boolean; minimal: boolean }) {
   const { scene, camera } = useThree();
+  const { lang } = useI18n();
   const stars = useRef<THREE.Points>(null);
   const fog = useMemo(() => new THREE.FogExp2(C_BG_A.getHex(), 0.018), []);
   const background = useMemo(() => C_BG_A.clone(), []);
@@ -370,7 +372,7 @@ function Rig({ reduced, minimal }: { reduced: boolean; minimal: boolean }) {
       {/* En modo minimal (p.ej. /utn-frt-mcp) sólo quedan los puntos viajando:
           sin el viaje de constelaciones del portfolio principal. */}
       {!minimal &&
-        CONSTELLATIONS.map((c) => (
+        getConstellations(lang).map((c) => (
           <ConstellationGroup key={c.id} data={c} starTex={starTex} pRef={pRef} reduced={reduced} />
         ))}
 

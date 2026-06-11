@@ -198,36 +198,55 @@ export function Projects() {
 export function Contact() {
   const { t } = useI18n();
   return (
-    <section id="contact" className="section" style={{ minHeight: "100svh", justifyContent: "center" }}>
-      <div className="wrap" style={{ textAlign: "center" }}>
-        {/* El título de la sección es la constelación "CHARLEMOS" que se ensambla
-            en el canvas 3D de fondo. Lo declaramos como heading oculto para
-            lectores de pantalla y el esquema del documento. */}
-        <h2 className="sr-only">{t("contact_title")}</h2>
+    <section
+      id="contact"
+      className="section"
+      style={{ minHeight: "100svh", justifyContent: "flex-start" }}
+    >
+      <div
+        className="wrap contact-stage"
+        style={{
+          minHeight: "calc(100svh - 6rem)",
+          display: "grid",
+          gridTemplateRows: "1fr auto",
+          textAlign: "center",
+          rowGap: "1rem",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            paddingTop: "clamp(4.5rem, 11vh, 7rem)",
+          }}
+        >
+          {/* El título de la sección es la constelación "CHARLEMOS" que se ensambla
+              en el canvas 3D de fondo. Lo declaramos como heading oculto para
+              lectores de pantalla y el esquema del documento. */}
+          <h2 className="sr-only">{t("contact_title")}</h2>
 
-        {/* Espacio reservado para que la palabra-constelación 3D respire arriba. */}
-        <div aria-hidden style={{ height: "clamp(110px, 22vh, 220px)" }} />
+          {/* Espacio reservado para que la palabra-constelación 3D respire arriba. */}
+          <div aria-hidden className="contact-space" style={{ height: "clamp(120px, 18vh, 220px)" }} />
 
-        <Reveal>
-          <p style={{ color: "var(--muted)", maxWidth: 560, margin: "0 auto", fontSize: "1.05rem" }}>
-            {t("contact_subtitle")}
+          <Reveal>
+            <p style={{ color: "var(--muted)", maxWidth: 560, margin: "0 auto", fontSize: "1.05rem" }}>
+              {t("contact_subtitle")}
+            </p>
+          </Reveal>
+          <Reveal delay={0.1} className="contact-constellations">
+            <ContactConstellations />
+          </Reveal>
+        </div>
+
+        <footer style={{ padding: "2rem 0 0.5rem", textAlign: "center" }}>
+          <div className="divider" style={{ maxWidth: 600, margin: "0 auto 1.2rem" }} />
+          <p style={{ color: "var(--muted)", fontSize: "0.85rem", margin: 0 }}>
+            © {new Date().getFullYear()} {CV.name}
           </p>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <ContactConstellations />
-        </Reveal>
+        </footer>
       </div>
     </section>
-  );
-}
-
-export function Footer() {
-  return (
-    <footer className="content-layer" style={{ padding: "2.5rem 1.5rem", textAlign: "center" }}>
-      <div className="divider" style={{ maxWidth: 600, margin: "0 auto 1.5rem" }} />
-      <p style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
-        © {new Date().getFullYear()} {CV.name}
-      </p>
-    </footer>
   );
 }

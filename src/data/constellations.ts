@@ -15,6 +15,7 @@
  */
 
 import { buildWord } from "@/data/glyphs";
+import type { Lang } from "@/data/cv";
 
 export interface Constellation {
   id: string;
@@ -278,3 +279,26 @@ export const CONSTELLATIONS: Constellation[] = [
     world: { x: -3.2, y: -5.2, z: -18.5, scale: 0.6 },
   },
 ];
+
+function makeContactConstellation(lang: Lang): Constellation {
+  const word = lang === "es" ? "CHARLEMOS" : "LETS TALK";
+  const layout =
+    lang === "es"
+      ? { y: 1.36, scale: 0.6, gap: 0.3 }
+      : { y: 1.62, scale: 0.52, gap: 0.22 };
+  return {
+    id: "charlemos",
+    sectionIndex: 4,
+    color: "#b9c4ff",
+    hero: true,
+    particlesPerNode: 4,
+    ...buildWord(word, { gap: layout.gap }),
+    world: { x: 0, y: layout.y, z: -8.4, scale: layout.scale },
+  };
+}
+
+export function getConstellations(lang: Lang): Constellation[] {
+  const constellations = CONSTELLATIONS.slice();
+  constellations[4] = makeContactConstellation(lang);
+  return constellations;
+}

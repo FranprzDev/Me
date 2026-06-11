@@ -90,8 +90,8 @@ export function ContactConstellations() {
         flexWrap: "wrap",
         justifyContent: "center",
         alignItems: "flex-start",
-        gap: "2.6rem 3.4rem",
-        marginTop: "3rem",
+        gap: "2.2rem 3rem",
+        marginTop: "clamp(1.8rem, 4vh, 2.6rem)",
       }}
     >
       {items.map((it) => (
