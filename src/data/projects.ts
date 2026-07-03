@@ -31,20 +31,6 @@ export const PROJECTS: Project[] = [
     featured: true,
   },
   {
-    name: "UTN-FRT-MCP",
-    tagline: {
-      es: "Servidor MCP de apuntes para estudiantes de la UTN-FRT.",
-      en: "MCP notes server for UTN-FRT students.",
-    },
-    description: {
-      es: "Servidor MCP gratuito que expone mis apuntes de Ingeniería en Sistemas para consultarlos desde cualquier CLI compatible. Búsqueda full-text, listado por materia y entrega de contenido directo a la terminal.",
-      en: "Free MCP server exposing my Information Systems notes to query from any compatible CLI. Full-text search, listing by subject and delivering content straight to the terminal.",
-    },
-    stack: ["MCP", "Next.js", "TypeScript", "Vercel"],
-    year: "2025",
-    featured: true,
-  },
-  {
     name: "Curso de Automatización con n8n — Poder Judicial de Tucumán",
     tagline: {
       es: "10 clases (20 h) de automatización para el Poder Judicial.",

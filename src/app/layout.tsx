@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Cormorant_Garamond, Shippori_Mincho } from "next/font/google";
+import { Geist, Geist_Mono, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { I18nProvider } from "@/lib/i18n";
 import { ScrollProvider } from "@/lib/scroll";
@@ -12,20 +12,14 @@ const serif = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
-const jp = Shippori_Mincho({
-  variable: "--font-jp",
-  subsets: ["latin"],
-  weight: ["400", "600", "800"],
-});
 
 export const metadata: Metadata = {
-  title: "Francisco Miguel Perez — Ing. en Sistemas & UTN-FRT-MCP",
+  title: "Francisco Miguel Perez — Ing. en Sistemas",
   description:
-    "Portfolio de Francisco Miguel Perez, Ingeniero en Sistemas de Información. Un viaje en 3D y la presentación del UTN-FRT-MCP: apuntes de la UTN-FRT accesibles desde tu CLI.",
+    "Portfolio de Francisco Miguel Perez, Ingeniero en Sistemas de Información. Un viaje en 3D por su experiencia, formación y proyectos.",
   openGraph: {
-    title: "Francisco Miguel Perez — Ing. en Sistemas & UTN-FRT-MCP",
-    description:
-      "Un viaje en 3D por mi experiencia y la presentación del UTN-FRT-MCP: apuntes de la UTN-FRT en tu CLI.",
+    title: "Francisco Miguel Perez — Ing. en Sistemas",
+    description: "Un viaje en 3D por mi experiencia, formación y proyectos.",
     type: "website",
   },
 };
@@ -36,7 +30,8 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} ${serif.variable} ${jp.variable} h-full antialiased`}
+      data-scroll-behavior="smooth"
+      className={`${geistSans.variable} ${geistMono.variable} ${serif.variable} h-full antialiased`}
     >
       <body className="min-h-full">
         <I18nProvider>

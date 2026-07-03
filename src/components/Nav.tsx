@@ -10,8 +10,7 @@ export function Nav() {
   const progress = useScrollProgress();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Hrefs absolutos: el Nav vive en el layout (todas las rutas). Los anclas a
-  // secciones del home llevan "/" delante para funcionar desde /utn-frt-mcp.
+  // Hrefs absolutos: el Nav vive en el layout (todas las rutas).
   const links: { href: string; key: Parameters<typeof t>[0] }[] = [
     { href: "/#experience", key: "nav_experience" },
     { href: "/#education", key: "nav_education" },

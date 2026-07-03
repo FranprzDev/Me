@@ -16,7 +16,7 @@ import {
  *
  * Orden de secciones (debe coincidir con page.tsx y con CONSTELLATIONS):
  *   0 Hero · 1 Experiencia · 2 Educación · 3 Proyectos · 4 Contacto
- * (El MCP vive en su propia ruta /utn-frt-mcp, fuera de este viaje.)
+ * El viaje principal vive en la home; las demás rutas quedan fuera de este cálculo.
  */
 export const SECTION_COUNT = 5;
 

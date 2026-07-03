@@ -60,8 +60,8 @@ export const CV: CV = {
     en: "Information Systems Engineer",
   },
   location: {
-    es: "Cruz Alta — Tucumán, Argentina",
-    en: "Cruz Alta — Tucumán, Argentina",
+    es: "Tucumán, Argentina",
+    en: "Tucumán, Argentina",
   },
   timezone: "GMT-3",
   email: "franciscoperezdeveloper@gmail.com",

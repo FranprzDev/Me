@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { Nav } from "@/components/Nav";
 
 // La escena 3D es client-only (WebGL); se carga sin SSR. Vive en el layout para
@@ -10,11 +11,22 @@ const Scene = dynamic(() => import("@/components/three/Scene"), { ssr: false });
 
 export function SiteChrome() {
   const pathname = usePathname();
-  // El MCP usa un cosmos minimal: sólo los puntos viajando, sin constelaciones.
-  const minimal = pathname?.startsWith("/utn-frt-mcp") ?? false;
+  const [sceneReady, setSceneReady] = useState(false);
+  const sceneBooted = useRef(false);
+  const onHome = pathname === "/";
+  // La escena 3D es lo más costoso del sitio. La diferimos para dejar que la
+  // UI textual pinte primero.
+  useEffect(() => {
+    if (!onHome || sceneBooted.current) return;
+
+    sceneBooted.current = true;
+    const timer = window.setTimeout(() => setSceneReady(true), 450);
+    return () => window.clearTimeout(timer);
+  }, [onHome]);
+
   return (
     <>
-      <Scene minimal={minimal} />
+      {onHome && sceneReady ? <Scene /> : null}
       <Nav />
     </>
   );
