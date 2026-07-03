@@ -116,12 +116,11 @@ export function ContactConstellations() {
           gap: 0.7rem;
           text-decoration: none;
           opacity: 0.6;
-          transition: opacity 0.3s ease, transform 0.3s ease;
+          transition: opacity 0.3s ease;
         }
         .cc-link:hover,
         .cc-link:focus-visible {
           opacity: 1;
-          transform: translateY(-4px);
           outline: none;
         }
         .cc-link .cc-lines line {
