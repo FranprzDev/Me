@@ -76,7 +76,7 @@ function makeStarTexture(): THREE.Texture {
  */
 function WarpField({ velRef, reduced }: { velRef: RefObject<number>; reduced: boolean }) {
   const { camera } = useThree();
-  const N = reduced ? 160 : 380;
+  const N = reduced ? 120 : 260;
 
   const { geo, mat, positions, stars } = useMemo(() => {
     const positions = new Float32Array(N * 6);
@@ -350,7 +350,7 @@ function Rig({ reduced, minimal }: { reduced: boolean; minimal: boolean }) {
     camera.lookAt(0, 0, camera.position.z - 9);
   });
 
-  const starCount = reduced ? 1500 : 3500;
+  const starCount = reduced ? 900 : 2200;
 
   return (
     <>
@@ -369,8 +369,7 @@ function Rig({ reduced, minimal }: { reduced: boolean; minimal: boolean }) {
 
       <WarpField velRef={velRef} reduced={reduced} />
 
-      {/* En modo minimal (p.ej. /utn-frt-mcp) sólo quedan los puntos viajando:
-          sin el viaje de constelaciones del portfolio principal. */}
+      {/* En modo minimal sólo quedan los puntos viajando, sin constelaciones. */}
       {!minimal &&
         getConstellations(lang).map((c) => (
           <ConstellationGroup key={c.id} data={c} starTex={starTex} pRef={pRef} reduced={reduced} />

@@ -30,7 +30,6 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-serif: var(--font-serif);
-  --font-jp: var(--font-jp);
 }
 
 * {
@@ -203,10 +202,6 @@ body {
   font-family: var(--font-serif), Georgia, serif;
   line-height: 1.02;
   letter-spacing: -0.02em;
-}
-
-.jp {
-  font-family: var(--font-jp), serif;
 }
 
 .glow-space {

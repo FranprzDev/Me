@@ -33,11 +33,11 @@ export function Hero() {
         <Reveal delay={0.28}>
           <div style={{ display: "flex", gap: "0.8rem", flexWrap: "wrap", justifyContent: "center" }}>
             <Link
-              href="/utn-frt-mcp"
+              href="/#projects"
               className="glass tilt-card"
               style={{ padding: "0.8rem 1.4rem", color: "var(--fg)", fontWeight: 600 }}
             >
-              {t("hero_cta_mcp")} →
+              {t("hero_cta_projects")} →
             </Link>
           </div>
         </Reveal>

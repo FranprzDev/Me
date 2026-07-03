@@ -16,11 +16,10 @@ type Dict = Record<Lang, string>;
 const UI = {
   nav_experience: { es: "Experiencia", en: "Experience" },
   nav_education: { es: "Educación", en: "Education" },
-  nav_mcp: { es: "UTN-FRT-MCP", en: "UTN-FRT-MCP" },
   nav_projects: { es: "Proyectos", en: "Projects" },
   nav_contact: { es: "Contacto", en: "Contact" },
 
-  hero_cta_mcp: { es: "Conecta mi cerebro", en: "Connect my brain" },
+  hero_cta_projects: { es: "Ver proyectos", en: "See projects" },
 
   exp_title: { es: "Experiencia profesional", en: "Professional experience" },
   exp_present: { es: "Presente", en: "Present" },
@@ -28,22 +27,6 @@ const UI = {
   edu_title: { es: "Educación", en: "Education" },
   edu_certs: { es: "Certificaciones", en: "Certifications" },
   edu_highlights: { es: "Participaciones destacadas", en: "Highlights" },
-
-  mcp_title: { es: "Presentando el UTN-FRT-MCP", en: "Introducing the UTN-FRT-MCP" },
-  mcp_subtitle: {
-    es: "Mis apuntes de la UTN-FRT, accesibles desde tu propia CLI. Sin descargas, sin vueltas.",
-    en: "My UTN-FRT notes, accessible from your own CLI. No downloads, no hassle.",
-  },
-  mcp_desc: {
-    es: "Un servidor MCP gratuito que cualquier estudiante de Ingeniería en Sistemas puede conectar a su asistente (Claude Code, Cursor, etc.) para consultar apuntes al instante: buscar por tema, listar materias y traer el contenido directo a la terminal.",
-    en: "A free MCP server any Information Systems student can connect to their assistant (Claude Code, Cursor, etc.) to query notes instantly: search by topic, list subjects and pull content straight to the terminal.",
-  },
-  mcp_how: { es: "Cómo conectarlo", en: "How to connect" },
-  mcp_tools: { es: "Herramientas disponibles", en: "Available tools" },
-  mcp_browse: { es: "Explorar materias", en: "Browse subjects" },
-  mcp_stat_levels: { es: "Niveles", en: "Levels" },
-  mcp_stat_subjects: { es: "Materias", en: "Subjects" },
-  mcp_stat_notes: { es: "Apuntes", en: "Notes" },
 
   proj_title: { es: "Proyectos & logros", en: "Projects & achievements" },
 
