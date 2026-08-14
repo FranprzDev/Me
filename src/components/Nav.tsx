@@ -49,7 +49,7 @@ export function Nav() {
         }}
         >
         <Link href="/" className="h-display" style={{ fontSize: "1.15rem", fontWeight: 600 }}>
-          FP.
+          FranDev
         </Link>
 
         <div className="glass-soft" style={{ display: "none", gap: "1.1rem", padding: "0.5rem 1.1rem" }} data-desktop-nav>
