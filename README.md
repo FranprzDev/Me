@@ -13,6 +13,12 @@ Portfolio personal en Next.js con una estética espacial, secciones bilingües y
 
 ## Desarrollo
 
+Este proyecto usa pnpm como gestor de paquetes.
+
+Para generar canonical, robots y sitemap con la URL pública, definí
+`NEXT_PUBLIC_SITE_URL` en el entorno de build (por ejemplo,
+`https://tu-dominio.com`).
+
 ```bash
 pnpm install
 pnpm dev

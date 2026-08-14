@@ -27,9 +27,9 @@
   --color-space: var(--space);
   --color-japan: var(--japan);
   --color-brain: var(--brain);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-serif: var(--font-serif);
+  --font-sans: system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-serif: Georgia, Cambria, "Times New Roman", serif;
 }
 
 * {
@@ -54,7 +54,7 @@ html {
 body {
   background: var(--scene-bg, var(--bg));
   color: var(--fg);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   margin: 0;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -94,7 +94,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 3rem 1.5rem;
+  padding: clamp(2.5rem, 7vw, 4rem) clamp(1rem, 5vw, 2.5rem);
   /* Punto de anclaje del snap: el borde superior de cada sección. Sin
      `scroll-snap-stop: always` a propósito —ese forzaba una parada dura en cada
      borde y hacía que la rueda se sintiera "atascada". Con `proximity` (en html)
@@ -110,9 +110,21 @@ body {
 }
 
 @media (max-width: 767px) {
+  .section {
+    min-height: 100svh;
+    overflow-x: hidden;
+  }
+
+  .wrap,
+  .glass,
+  .glass-soft {
+    min-width: 0;
+  }
+
   .contact-stage {
     min-height: calc(100svh - 4.5rem);
     row-gap: 0.4rem;
+    overflow-x: hidden;
   }
 
   .contact-stage .contact-space {
@@ -190,16 +202,24 @@ body {
   border-radius: 0.9rem;
 }
 
+@media (max-width: 767px) {
+  .glass,
+  .glass-soft {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+}
+
 .eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.28em;
   font-size: 0.72rem;
   color: var(--muted);
-  font-family: var(--font-geist-mono), monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .h-display {
-  font-family: var(--font-serif), Georgia, serif;
+  font-family: Georgia, Cambria, "Times New Roman", serif;
   line-height: 1.02;
   letter-spacing: -0.02em;
 }
@@ -269,11 +289,11 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.04);
   color: var(--muted);
-  font-family: var(--font-geist-mono), monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .code-block {
-  font-family: var(--font-geist-mono), monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 0.82rem;
   background: rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -300,5 +320,14 @@ button:focus-visible {
   }
   .scroll-cue span {
     animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }
