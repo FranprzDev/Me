@@ -140,7 +140,7 @@ export function ContactConstellations() {
           filter: drop-shadow(0 0 7px var(--cc));
         }
         .cc-caption {
-          font-family: var(--font-geist-mono), monospace;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
           font-size: 0.82rem;
           letter-spacing: 0.02em;
           color: var(--muted);

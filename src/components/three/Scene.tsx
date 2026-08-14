@@ -33,13 +33,30 @@ function dampingFactor(dt: number, speed: number) {
   return 1 - Math.exp(-dt * speed);
 }
 
+function prefersReducedMotion(): boolean {
+  return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function isConstrainedDevice(reduced: boolean): boolean {
+  if (typeof window === "undefined") return false;
+  const connection = (navigator as Navigator & {
+    connection?: { saveData?: boolean };
+  }).connection;
+  return (
+    window.innerWidth < 768 ||
+    reduced ||
+    (navigator.hardwareConcurrency > 0 && navigator.hardwareConcurrency <= 4) ||
+    connection?.saveData === true
+  );
+}
+
 function smoother(x: number, e0: number, e1: number): number {
   const t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0)));
   return t * t * (3 - 2 * t);
 }
 
 function useReducedMotion() {
-  const [reduced, setReduced] = useState(false);
+  const [reduced, setReduced] = useState(prefersReducedMotion);
   useEffect(() => {
     const m = window.matchMedia("(prefers-reduced-motion: reduce)");
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -74,9 +91,17 @@ function makeStarTexture(): THREE.Texture {
  * longitud de las estelas y la velocidad crecen con la velocidad de scroll
  * (velRef), convirtiendo "mirar puntos" en "viajar por el espacio".
  */
-function WarpField({ velRef, reduced }: { velRef: RefObject<number>; reduced: boolean }) {
+function WarpField({
+  velRef,
+  reduced,
+  performanceMode,
+}: {
+  velRef: RefObject<number>;
+  reduced: boolean;
+  performanceMode: boolean;
+}) {
   const { camera } = useThree();
-  const N = reduced ? 120 : 260;
+  const N = performanceMode ? 80 : reduced ? 120 : 260;
 
   const { geo, mat, positions, stars } = useMemo(() => {
     const positions = new Float32Array(N * 6);
@@ -144,18 +169,32 @@ function ConstellationGroup({
   starTex,
   pRef,
   reduced,
+  performanceMode,
 }: {
   data: Constellation;
   starTex: THREE.Texture;
   pRef: RefObject<number>;
   reduced: boolean;
+  performanceMode: boolean;
 }) {
   const center = useMemo(() => sectionCenter(data.sectionIndex), [data.sectionIndex]);
   const ambient = data.ambient ?? false;
   const hero = data.hero ?? false;
   // Las ambientales son decorado lejano: menos partículas por nodo (más baratas).
   // `particlesPerNode` permite bajarlo en constelaciones con muchos nodos (palabra).
-  const ppn = data.particlesPerNode ?? (ambient ? (reduced ? 5 : 10) : reduced ? 10 : 24);
+  const ppn = data.particlesPerNode ?? (
+    ambient
+      ? performanceMode
+        ? 4
+        : reduced
+          ? 5
+          : 10
+      : performanceMode
+        ? 7
+        : reduced
+          ? 10
+          : 24
+  );
 
   const { group, pointsMat, lineMat, geo, home, target, phase, count } = useMemo(() => {
     const count = data.nodes.length * ppn;
@@ -290,7 +329,15 @@ function ConstellationGroup({
   return <primitive object={group} />;
 }
 
-function Rig({ reduced, minimal }: { reduced: boolean; minimal: boolean }) {
+function Rig({
+  reduced,
+  minimal,
+  performanceMode,
+}: {
+  reduced: boolean;
+  minimal: boolean;
+  performanceMode: boolean;
+}) {
   const { scene, camera } = useThree();
   const { lang } = useI18n();
   const stars = useRef<THREE.Points>(null);
@@ -367,15 +414,22 @@ function Rig({ reduced, minimal }: { reduced: boolean; minimal: boolean }) {
         speed={reduced ? 0 : 0.2}
       />
 
-      <WarpField velRef={velRef} reduced={reduced} />
+      <WarpField velRef={velRef} reduced={reduced} performanceMode={performanceMode} />
 
       {/* En modo minimal sólo quedan los puntos viajando, sin constelaciones. */}
       {!minimal &&
         getConstellations(lang).map((c) => (
-          <ConstellationGroup key={c.id} data={c} starTex={starTex} pRef={pRef} reduced={reduced} />
+          <ConstellationGroup
+            key={c.id}
+            data={c}
+            starTex={starTex}
+            pRef={pRef}
+            reduced={reduced}
+            performanceMode={performanceMode}
+          />
         ))}
 
-      {!reduced && (
+      {!reduced && !performanceMode && (
         <EffectComposer>
           <Bloom
             intensity={0.85}
@@ -392,7 +446,8 @@ function Rig({ reduced, minimal }: { reduced: boolean; minimal: boolean }) {
 
 export default function Scene({ minimal = false }: { minimal?: boolean }) {
   const reduced = useReducedMotion();
-  const [dpr, setDpr] = useState<[number, number]>([1, 1.5]);
+  const [performanceMode, setPerformanceMode] = useState(() => isConstrainedDevice(reduced));
+  const [dpr, setDpr] = useState<[number, number]>(() => (isConstrainedDevice(reduced) ? [1, 1] : [1, 1.5]));
   // Pausamos el loop cuando la pestaña queda oculta: no tiene sentido animar
   // estrellas que nadie ve (ahorra GPU/CPU y batería en segundo plano).
   const [frameloop, setFrameloop] = useState<"always" | "never">("always");
@@ -405,16 +460,25 @@ export default function Scene({ minimal = false }: { minimal?: boolean }) {
   }, []);
 
   useEffect(() => {
-    // DPR adaptativo: en pantallas chicas bajamos resolución por performance.
-    // Reaccionar al resize evita que el canvas quede mal afinado al achicar.
+    // Los móviles, conexiones con ahorro de datos y equipos con pocos núcleos
+    // conservan el fondo 3D, pero usan un perfil más barato de renderizado.
+    const connection = (navigator as Navigator & {
+      connection?: { saveData?: boolean };
+    }).connection;
+    const lowPowerDevice =
+      (navigator.hardwareConcurrency > 0 && navigator.hardwareConcurrency <= 4) ||
+      connection?.saveData === true;
+
     const apply = () => {
       const small = window.innerWidth < 768;
-      setDpr(small ? [1, 1] : [1, 1.5]);
+      const constrained = small || lowPowerDevice || reduced;
+      setPerformanceMode(constrained);
+      setDpr(constrained ? [1, 1] : [1, 1.5]);
     };
     apply();
     window.addEventListener("resize", apply, { passive: true });
     return () => window.removeEventListener("resize", apply);
-  }, []);
+  }, [reduced]);
 
   return (
     <div
@@ -435,7 +499,11 @@ export default function Scene({ minimal = false }: { minimal?: boolean }) {
         // Debounce del resize: re-mide tras 50ms en lugar de en cada píxel.
         resize={{ scroll: false, debounce: { scroll: 0, resize: 50 } }}
         // alpha:false -> canvas OPACO. Sin transparencia no hay flash blanco.
-        gl={{ antialias: true, powerPreference: "high-performance", alpha: false }}
+        gl={{
+          antialias: !performanceMode,
+          powerPreference: performanceMode ? "low-power" : "high-performance",
+          alpha: false,
+        }}
         style={{ background: FALLBACK_BG }}
         onCreated={({ gl }) => {
           gl.setClearColor(FALLBACK_BG, 1);
@@ -443,7 +511,11 @@ export default function Scene({ minimal = false }: { minimal?: boolean }) {
           canvas.addEventListener("webglcontextlost", (e) => e.preventDefault(), false);
         }}
       >
-        <Rig reduced={reduced} minimal={minimal} />
+        <Rig
+          reduced={reduced}
+          minimal={minimal || performanceMode}
+          performanceMode={performanceMode}
+        />
       </Canvas>
     </div>
   );

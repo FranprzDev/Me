@@ -20,8 +20,25 @@ export function SiteChrome() {
     if (!onHome || sceneBooted.current) return;
 
     sceneBooted.current = true;
-    const timer = window.setTimeout(() => setSceneReady(true), 450);
-    return () => window.clearTimeout(timer);
+    let timer: number | undefined;
+    let idleId: number | undefined;
+    const start = () => {
+      timer = window.setTimeout(() => setSceneReady(true), 450);
+    };
+
+    // Dejamos que la UI textual y el primer frame tengan prioridad. En
+    // navegadores compatibles usamos idle callback para no competir con el
+    // render inicial; el timeout garantiza que nunca quede esperando.
+    if ("requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(start, { timeout: 900 });
+    } else {
+      start();
+    }
+
+    return () => {
+      if (idleId !== undefined) window.cancelIdleCallback(idleId);
+      if (timer !== undefined) window.clearTimeout(timer);
+    };
   }, [onHome]);
 
   return (
