@@ -12,14 +12,14 @@ import type { Lang } from "@/data/cv";
 
 type Dict = Record<Lang, string>;
 
-/** Strings de UI (el contenido real vive en data/cv.ts y notes-index.json). */
+/** Strings de UI (el contenido real vive en data/cv.ts y data/projects.ts). */
 const UI = {
   nav_experience: { es: "Experiencia", en: "Experience" },
   nav_education: { es: "Educación", en: "Education" },
   nav_projects: { es: "Proyectos", en: "Projects" },
   nav_contact: { es: "Contacto", en: "Contact" },
 
-  hero_cta_projects: { es: "Utiliza mis apuntes", en: "Use my notes" },
+  hero_cta_projects: { es: "Ver proyectos", en: "See projects" },
 
   exp_title: { es: "Experiencia profesional", en: "Professional experience" },
   exp_present: { es: "Presente", en: "Present" },

@@ -1,0 +1,4 @@
+allowBuilds:
+  sharp: false
+  tesseract.js: false
+  unrs-resolver: false
