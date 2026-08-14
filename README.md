@@ -14,14 +14,14 @@ Portfolio personal en Next.js con una estética espacial, secciones bilingües y
 ## Desarrollo
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 ## Build
 
 ```bash
-npm run build
+pnpm build
 ```
 
 ## Estructura
@@ -30,4 +30,3 @@ npm run build
 - `src/components` - secciones, navegación y escena 3D
 - `src/data` - contenido del portfolio
 - `src/lib` - i18n, scroll y utilidades
-
