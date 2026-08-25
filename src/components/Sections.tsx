@@ -6,6 +6,8 @@ import { PROJECTS } from "@/data/projects";
 import { useI18n } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import { ContactConstellations } from "@/components/ContactConstellations";
+import { GsapHeroName } from "@/components/GsapHeroName";
+import { Magnetic } from "@/components/Magnetic";
 
 export function Hero() {
   const { t, tl } = useI18n();
@@ -15,11 +17,7 @@ export function Hero() {
         <Reveal>
           <span className="eyebrow">{tl(CV.location)}</span>
         </Reveal>
-        <Reveal delay={0.05}>
-          <h1 className="h-display glow-space" style={{ fontSize: "clamp(2.8rem, 9vw, 6.5rem)", margin: 0 }}>
-            {CV.name}
-          </h1>
-        </Reveal>
+        <GsapHeroName text={CV.name} />
         <Reveal delay={0.12}>
           <p style={{ fontSize: "clamp(1.1rem, 2.5vw, 1.6rem)", color: "var(--muted)", margin: 0 }}>
             {tl(CV.title)}
@@ -32,13 +30,15 @@ export function Hero() {
         </Reveal>
         <Reveal delay={0.28}>
           <div style={{ display: "flex", gap: "0.8rem", flexWrap: "wrap", justifyContent: "center" }}>
-            <Link
-              href="/#projects"
-              className="glass tilt-card"
-              style={{ padding: "0.8rem 1.4rem", color: "var(--fg)", fontWeight: 600 }}
-            >
-              {t("hero_cta_projects")} →
-            </Link>
+            <Magnetic>
+              <Link
+                href="/#projects"
+                className="glass tilt-card"
+                style={{ padding: "0.8rem 1.4rem", color: "var(--fg)", fontWeight: 600, display: "inline-block" }}
+              >
+                {t("hero_cta_projects")} →
+              </Link>
+            </Magnetic>
           </div>
         </Reveal>
         <Reveal delay={0.5}>
@@ -159,6 +159,7 @@ export function Projects() {
         <div style={{ display: "grid", gap: "1rem", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
           {PROJECTS.map((p, i) => (
             <Reveal key={p.name} delay={i * 0.06}>
+              <Magnetic strength={0.12} style={{ height: "100%" }}>
               <article
                 className="glass tilt-card"
                 style={{
@@ -187,6 +188,7 @@ export function Projects() {
                   </a>
                 )}
               </article>
+              </Magnetic>
             </Reveal>
           ))}
         </div>
@@ -230,11 +232,6 @@ export function Contact() {
           {/* Espacio reservado para que la palabra-constelación 3D respire arriba. */}
           <div aria-hidden className="contact-space" style={{ height: "clamp(120px, 18vh, 220px)" }} />
 
-          <Reveal>
-            <p style={{ color: "var(--muted)", maxWidth: 560, margin: "0 auto", fontSize: "1.05rem" }}>
-              {t("contact_subtitle")}
-            </p>
-          </Reveal>
           <Reveal delay={0.1} className="contact-constellations">
             <ContactConstellations />
           </Reveal>

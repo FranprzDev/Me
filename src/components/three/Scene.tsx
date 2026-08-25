@@ -11,12 +11,12 @@
 import "@/lib/silenceR3FClockWarning";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Stars } from "@react-three/drei";
-import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { useMemo, useRef, useState, useEffect, type RefObject } from "react";
 import * as THREE from "three";
 import { getScrollProgress, sectionCenter, bumpWeight } from "@/lib/scroll";
 import { getConstellations, type Constellation } from "@/data/constellations";
 import { useI18n } from "@/lib/i18n";
+import { Nebula, Planet } from "./Cosmos";
 
 // Fondo de respaldo: clear-color del WebGL y fallback CSS. Siempre oscuro para
 // que NUNCA aparezca un flash blanco (p.ej. al redimensionar).
@@ -75,9 +75,11 @@ function makeStarTexture(): THREE.Texture {
   canvas.width = canvas.height = size;
   const ctx = canvas.getContext("2d")!;
   const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  // Núcleo blanco compacto + halo ancho: reemplaza el glow que dejaba el Bloom.
   g.addColorStop(0, "rgba(255,255,255,1)");
-  g.addColorStop(0.25, "rgba(255,255,255,0.9)");
-  g.addColorStop(0.5, "rgba(255,255,255,0.35)");
+  g.addColorStop(0.18, "rgba(255,255,255,1)");
+  g.addColorStop(0.4, "rgba(255,255,255,0.55)");
+  g.addColorStop(0.65, "rgba(255,255,255,0.18)");
   g.addColorStop(1, "rgba(255,255,255,0)");
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, size, size);
@@ -152,7 +154,7 @@ function WarpField({
       positions[o + 5] = s.z - streak;
     }
     geo.attributes.position.needsUpdate = true;
-    mat.opacity = 0.55 + Math.min(0.4, warp * 0.7);
+    mat.opacity = 0.7 + Math.min(0.3, warp * 0.7);
   });
 
   return <lineSegments geometry={geo} material={mat} />;
@@ -196,7 +198,7 @@ function ConstellationGroup({
           : 24
   );
 
-  const { group, pointsMat, lineMat, geo, home, target, phase, count } = useMemo(() => {
+  const { group, pointsMat, lineMat, haloMat, geo, home, target, phase, count } = useMemo(() => {
     const count = data.nodes.length * ppn;
     const home = new Float32Array(count * 3); // posición dispersa
     const target = new Float32Array(count * 3); // posición ensamblada (en el nodo)
@@ -240,6 +242,9 @@ function ConstellationGroup({
       size: 0.2,
       sizeAttenuation: true,
       transparent: true,
+      // El hero (CHARLEMOS) dibuja por encima de nebulosa/planeta: es el
+      // título de la sección, no decorado de fondo.
+      depthTest: !hero,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
       opacity: 0,
@@ -247,18 +252,43 @@ function ConstellationGroup({
     const lMat = new THREE.LineBasicMaterial({
       color,
       transparent: true,
+      depthTest: !hero,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
       opacity: 0,
     });
+    // Halo del hero: segunda capa de puntos más grandes y tenues detrás de las
+    // estrellas. Da profundidad y "glow" barato sin Bloom ni engrosar el trazo.
+    const hMat = hero
+      ? new THREE.PointsMaterial({
+          map: starTex,
+          color,
+          size: 0.55,
+          sizeAttenuation: true,
+          transparent: true,
+          depthTest: false,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+          opacity: 0,
+        })
+      : null;
 
     const g = new THREE.Group();
     g.position.set(data.world.x, data.world.y, data.world.z);
     g.scale.setScalar(data.world.scale);
-    g.add(new THREE.LineSegments(lineGeo, lMat));
-    g.add(new THREE.Points(ptsGeo, pMat));
-    return { group: g, pointsMat: pMat, lineMat: lMat, geo: ptsGeo, home, target, phase, count };
-  }, [data, starTex, ppn]);
+    const lines = new THREE.LineSegments(lineGeo, lMat);
+    const points = new THREE.Points(ptsGeo, pMat);
+    if (hero && hMat) {
+      lines.renderOrder = 20;
+      const halo = new THREE.Points(ptsGeo, hMat);
+      halo.renderOrder = 19;
+      points.renderOrder = 21;
+      g.add(halo);
+    }
+    g.add(lines);
+    g.add(points);
+    return { group: g, pointsMat: pMat, lineMat: lMat, haloMat: hMat, geo: ptsGeo, home, target, phase, count };
+  }, [data, starTex, ppn, hero]);
 
   useEffect(() => {
     return () => {
@@ -268,20 +298,28 @@ function ConstellationGroup({
       });
       pointsMat.dispose();
       lineMat.dispose();
+      haloMat?.dispose();
     };
-  }, [group, pointsMat, lineMat]);
+  }, [group, pointsMat, lineMat, haloMat]);
 
   // Estado dormido: cuando una constelación de sección está lejos de su zona no
   // hace falta tocar sus partículas. Evita ese trabajo una vez apagada.
   const sleeping = useRef(false);
 
   useFrame(() => {
-    // Ambientales: siempre ensambladas (w = 1). De sección: peso según scroll.
-    const w = ambient ? 1 : bumpWeight(pRef.current, center);
+    // Ambientales: siempre ensambladas (w = 1). El hero ("CHARLEMOS") tiene
+    // curva propia: sube de a poco y QUEDA encendida al final del viaje (no se
+    // apaga al pasar su centro como las demás). Resto: peso según scroll.
+    const pNow = pRef.current;
+    const w = ambient
+      ? 1
+      : hero
+        ? smoother(pNow, center - 0.22, Math.min(1, center + 0.06))
+        : bumpWeight(pNow, center);
 
     // Early-out: dormida y ya invisible -> no animamos sus partículas. Con más
     // constelaciones en escena esto recorta CPU del render loop notablemente.
-    if (!ambient && w < 0.002) {
+    if (!ambient && !hero && w < 0.002) {
       if (!sleeping.current) {
         pointsMat.opacity = 0;
         lineMat.opacity = 0;
@@ -310,19 +348,26 @@ function ConstellationGroup({
       // Decorado lejano: muy tenue y constante, con un leve latido para que no
       // se sienta estático. Nunca compite por la atención.
       const pulse = reduced ? 0 : Math.sin(t * 0.4 + phase[0]) * 0.02;
-      pointsMat.opacity = 0.09 + pulse;
-      pointsMat.size = 0.1;
-      lineMat.opacity = 0.1 + pulse;
+      pointsMat.opacity = 0.14 + pulse;
+      pointsMat.size = 0.14;
+      lineMat.opacity = 0.14 + pulse;
     } else if (hero) {
-      // Protagonista (la palabra "CHARLEMOS"): brilla como título de la sección.
-      pointsMat.opacity = 0.1 + 0.75 * w;
-      pointsMat.size = 0.14 + 0.16 * w;
-      lineMat.opacity = 0.6 * e;
+      // Protagonista (la palabra "CHARLEMOS"): brilla como título de la sección,
+      // pero con puntos finos para que la palabra se lea, no se empaste.
+      // Respiración lenta + halo pulsante: viva sin ser ruidosa.
+      const breathe = reduced ? 0 : Math.sin(t * 0.9) * 0.5 + 0.5;
+      pointsMat.opacity = 0.14 + (0.52 + 0.1 * breathe) * w;
+      pointsMat.size = 0.15 + 0.09 * w;
+      lineMat.opacity = 0.9 * e;
+      if (haloMat) {
+        haloMat.opacity = (0.06 + 0.07 * breathe) * w;
+        haloMat.size = 0.5 + 0.08 * breathe;
+      }
     } else {
       // Pico de opacidad bajo: quedan de fondo y no compiten con el texto.
-      pointsMat.opacity = 0.04 + 0.34 * w;
-      pointsMat.size = 0.12 + 0.12 * w;
-      lineMat.opacity = 0.26 * e;
+      pointsMat.opacity = 0.08 + 0.44 * w;
+      pointsMat.size = 0.16 + 0.14 * w;
+      lineMat.opacity = 0.32 * e;
     }
   });
 
@@ -377,11 +422,9 @@ function Rig({
 
     // Fondo + niebla dentro de la familia espacial (siempre oscuro).
     tmpColor.copy(C_BG_A).lerp(C_BG_B, smoother(p, 0, 0.5)).lerp(C_BG_C, smoother(p, 0.5, 1));
-    const cssBg = `#${tmpColor.getHexString()}`;
-    if (lastCssBg.current !== cssBg) {
-      lastCssBg.current = cssBg;
-      document.documentElement.style.setProperty("--scene-bg", cssBg);
-    }
+    // El canvas es opaco y cubre el viewport: escribir --scene-bg cada frame
+    // forzaría un recálculo de estilo de toda la página (fuente de parpadeo
+    // junto al backdrop-filter de las tarjetas). El fondo vivo vive sólo acá.
     background.lerp(tmpColor, blend);
     fog.color.lerp(tmpColor, blend);
 
@@ -402,6 +445,9 @@ function Rig({
   return (
     <>
       <ambientLight intensity={0.5} />
+
+      <Nebula pRef={pRef} reduced={reduced} performanceMode={performanceMode} />
+      {!performanceMode && <Planet reduced={reduced} pRef={pRef} />}
 
       <Stars
         ref={stars as never}
@@ -429,17 +475,6 @@ function Rig({
           />
         ))}
 
-      {!reduced && !performanceMode && (
-        <EffectComposer>
-          <Bloom
-            intensity={0.85}
-            luminanceThreshold={0.2}
-            luminanceSmoothing={0.6}
-            radius={0.7}
-            mipmapBlur
-          />
-        </EffectComposer>
-      )}
     </>
   );
 }
