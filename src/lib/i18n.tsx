@@ -31,10 +31,6 @@ const UI = {
   proj_title: { es: "Proyectos & logros", en: "Projects & achievements" },
 
   contact_title: { es: "Charlemos", en: "Let's chat" },
-  contact_subtitle: {
-    es: "¿Un proyecto, una propuesta, o alguna duda? Escribime :)",
-    en: "A project, a proposal, or a question? Drop me a line :)",
-  },
 
   footer_built: { es: "Hecho con", en: "Built with" },
   footer_journey: { es: "Un viaje de tres mundos", en: "A journey of three worlds" },

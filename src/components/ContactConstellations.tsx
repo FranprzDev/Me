@@ -62,14 +62,12 @@ export function ContactConstellations() {
       word: "EMAIL",
       color: "#e9c270",
       href: `mailto:${CV.email}`,
-      caption: CV.email,
       aria: `Email: ${CV.email}`,
     },
     {
       word: "LINKEDIN",
       color: "#5b8cff",
       href: CV.linkedin,
-      caption: "in/franprzdev",
       aria: "LinkedIn: in/franprzdev",
       external: true,
     },
@@ -77,7 +75,6 @@ export function ContactConstellations() {
       word: "WHATSAPP",
       color: "#5fd39a",
       href: `https://wa.me/${CV.whatsapp}`,
-      caption: lang === "es" ? "Mensaje directo" : "Direct message",
       aria: lang === "es" ? "WhatsApp: mensaje directo" : "WhatsApp: direct message",
       external: true,
     },
@@ -104,7 +101,6 @@ export function ContactConstellations() {
           {...(it.external ? { target: "_blank", rel: "noreferrer" } : {})}
         >
           <StarWord word={it.word} color={it.color} />
-          <span className="cc-caption">{it.caption}</span>
         </a>
       ))}
 
@@ -138,17 +134,6 @@ export function ContactConstellations() {
         .cc-link:hover .cc-stars circle,
         .cc-link:focus-visible .cc-stars circle {
           filter: drop-shadow(0 0 7px var(--cc));
-        }
-        .cc-caption {
-          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-          font-size: 0.82rem;
-          letter-spacing: 0.02em;
-          color: var(--muted);
-          transition: color 0.3s ease;
-        }
-        .cc-link:hover .cc-caption,
-        .cc-link:focus-visible .cc-caption {
-          color: var(--cc);
         }
       `}</style>
     </div>

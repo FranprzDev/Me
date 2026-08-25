@@ -54,7 +54,7 @@ export interface CV {
 }
 
 export const CV: CV = {
-  name: "Francisco Miguel Perez",
+    name: "Francisco Perez",
   title: {
     es: "Ing. en Sistemas de Información",
     en: "Information Systems Engineer",
@@ -69,8 +69,8 @@ export const CV: CV = {
   whatsapp: "5493815412480",
 
   summary: {
-    es: "Estudiante de Ingeniería en Sistemas de Información, con 3 años de experiencia en la industria y enfoque en el desarrollo de código limpio, robusto y escalable.",
-    en: "Information Systems Engineering student with 3 years of industry experience and a focus on clean, robust and scalable code.",
+    es: "Estudiante de Ingeniería en Sistemas de Información, con 3 años de experiencia en la industria y enfoque en el desarrollo de código limpio, robusto y escalable. Obsesionado con la tecnología y con hacer que las cosas pasen.",
+    en: "Information Systems Engineering student with 3 years of industry experience and a focus on clean, robust and scalable code. Obsessed with technology and with making things happen.",
   },
 
   highlights: [
