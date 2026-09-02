@@ -16,7 +16,7 @@ type Dict = Record<Lang, string>;
 const UI = {
   nav_experience: { es: "Experiencia", en: "Experience" },
   nav_education: { es: "Educación", en: "Education" },
-  nav_projects: { es: "Proyectos", en: "Projects" },
+  nav_projects: { es: "Sobre Mi", en: "About Me" },
   nav_contact: { es: "Contacto", en: "Contact" },
 
   hero_cta_projects: { es: "Ver proyectos", en: "See projects" },
@@ -28,7 +28,7 @@ const UI = {
   edu_certs: { es: "Certificaciones", en: "Certifications" },
   edu_highlights: { es: "Participaciones destacadas", en: "Highlights" },
 
-  proj_title: { es: "Proyectos & logros", en: "Projects & achievements" },
+  proj_title: { es: "Sobre Mi", en: "About Me" },
 
   contact_title: { es: "Charlemos", en: "Let's chat" },
 

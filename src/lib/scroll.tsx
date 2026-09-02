@@ -15,10 +15,10 @@ import {
  * [0..1] y enciende su constelación al pasar por su centro.
  *
  * Orden de secciones (debe coincidir con page.tsx y con CONSTELLATIONS):
- *   0 Hero · 1 Experiencia · 2 Educación · 3 Proyectos · 4 Contacto
+ *   0 Hero · 1 Experiencia · 2 Sobre Mi · 3 Contacto
  * El viaje principal vive en la home; las demás rutas quedan fuera de este cálculo.
  */
-export const SECTION_COUNT = 5;
+export const SECTION_COUNT = 4;
 
 export function smoothstep(edge0: number, edge1: number, x: number): number {
   const t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
@@ -28,6 +28,32 @@ export function smoothstep(edge0: number, edge1: number, x: number): number {
 /** Centro de la zona de scroll de una sección. */
 export function sectionCenter(index: number): number {
   return (index + 0.5) / SECTION_COUNT;
+}
+
+/**
+ * Centros de sección medidos desde el DOM real (las secciones NO ocupan lo
+ * mismo: Proyectos es más alta por el slider). Se cachea por altura de
+ * documento; cae al modelo de zonas iguales si aún no hay DOM (SSR).
+ */
+const SECTION_IDS = ["top", "experience", "projects", "contact"];
+let centersCacheKey = -1;
+let centersCache: number[] = [];
+
+export function measuredSectionCenter(index: number): number {
+  if (typeof document === "undefined") return sectionCenter(index);
+  const doc = document.documentElement;
+  const key = doc.scrollHeight;
+  if (key !== centersCacheKey) {
+    const max = key - window.innerHeight;
+    centersCache = SECTION_IDS.map((id) => {
+      const el = document.getElementById(id);
+      if (!el || max <= 0) return (SECTION_IDS.indexOf(id) + 0.5) / SECTION_COUNT;
+      const centerPx = el.offsetTop + el.offsetHeight / 2 - window.innerHeight / 2;
+      return Math.min(1, Math.max(0, centerPx / max));
+    });
+    centersCacheKey = key;
+  }
+  return centersCache[index] ?? sectionCenter(index);
 }
 
 /**
