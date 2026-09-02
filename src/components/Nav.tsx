@@ -13,7 +13,6 @@ export function Nav() {
   // Hrefs absolutos: el Nav vive en el layout (todas las rutas).
   const links: { href: string; key: Parameters<typeof t>[0] }[] = [
     { href: "/#experience", key: "nav_experience" },
-    { href: "/#education", key: "nav_education" },
     { href: "/#projects", key: "nav_projects" },
     { href: "/#contact", key: "nav_contact" },
   ];

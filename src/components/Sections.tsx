@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { CV } from "@/data/cv";
 import { PROJECTS } from "@/data/projects";
 import { useI18n } from "@/lib/i18n";
+import { setActiveProject } from "@/lib/projectFocus";
 import { Reveal } from "@/components/Reveal";
 import { ContactConstellations } from "@/components/ContactConstellations";
 import { GsapHeroName } from "@/components/GsapHeroName";
@@ -108,23 +110,6 @@ export function Education() {
         </div>
 
         <Reveal delay={0.1}>
-          <h3 className="h-display" style={{ fontSize: "1.6rem", margin: "2.2rem 0 1rem" }}>{t("edu_highlights")}</h3>
-        </Reveal>
-        <div style={{ display: "grid", gap: "0.8rem", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
-          {CV.highlights.map((h, i) => (
-            <Reveal key={i} delay={i * 0.06}>
-              <div className="glass-soft tilt-card" style={{ padding: "1.1rem 1.3rem", height: "100%" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: "0.5rem" }}>
-                  <strong style={{ color: "var(--japan-2, #e9b949)" }}>{h.title}</strong>
-                  <span className="chip">{h.year}</span>
-                </div>
-                <p style={{ margin: "0.5rem 0 0", color: "var(--muted)", fontSize: "0.92rem", lineHeight: 1.6 }}>{tl(h.detail)}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-
-        <Reveal delay={0.1}>
           <h3 className="h-display" style={{ fontSize: "1.6rem", margin: "2.2rem 0 1rem" }}>{t("edu_certs")}</h3>
         </Reveal>
         <div style={{ display: "grid", gap: "0.7rem", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
@@ -148,50 +133,111 @@ export function Education() {
 
 export function Projects() {
   const { t, tl } = useI18n();
+  const [idx, setIdx] = useState(0);
+  const total = PROJECTS.length;
+
+  const go = (next: number, dir: number) => {
+    setActiveProject((next + total) % total, dir);
+    setIdx((next + total) % total);
+  };
+  useEffect(() => {
+    setActiveProject(idx, 1);
+  }, [idx]);
+
+  const p = PROJECTS[idx];
   return (
-    <section id="projects" className="section">
-      <div className="wrap">
+    <section id="projects" className="section" style={{ position: "relative", textAlign: "center" }}>
+      <div className="wrap" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.9rem" }}>
         <Reveal>
-          <h2 className="h-display glow-brain" style={{ fontSize: "clamp(2rem, 5vw, 3.4rem)", margin: "0.4rem 0 2rem" }}>
+          <h2 className="h-display glow-brain" style={{ fontSize: "clamp(2rem, 5vw, 3.4rem)", margin: "0.4rem 0 0.2rem" }}>
             {t("proj_title")}
           </h2>
         </Reveal>
-        <div style={{ display: "grid", gap: "1rem", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
-          {PROJECTS.map((p, i) => (
-            <Reveal key={p.name} delay={i * 0.06}>
-              <Magnetic strength={0.12} style={{ height: "100%" }}>
-              <article
-                className="glass tilt-card"
+        <Reveal delay={0.06}>
+          <p style={{ color: "var(--muted)", margin: "0 auto", maxWidth: 640, textAlign: "center", lineHeight: 1.6 }}>
+            Cada tópico corresponde a un planeta, elije el tópico que deseas visualizar;
+          </p>
+        </Reveal>
+
+        {/* Planeta actual centrado: protagonista del slider (el 3D vive detrás). */}
+        <Reveal delay={0.1}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.35rem" }}>
+            <Link href={`/${p.slug}`} style={{ textDecoration: "none" }}>
+              <h3
+                className="link-underline"
                 style={{
-                  padding: "1.4rem 1.5rem",
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0.6rem",
-                  borderColor: p.featured ? "rgba(57,255,20,0.35)" : undefined,
+                  margin: 0,
+                  fontSize: "clamp(1.4rem, 3vw, 1.95rem)",
+                  color: p.planet.atmoA,
+                  textAlign: "center",
+                  display: "inline",
                 }}
               >
-                <div style={{ display: "flex", justifyContent: "space-between", gap: "0.5rem", alignItems: "flex-start" }}>
-                  <h3 style={{ margin: 0, fontSize: "1.1rem", lineHeight: 1.3 }}>{p.name}</h3>
-                  <span className="chip">{p.year}</span>
-                </div>
-                <p className="accent-brain" style={{ margin: 0, fontSize: "0.9rem", fontWeight: 600 }}>{tl(p.tagline)}</p>
-                <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.9rem", lineHeight: 1.6, flex: 1 }}>{tl(p.description)}</p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
-                  {p.stack.map((s) => (
-                    <span key={s} className="chip">{s}</span>
-                  ))}
-                </div>
-                {p.link && (
-                  <a href={p.link} target="_blank" rel="noreferrer" className="link-underline accent-brain" style={{ fontSize: "0.85rem", fontWeight: 600 }}>
-                    Ver más →
-                  </a>
-                )}
-              </article>
-              </Magnetic>
-            </Reveal>
-          ))}
-        </div>
+                {p.name}
+              </h3>
+            </Link>
+            <span className="chip" style={{ borderColor: p.planet.atmoA, color: p.planet.atmoA }}>
+              {p.year}{p.featured ? " ★" : ""}
+            </span>
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.14}>
+          <div style={{ display: "flex", gap: "0.5rem", justifyContent: "center" }}>
+            {PROJECTS.map((proj, i) => (
+              <button
+                key={proj.slug}
+                onClick={() => go(i, i > idx ? 1 : -1)}
+                aria-label={proj.name}
+                aria-current={i === idx}
+                style={{
+                  width: i === idx ? 24 : 8,
+                  height: 8,
+                  borderRadius: 999,
+                  border: "none",
+                  cursor: "pointer",
+                  background: i === idx ? proj.planet.atmoA : "rgba(255,255,255,0.25)",
+                  transition: "width 0.3s ease",
+                }}
+              />
+            ))}
+          </div>
+        </Reveal>
+      </div>
+
+      {/* Flechas a cada lado de la pantalla — más usable y el planeta queda protagonista. */}
+      <div
+        aria-hidden={false}
+        style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 clamp(0.7rem, 3vw, 2rem)",
+          pointerEvents: "none",
+        }}
+      >
+        <Magnetic strength={0.22}>
+          <button
+            onClick={() => go(idx - 1, -1)}
+            aria-label={tl({ es: "Planeta anterior", en: "Previous planet" })}
+            className="glass"
+            style={{ borderRadius: "999px", width: 52, height: 52, color: "var(--fg)", fontSize: "1.3rem", cursor: "pointer", pointerEvents: "auto" }}
+          >
+            ←
+          </button>
+        </Magnetic>
+        <Magnetic strength={0.22}>
+          <button
+            onClick={() => go(idx + 1, 1)}
+            aria-label={tl({ es: "Siguiente planeta", en: "Next planet" })}
+            className="glass"
+            style={{ borderRadius: "999px", width: 52, height: 52, color: "var(--fg)", fontSize: "1.3rem", cursor: "pointer", pointerEvents: "auto" }}
+          >
+            →
+          </button>
+        </Magnetic>
       </div>
     </section>
   );

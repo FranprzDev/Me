@@ -1,10 +1,4 @@
-import {
-  Hero,
-  Experience,
-  Education,
-  Projects,
-  Contact,
-} from "@/components/Sections";
+import { Hero, Experience, Projects, Contact } from "@/components/Sections";
 import { StarAura } from "@/components/StarAura";
 
 export default function Home() {
@@ -13,7 +7,6 @@ export default function Home() {
       <StarAura />
       <Hero />
       <Experience />
-      <Education />
       <Projects />
       <Contact />
     </main>

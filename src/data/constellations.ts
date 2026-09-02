@@ -92,35 +92,10 @@ export const CONSTELLATIONS: Constellation[] = [
     world: { x: -6.0, y: -2.7, z: -10.5, scale: 0.85 },
   },
 
-  // Educación (UTN) — "Academia": tus estudios de ingeniería, libro abierto.
-  {
-    id: "academy",
-    sectionIndex: 2,
-    color: "#9b93d6",
-    nodes: [
-      [-1.05, 0.45],
-      [0, 0.65],
-      [1.05, 0.45],
-      [-1.05, -0.5],
-      [0, -0.3],
-      [1.05, -0.5],
-    ],
-    edges: [
-      [0, 1],
-      [1, 2],
-      [0, 3],
-      [2, 5],
-      [3, 4],
-      [4, 5],
-      [1, 4],
-    ],
-    world: { x: 6.0, y: -2.9, z: -11, scale: 0.85 },
-  },
-
-  // Proyectos — "La Forja": tus proyectos (NASA Space Apps, etc.).
+  // Sobre Mi — "La Forja": tus mundos (hackathones, proyectos, educación).
   {
     id: "forge",
-    sectionIndex: 3,
+    sectionIndex: 2,
     color: "#8f86d0",
     nodes: [
       [-1.05, -0.2],
@@ -147,7 +122,7 @@ export const CONSTELLATIONS: Constellation[] = [
   // justo detrás del CTA. Es la única que va al centro a propósito: es el destino.
   {
     id: "charlemos",
-    sectionIndex: 4,
+    sectionIndex: 3,
     color: "#b9c4ff",
     hero: true, // protagonista: es el título de la sección, no fondo
     particlesPerNode: 4, // ~50 nodos: bajamos partículas para no inflar el conteo
@@ -288,7 +263,7 @@ function makeContactConstellation(lang: Lang): Constellation {
       : { y: 1.62, scale: 0.52, gap: 0.22 };
   return {
     id: "charlemos",
-    sectionIndex: 4,
+    sectionIndex: 3,
     color: "#b9c4ff",
     hero: true,
     particlesPerNode: 4,
@@ -299,6 +274,6 @@ function makeContactConstellation(lang: Lang): Constellation {
 
 export function getConstellations(lang: Lang): Constellation[] {
   const constellations = CONSTELLATIONS.slice();
-  constellations[4] = makeContactConstellation(lang);
+  constellations[3] = makeContactConstellation(lang);
   return constellations;
 }

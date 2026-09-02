@@ -13,10 +13,10 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Stars } from "@react-three/drei";
 import { useMemo, useRef, useState, useEffect, type RefObject } from "react";
 import * as THREE from "three";
-import { getScrollProgress, sectionCenter, bumpWeight } from "@/lib/scroll";
+import { getScrollProgress, measuredSectionCenter, bumpWeight } from "@/lib/scroll";
 import { getConstellations, type Constellation } from "@/data/constellations";
 import { useI18n } from "@/lib/i18n";
-import { Nebula, Planet } from "./Cosmos";
+import { Nebula, Planet, ProjectPlanets } from "./Cosmos";
 
 // Fondo de respaldo: clear-color del WebGL y fallback CSS. Siempre oscuro para
 // que NUNCA aparezca un flash blanco (p.ej. al redimensionar).
@@ -179,7 +179,7 @@ function ConstellationGroup({
   reduced: boolean;
   performanceMode: boolean;
 }) {
-  const center = useMemo(() => sectionCenter(data.sectionIndex), [data.sectionIndex]);
+  const center = useMemo(() => measuredSectionCenter(data.sectionIndex), [data.sectionIndex]);
   const ambient = data.ambient ?? false;
   const hero = data.hero ?? false;
   // Las ambientales son decorado lejano: menos partículas por nodo (más baratas).
@@ -314,7 +314,9 @@ function ConstellationGroup({
     const w = ambient
       ? 1
       : hero
-        ? smoother(pNow, center - 0.22, Math.min(1, center + 0.06))
+        ? // Arranca tarde (apenas antes de su sección): no debe invadir la
+          // cola de Proyectos, donde viven los planetas del slider.
+          smoother(pNow, center - 0.12, Math.min(1, center + 0.04))
         : bumpWeight(pNow, center);
 
     // Early-out: dormida y ya invisible -> no animamos sus partículas. Con más
@@ -383,7 +385,7 @@ function Rig({
   minimal: boolean;
   performanceMode: boolean;
 }) {
-  const { scene, camera } = useThree();
+  const { scene, camera, gl } = useThree();
   const { lang } = useI18n();
   const stars = useRef<THREE.Points>(null);
   const fog = useMemo(() => new THREE.FogExp2(C_BG_A.getHex(), 0.018), []);
@@ -438,6 +440,18 @@ function Rig({
     camera.position.x += (tx - camera.position.x) * 0.05;
     camera.position.y += (ty - camera.position.y) * 0.05;
     camera.lookAt(0, 0, camera.position.z - 9);
+
+    // Los planetas del slider son clickeables: el wrapper de la escena sólo
+    // captura el puntero dentro de la zona de Proyectos (el contenido DOM vive
+    // encima; en el resto del viaje el canvas es transparente al puntero).
+    // Se escribe sobre NUESTRO wrapper (marcado con data-scene-root) y fuera
+    // de React: el div interno de R3F lo pisa React en cada re-render.
+    const root = gl.domElement.closest<HTMLElement>("[data-scene-root]");
+    if (root) {
+      const interactive = bumpWeight(pRef.current, measuredSectionCenter(2), 0.1) > 0.05;
+      const next = interactive ? "auto" : "none";
+      if (root.style.pointerEvents !== next) root.style.pointerEvents = next;
+    }
   });
 
   const starCount = reduced ? 900 : 2200;
@@ -448,6 +462,8 @@ function Rig({
 
       <Nebula pRef={pRef} reduced={reduced} performanceMode={performanceMode} />
       {!performanceMode && <Planet reduced={reduced} pRef={pRef} />}
+      {/* Los proyectos como planetas: sólo en dispositivos con margen de GPU. */}
+      {!performanceMode && <ProjectPlanets reduced={reduced} pRef={pRef} />}
 
       <Stars
         ref={stars as never}
@@ -518,6 +534,7 @@ export default function Scene({ minimal = false }: { minimal?: boolean }) {
   return (
     <div
       aria-hidden
+      data-scene-root=""
       style={{
         position: "fixed",
         inset: 0,
