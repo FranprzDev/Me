@@ -54,41 +54,58 @@ export function ProjectPageContent({ slug }: { slug: string }) {
       <p style={{ margin: 0, color: "var(--muted)", lineHeight: 1.8 }}>{tl(p.description)}</p>
 
       {p.items && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginTop: "0.6rem" }}>
-          {p.items.map((it) => (
-            <div
-              key={it.name}
-              className="glass-soft"
-              style={{ padding: "1.1rem 1.4rem", borderLeft: `3px solid var(--planet)` }}
-            >
-              <strong style={{ fontSize: "1.05rem" }}>
-                {it.name}{" "}
-                <span className="chip" style={{ marginLeft: "0.3rem" }}>{it.year}</span>
-                {it.highlight && (
-                  <span
-                    className="chip"
-                    style={{ marginLeft: "0.3rem", color: "var(--planet)", borderColor: "var(--planet)" }}
-                  >
-                    {tl(it.highlight)}
-                  </span>
-                )}
-              </strong>
-              <p style={{ margin: "0.4rem 0 0.4rem", color: "var(--muted)", lineHeight: 1.7 }}>
-                {tl(it.description)}
-              </p>
-              {it.link && (
-                <a
-                  href={it.link}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="link-underline"
-                  style={{ color: "var(--planet)", fontWeight: 600 }}
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.8rem", marginTop: "0.6rem" }}>
+          {[...new Map(p.items.map((it) => [it.category?.es ?? "Highlights", it])).keys()].map((category) => {
+            const categoryItems = p.items!.filter((it) => (it.category?.es ?? "Highlights") === category);
+            const label = categoryItems[0].category ?? { es: "Destacados", en: "Highlights" };
+            return (
+              <section key={category} aria-labelledby={`project-category-${category}`}>
+                <h2
+                  id={`project-category-${category}`}
+                  className="eyebrow"
+                  style={{ color: "var(--planet-rim)", margin: "0 0 0.7rem", fontSize: "0.78rem" }}
                 >
-                  GitHub →
-                </a>
-              )}
-            </div>
-          ))}
+                  {tl(label)}
+                </h2>
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                  {categoryItems.map((it) => (
+                    <div
+                      key={it.name}
+                      className="glass-soft"
+                      style={{ padding: "1.1rem 1.4rem", borderLeft: `3px solid var(--planet)` }}
+                    >
+                      <strong style={{ fontSize: "1.05rem" }}>
+                        {it.name}{" "}
+                        <span className="chip" style={{ marginLeft: "0.3rem" }}>{it.year}</span>
+                        {it.highlight && (
+                          <span
+                            className="chip"
+                            style={{ marginLeft: "0.3rem", color: "var(--planet)", borderColor: "var(--planet)" }}
+                          >
+                            {tl(it.highlight)}
+                          </span>
+                        )}
+                      </strong>
+                      <p style={{ margin: "0.4rem 0 0.4rem", color: "var(--muted)", lineHeight: 1.7 }}>
+                        {tl(it.description)}
+                      </p>
+                      {it.link && (
+                        <a
+                          href={it.link}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="link-underline"
+                          style={{ color: "var(--planet)", fontWeight: 600 }}
+                        >
+                          {it.link.includes("github.com") ? "GitHub →" : "Ver proyecto →"}
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            );
+          })}
         </div>
       )}
 
