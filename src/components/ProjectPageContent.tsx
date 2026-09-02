@@ -1,6 +1,7 @@
 "use client";
 
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { PROJECTS } from "@/data/projects";
 import { useI18n } from "@/lib/i18n";
 
@@ -9,7 +10,7 @@ import { useI18n } from "@/lib/i18n";
  * bilingüe vía el mismo contexto i18n que el resto del sitio.
  */
 export function ProjectPageContent({ slug }: { slug: string }) {
-  const { tl } = useI18n();
+  const { t, tl } = useI18n();
   const p = PROJECTS.find((x) => x.slug === slug);
   if (!p) notFound();
 
@@ -26,6 +27,9 @@ export function ProjectPageContent({ slug }: { slug: string }) {
         } as React.CSSProperties
       }
     >
+      <Link href="/#projects" className="chip" style={{ alignSelf: "flex-start" }}>
+        {t("proj_back")}
+      </Link>
       <span
         className="eyebrow"
         style={{ color: "var(--planet)", letterSpacing: "0.22em", fontSize: "0.75rem" }}
