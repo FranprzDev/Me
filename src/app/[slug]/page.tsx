@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PROJECTS } from "@/data/projects";
 import { PlanetBackground } from "@/components/PlanetBackground";
 import { ProjectPageContent } from "@/components/ProjectPageContent";
@@ -39,9 +38,6 @@ export default async function ProjectPage({
       <PlanetBackground slug={slug} />
       <main className="section" style={{ paddingTop: "8rem", justifyContent: "flex-start" }}>
         <div className="wrap">
-          <Link href="/#projects" className="chip" style={{ display: "inline-block", marginBottom: "1.5rem" }}>
-            ← Volver al cosmos
-          </Link>
           <ProjectPageContent slug={slug} />
         </div>
       </main>

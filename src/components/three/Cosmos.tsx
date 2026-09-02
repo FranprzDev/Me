@@ -284,7 +284,7 @@ function ProjectPlanet({
   pRef: RefObject<number>;
 }) {
   const group = useRef<THREE.Group>(null);
-  const { camera } = useThree();
+  const { camera, size } = useThree();
   const router = useRouter();
   // Slide: 0 = fuera de escena, 1 = en el centro del escenario.
   const slideRef = useRef(0);
@@ -374,7 +374,8 @@ function ProjectPlanet({
     const camZ = camera.position.z;
     const off = (1 - s) * getSlideDirection() * 8;
     group.current.position.set(PLANET_FRONT.x + off, PLANET_FRONT.y, camZ + PLANET_FRONT.z);
-    group.current.scale.setScalar(spec.radius * 1.82 * (1 + 0.06 * hoverRef.current));
+    const viewportScale = Math.min(1, Math.max(0.48, size.width / 1200));
+    group.current.scale.setScalar(spec.radius * 1.82 * viewportScale * (1 + 0.06 * hoverRef.current));
 
     const f = inSection * s;
     bodyMat.opacity = f;

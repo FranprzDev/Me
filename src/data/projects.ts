@@ -20,6 +20,7 @@ export interface ProjectItem {
   year: string;
   link?: string;
   highlight?: Localized<string>;
+  category?: Localized<string>;
 }
 
 export interface Project {
@@ -129,21 +130,93 @@ export const PROJECTS: Project[] = [
     slug: "projects",
     name: "Proyectos Personales",
     tagline: {
-      es: "Colección de proyectos, experimentos y herramientas.",
-      en: "Collection of projects, experiments and tools.",
+      es: "Herramientas reales: developer tools, IA y productos web.",
+      en: "Real tools: developer tools, AI and web products.",
     },
     description: {
-      es: "Un compendio de proyectos propios y colaborativos: CLIs, automatizaciones y productos web que nacieron como experimentos y se volvieron herramientas diarias.",
-      en: "A compendium of personal and collaborative builds: CLIs, automations and web products that started as experiments and became everyday tools.",
+      es: "Una selección de herramientas que construí para resolver problemas concretos: automatización, agentes de IA, utilidades para desarrollo y productos web.",
+      en: "A selection of tools I built to solve concrete problems: automation, AI agents, developer utilities and web products.",
     },
-    stack: ["CLI", "Developer Tools", "Web"],
-    year: "En curso",
+    stack: ["TypeScript", "IA", "Web", "Open Source"],
+    year: "2023 – en curso",
     planet: {
       body: "#1f4a66",
       atmoA: "#4fc3f7",
       atmoB: "#c5ecff",
       radius: 0.88,
     },
+    items: [
+      {
+        name: "apuntes-cli",
+        description: {
+          es: "CLI/plugin para generar FAQs y apuntes finales compactos por materia.",
+          en: "CLI/plugin for generating compact FAQs and final notes by subject.",
+        },
+        year: "2025",
+        link: "https://github.com/FranprzDev/apuntes-cli",
+        category: { es: "Developer Tools", en: "Developer Tools" },
+      },
+      {
+        name: "mac-brainroot-cli",
+        description: {
+          es: "CLI para abrir rápidamente flujos de trabajo con herramientas de IA desde macOS.",
+          en: "CLI for quickly launching AI tool workflows from macOS.",
+        },
+        year: "2025",
+        link: "https://github.com/FranprzDev/mac-brainroot-cli",
+        category: { es: "Developer Tools", en: "Developer Tools" },
+      },
+      {
+        name: "n8n-nodes-timed-buffer",
+        description: {
+          es: "Nodo comunitario de n8n que agrupa mensajes por tiempo usando Redis antes de emitirlos.",
+          en: "Community n8n node that batches messages over time with Redis before emitting them.",
+        },
+        year: "2025",
+        link: "https://github.com/FranprzDev/n8n-nodes-timed-buffer",
+        category: { es: "Developer Tools", en: "Developer Tools" },
+      },
+      {
+        name: "SantiagoAgent-RS",
+        description: {
+          es: "Agente conversacional para repuestos con memoria persistente, visión, subagentes y generación de solicitudes en PDF.",
+          en: "Conversational spare-parts agent with persistent memory, vision, subagents and PDF request generation.",
+        },
+        year: "2025 – en curso",
+        link: "https://github.com/FranprzDev/SantiagoAgent-RS",
+        category: { es: "IA y Automatización", en: "AI & Automation" },
+      },
+      {
+        name: "n8n Workflows — RepuestosShop",
+        description: {
+          es: "Workflows de automatización para conectar procesos, datos y atención de una operación de repuestos.",
+          en: "Automation workflows connecting processes, data and support for a spare-parts operation.",
+        },
+        year: "2025 – en curso",
+        link: "https://github.com/FranprzDev/n8n-workflows-repuestoshops",
+        category: { es: "IA y Automatización", en: "AI & Automation" },
+      },
+      {
+        name: "ClAISS",
+        description: {
+          es: "Producto web que transforma ideas en videos educativos visuales con IA y animaciones Manim.",
+          en: "Web product that turns ideas into visual educational videos with AI and Manim animations.",
+        },
+        year: "2025",
+        link: "https://claiss.vercel.app/",
+        category: { es: "Productos Web", en: "Web Products" },
+      },
+      {
+        name: "GPozos",
+        description: {
+          es: "Juego educativo que convierte un modelo de Programación Lineal en una experiencia de decisión sobre infraestructura hídrica.",
+          en: "Educational game turning a Linear Programming model into a decision experience about water infrastructure.",
+        },
+        year: "2025",
+        link: "https://pozos-delfingallo.vercel.app",
+        category: { es: "Productos Web", en: "Web Products" },
+      },
+    ],
   },
   {
     slug: "university",

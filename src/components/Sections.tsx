@@ -155,7 +155,7 @@ export function Projects() {
         </Reveal>
         <Reveal delay={0.06}>
           <p style={{ color: "var(--muted)", margin: "0 auto", maxWidth: 640, textAlign: "center", lineHeight: 1.6 }}>
-            Cada tópico corresponde a un planeta, elije el tópico que deseas visualizar;
+            {t("proj_instruction")}
           </p>
         </Reveal>
 

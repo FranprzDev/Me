@@ -462,8 +462,7 @@ function Rig({
 
       <Nebula pRef={pRef} reduced={reduced} performanceMode={performanceMode} />
       {!performanceMode && <Planet reduced={reduced} pRef={pRef} />}
-      {/* Los proyectos como planetas: sólo en dispositivos con margen de GPU. */}
-      {!performanceMode && <ProjectPlanets reduced={reduced} pRef={pRef} />}
+      <ProjectPlanets reduced={reduced} pRef={pRef} />
 
       <Stars
         ref={stars as never}

@@ -29,6 +29,11 @@ const UI = {
   edu_highlights: { es: "Participaciones destacadas", en: "Highlights" },
 
   proj_title: { es: "Sobre Mi", en: "About Me" },
+  proj_instruction: {
+    es: "Cada tópico corresponde a un planeta, elegí el tópico que deseas visualizar.",
+    en: "Each topic is a planet; choose the one you want to explore.",
+  },
+  proj_back: { es: "← Volver al cosmos", en: "← Back to cosmos" },
 
   contact_title: { es: "Charlemos", en: "Let's chat" },
 
