@@ -27,6 +27,7 @@ export interface Project {
   /** Slug de la ruta del planeta (p.ej. "hackathons" → /hackathons). */
   slug: string;
   name: string;
+  title?: Localized<string>;
   tagline: Localized<string>;
   description: Localized<string>;
   stack: string[];
@@ -42,12 +43,12 @@ export interface Project {
 /**
  * Los planetas del portfolio: cada uno ES un proyecto y al clickearlo se
  * visita su ruta /{slug} con la información completa.
- * TODO(francisco): confirmar links faltantes.
  */
 export const PROJECTS: Project[] = [
   {
     slug: "hackathons",
     name: "Hackathones",
+    title: { es: "Hackathones", en: "Hackathons" },
     tagline: {
       es: "Hackathones bajo presión: NASA, n8n y UNESCO.",
       en: "Hackathons under pressure: NASA, n8n and UNESCO.",
@@ -80,20 +81,19 @@ export const PROJECTS: Project[] = [
       {
         name: "BeeAgro",
         description: {
-          es: "Tecnología al servicio de la apicultura. Nuestra primera participación en Space Apps.",
-          en: "Technology for beekeeping. Our first Space Apps participation.",
+          es: "Tecnología al servicio de la apicultura. Nuestra participación en Space Apps 2025.",
+          en: "Technology for beekeeping. Our Space Apps 2025 participation.",
         },
-        year: "2023",
+        year: "2025",
         link: "https://github.com/FranprzDev/BeeAgro-Spanish",
       },
       {
         name: "Hackathon n8n — Vortex IT",
         description: {
-          es: "Hackathon enfocado en automatización y workflows con n8n.",
-          en: "Hackathon focused on automation and workflows with n8n.",
+          es: "Competidor presencial en Tucumán. Automatización y workflows con n8n bajo presión.",
+          en: "On-site competitor in Tucumán. Automation and n8n workflows under pressure.",
         },
         year: "2025",
-        // TODO(francisco): agregar repo/link cuando esté público
       },
       {
         name: "Youth Hackathon 2025 — UNESCO",
@@ -102,13 +102,13 @@ export const PROJECTS: Project[] = [
           en: "Participation in UNESCO Youth Hackathon 2025.",
         },
         year: "2025",
-        // TODO(francisco): agregar repo/link cuando esté público
       },
     ],
   },
   {
     slug: "curso-n8n",
     name: "Curso de Automatización con n8n",
+    title: { es: "Curso de Automatización con n8n", en: "n8n Automation Course" },
     tagline: {
       es: "10 clases (20 h) de automatización para el Poder Judicial de Tucumán.",
       en: "10 sessions (20h) of automation for the Tucumán Judiciary.",
@@ -125,10 +125,33 @@ export const PROJECTS: Project[] = [
       atmoB: "#ffe6b0",
       radius: 0.95,
     },
+    items: [
+      {
+        name: "n8n-workflows-course",
+        description: {
+          es: "Workflows de las sesiones 2 a 10 del curso: el material práctico que construimos en vivo con el grupo.",
+          en: "Session 2–10 workflows from the course: the hands-on material we built live with the group.",
+        },
+        year: "2025",
+        link: "https://github.com/FranprzDev/n8n-workflows-course",
+        category: { es: "Material del curso", en: "Course material" },
+      },
+      {
+        name: "n8n-curso-vivo",
+        description: {
+          es: "Repo vivo del curso con la sesión 9 y material de apoyo de las clases.",
+          en: "Live course repo with session 9 and class support material.",
+        },
+        year: "2025",
+        link: "https://github.com/FranprzDev/n8n-curso-vivo",
+        category: { es: "Material del curso", en: "Course material" },
+      },
+    ],
   },
   {
     slug: "projects",
     name: "Proyectos Personales",
+    title: { es: "Proyectos Personales", en: "Personal Projects" },
     tagline: {
       es: "Herramientas reales: developer tools, IA y productos web.",
       en: "Real tools: developer tools, AI and web products.",
@@ -139,6 +162,7 @@ export const PROJECTS: Project[] = [
     },
     stack: ["TypeScript", "IA", "Web", "Open Source"],
     year: "2023 – en curso",
+    link: "https://github.com/FranprzDev?tab=repositories",
     planet: {
       body: "#1f4a66",
       atmoA: "#4fc3f7",
@@ -177,40 +201,41 @@ export const PROJECTS: Project[] = [
         category: { es: "Developer Tools", en: "Developer Tools" },
       },
       {
-        name: "SantiagoAgent-RS",
+        name: "Scrapping-Repuestos-UY-API",
         description: {
-          es: "Agente conversacional para repuestos con memoria persistente, visión, subagentes y generación de solicitudes en PDF.",
-          en: "Conversational spare-parts agent with persistent memory, vision, subagents and PDF request generation.",
+          es: "API en NestJS para scraping de catálogos de repuestos con arquitectura híbrida por dominio: HTTP + parseo HTML/JSON-LD primero, Playwright solo como fallback. Quality gate central, migraciones versionadas y deploy en Railway.",
+          en: "NestJS API for spare-parts catalog scraping with per-domain hybrid architecture: HTTP + HTML/JSON-LD parsing first, Playwright only as fallback. Central quality gate, versioned migrations, Railway deploy.",
         },
         year: "2025 – en curso",
-        link: "https://github.com/FranprzDev/SantiagoAgent-RS",
+        link: "https://github.com/FranprzDev/Scrapping-Repuestos-UY-API",
         category: { es: "IA y Automatización", en: "AI & Automation" },
       },
       {
-        name: "n8n Workflows — RepuestosShop",
+        name: "FinalProject-DataEng",
         description: {
-          es: "Workflows de automatización para conectar procesos, datos y atención de una operación de repuestos.",
-          en: "Automation workflows connecting processes, data and support for a spare-parts operation.",
-        },
-        year: "2025 – en curso",
-        link: "https://github.com/FranprzDev/n8n-workflows-repuestoshops",
-        category: { es: "IA y Automatización", en: "AI & Automation" },
-      },
-      {
-        name: "ClAISS",
-        description: {
-          es: "Producto web que transforma ideas en videos educativos visuales con IA y animaciones Manim.",
-          en: "Web product that turns ideas into visual educational videos with AI and Manim animations.",
+          es: "Modern Open Source Data Stack: arquitectura e integración de Apache Airflow, dbt, Great Expectations y Apache Superset sobre PostgreSQL.",
+          en: "Modern Open Source Data Stack: architecture and integration of Apache Airflow, dbt, Great Expectations, and Apache Superset over PostgreSQL.",
         },
         year: "2025",
-        link: "https://claiss.vercel.app/",
-        category: { es: "Productos Web", en: "Web Products" },
+        link: "https://github.com/FranprzDev/FinalProject-DataEng",
+        category: { es: "Data Engineering", en: "Data Engineering" },
+      },
+      {
+        name: "Psichomatch",
+        description: {
+          es: "Proyecto seleccionado por el equipo de No Country para la siguiente etapa. Plataforma interactiva de matching y salud mental desarrollada en equipo multidisciplinario.",
+          en: "Project selected by No Country staff for the next stage. Collaborative mental health and matching platform built in a multidisciplinary team.",
+        },
+        year: "2024",
+        link: "https://github.com/FranprzDev/Psichomatch-No-Country-",
+        highlight: { es: "Seleccionado No Country ★", en: "Selected No Country ★" },
+        category: { es: "Prácticas y Simulación", en: "Practice & Simulation" },
       },
       {
         name: "GPozos",
         description: {
-          es: "Juego educativo que convierte un modelo de Programación Lineal en una experiencia de decisión sobre infraestructura hídrica.",
-          en: "Educational game turning a Linear Programming model into a decision experience about water infrastructure.",
+          es: "Juego 2D educativo e interactivo sobre planificación de inversiones en una red de agua potable (Delfín Gallo): asumís el rol de gerente de obras, elegís 3 tramos de tubería y el juego compara tu plan con el óptimo de un modelo de Programación Lineal.",
+          en: "Educational 2D game about investment planning on a drinking-water network (Delfín Gallo): you play the works manager, pick 3 pipe segments, and the game compares your plan against a Linear Programming optimum.",
         },
         year: "2025",
         link: "https://pozos-delfingallo.vercel.app",
@@ -221,6 +246,7 @@ export const PROJECTS: Project[] = [
   {
     slug: "university",
     name: "Educación",
+    title: { es: "Educación & Formación", en: "Education & Degree" },
     tagline: {
       es: "Ingeniería en Sistemas — UTN-FRT y formación continua.",
       en: "Systems Engineering — UTN-FRT and continuous training.",
@@ -246,6 +272,7 @@ export const PROJECTS: Project[] = [
           en: "Degree at Universidad Tecnológica Nacional, Tucumán. In progress since 2022.",
         },
         year: "2022 – en curso",
+        category: { es: "Formación de Grado", en: "Degree Program" },
       },
       {
         name: "FullStack Developer (MERN)",
@@ -255,6 +282,7 @@ export const PROJECTS: Project[] = [
         },
         year: "2022 – 2023",
         highlight: { es: "Alumno Destacado ★", en: "Outstanding Student ★" },
+        category: { es: "Certificaciones", en: "Certifications" },
       },
       {
         name: "React Avanzado",
@@ -263,6 +291,7 @@ export const PROJECTS: Project[] = [
           en: "RollingCode School — May to September 2024.",
         },
         year: "2024",
+        category: { es: "Certificaciones", en: "Certifications" },
       },
       {
         name: "Next.js Avanzado",
@@ -271,6 +300,7 @@ export const PROJECTS: Project[] = [
           en: "RollingCode School — June to November 2025.",
         },
         year: "2025",
+        category: { es: "Certificaciones", en: "Certifications" },
       },
       {
         name: "Data Engineer",
@@ -279,6 +309,87 @@ export const PROJECTS: Project[] = [
           en: "RollingCode School — June to October 2025.",
         },
         year: "2025",
+        category: { es: "Certificaciones", en: "Certifications" },
+      },
+      {
+        name: "LaburandoAndo (MERN)",
+        description: {
+          es: "Portal de empleo full-stack con autenticación JWT, Passport, MongoDB y validación estricta de datos. Proyecto final integral de la carrera FullStack.",
+          en: "Full-stack job portal with JWT authentication, Passport, MongoDB, and strict data validation. Capstone project of FullStack program.",
+        },
+        year: "2023",
+        link: "https://github.com/FranprzDev/LaburandoAndo-Back",
+        category: { es: "Proyectos RollingCode School", en: "RollingCode School Projects" },
+      },
+      {
+        name: "FIRMS Fire Station Planner",
+        description: {
+          es: "Pipeline ETL y Data Engineering para procesamiento y análisis de datos de focos de incendios satelitales (MODIS, Airflow, dbt, PostgreSQL).",
+          en: "ETL and Data Engineering pipeline for processing and analyzing satellite fire detection data (MODIS, Airflow, dbt, PostgreSQL).",
+        },
+        year: "2025",
+        link: "https://github.com/FranprzDev/firms-fire-station-planner",
+        category: { es: "Proyectos RollingCode School", en: "RollingCode School Projects" },
+      },
+      {
+        name: "DueMovie",
+        description: {
+          es: "Plataforma web interactiva para catálogo de películas y series con panel de administración CRUD.",
+          en: "Interactive web platform for movie and series catalog with CRUD administration panel.",
+        },
+        year: "2023",
+        link: "https://github.com/FranprzDev/DueMovie",
+        category: { es: "Proyectos RollingCode School", en: "RollingCode School Projects" },
+      },
+      {
+        name: "React Advanced Lab",
+        description: {
+          es: "Colección de desafíos técnicos y trabajos prácticos avanzados con React, componentes modulares y manipulación de datos tabulares.",
+          en: "Technical challenges and advanced hands-on assignments with React, modular components, and tabular data manipulation.",
+        },
+        year: "2024",
+        link: "https://github.com/FranprzDev/ReactAdvanced---Rolling",
+        category: { es: "Proyectos RollingCode School", en: "RollingCode School Projects" },
+      },
+      {
+        name: "AdHorarium",
+        description: {
+          es: "Planificador académico integral para carreras de UTN: gestión inteligente de correlativas, diagramación de horarios y cálculo de GPA.",
+          en: "Comprehensive academic planner for UTN degrees: smart prerequisite tracking, schedule diagramming, and GPA calculation.",
+        },
+        year: "2025",
+        link: "https://github.com/FranprzDev/AdHorarium",
+        category: { es: "Proyectos Académicos UTN-FRT", en: "UTN-FRT Academic Projects" },
+      },
+      {
+        name: "Simulador EcoATM Kiosk",
+        description: {
+          es: "Simulador de factibilidad económica y operativa de kioscos EcoATM con motor de simulación Monte Carlo propio. TFI Simulación.",
+          en: "Operational and economic feasibility simulator for EcoATM kiosks with custom Monte Carlo engine. Simulation final project.",
+        },
+        year: "2025",
+        link: "https://github.com/FranprzDev/Simulacion-TFI-Kiosk-EcoATM",
+        category: { es: "Proyectos Académicos UTN-FRT", en: "UTN-FRT Academic Projects" },
+      },
+      {
+        name: "SysPersonal Recursos Humanos",
+        description: {
+          es: "Sistema de gestión de personal y RRHH desarrollado con Next.js y Supabase. TFI Administración de Recursos.",
+          en: "HR and personnel management system built with Next.js and Supabase. Resource Administration capstone.",
+        },
+        year: "2025",
+        link: "https://github.com/FranprzDev/SysPersonal-AdmDeRecursos-4to-Anio-UTN",
+        category: { es: "Proyectos Académicos UTN-FRT", en: "UTN-FRT Academic Projects" },
+      },
+      {
+        name: "Hamming Step-by-Step",
+        description: {
+          es: "Simulador interactivo para el aprendizaje y visualización paso a paso de la codificación y corrección de errores con código Hamming. Comunicaciones.",
+          en: "Interactive simulator for step-by-step learning and visualization of Hamming code error detection and correction. Communications.",
+        },
+        year: "2024",
+        link: "https://github.com/FranprzDev/HammingStepByStep",
+        category: { es: "Proyectos Académicos UTN-FRT", en: "UTN-FRT Academic Projects" },
       },
     ],
   },

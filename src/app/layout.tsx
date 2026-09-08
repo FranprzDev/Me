@@ -4,7 +4,7 @@ import { I18nProvider } from "@/lib/i18n";
 import { ScrollProvider } from "@/lib/scroll";
 import { SiteChrome } from "@/components/SiteChrome";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://franprzdev.github.io";
 
 export const metadata: Metadata = {
   metadataBase: siteUrl ? new URL(siteUrl) : undefined,
@@ -18,6 +18,8 @@ export const metadata: Metadata = {
     description: "Un viaje en 3D por mi experiencia, formación y proyectos.",
     type: "website",
     url: siteUrl || undefined,
+    siteName: "Francisco Perez — Portfolio",
+    locale: "es_AR",
   },
   twitter: {
     card: "summary",

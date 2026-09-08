@@ -27,7 +27,7 @@ export function ProjectPageContent({ slug }: { slug: string }) {
         } as React.CSSProperties
       }
     >
-      <Link href="/#projects" className="chip" style={{ alignSelf: "flex-start" }}>
+      <Link href="/#projects" className="btn-cosmic-secondary" style={{ alignSelf: "flex-start", padding: "0.5rem 1.1rem", fontSize: "0.85rem" }}>
         {t("proj_back")}
       </Link>
       <span
@@ -46,7 +46,7 @@ export function ProjectPageContent({ slug }: { slug: string }) {
           textShadow: `0 0 40px color-mix(in srgb, var(--planet) 45%, transparent)`,
         }}
       >
-        {p.name}
+        {p.title ? tl(p.title) : p.name}
       </h1>
       <p style={{ margin: 0, color: "var(--planet-rim)", fontWeight: 600, fontSize: "1.1rem" }}>
         {tl(p.tagline)}
@@ -90,15 +90,28 @@ export function ProjectPageContent({ slug }: { slug: string }) {
                         {tl(it.description)}
                       </p>
                       {it.link && (
-                        <a
-                          href={it.link}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="link-underline"
-                          style={{ color: "var(--planet)", fontWeight: 600 }}
-                        >
-                          {it.link.includes("github.com") ? "GitHub →" : "Ver proyecto →"}
-                        </a>
+                        <div style={{ marginTop: "0.6rem" }}>
+                          <a
+                            href={it.link}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="chip"
+                            style={{
+                              color: "#ffffff",
+                              borderColor: "var(--planet)",
+                              background: "color-mix(in srgb, var(--planet) 15%, transparent)",
+                              padding: "0.35rem 0.85rem",
+                              fontSize: "0.78rem",
+                              fontWeight: 600,
+                              textDecoration: "none",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.4rem",
+                            }}
+                          >
+                            {it.link.includes("github.com") ? "Ver en GitHub ↗" : "Ver proyecto en vivo ↗"}
+                          </a>
+                        </div>
                       )}
                     </div>
                   ))}
