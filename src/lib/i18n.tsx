@@ -16,10 +16,11 @@ type Dict = Record<Lang, string>;
 const UI = {
   nav_experience: { es: "Experiencia", en: "Experience" },
   nav_education: { es: "Educación", en: "Education" },
-  nav_projects: { es: "Sobre Mi", en: "About Me" },
+  nav_projects: { es: "Proyectos", en: "Projects" },
   nav_contact: { es: "Contacto", en: "Contact" },
 
   hero_cta_projects: { es: "Ver proyectos", en: "See projects" },
+  hero_cta_cv: { es: "Descargar CV", en: "Download Resume" },
 
   exp_title: { es: "Experiencia profesional", en: "Professional experience" },
   exp_present: { es: "Presente", en: "Present" },
@@ -28,12 +29,16 @@ const UI = {
   edu_certs: { es: "Certificaciones", en: "Certifications" },
   edu_highlights: { es: "Participaciones destacadas", en: "Highlights" },
 
-  proj_title: { es: "Sobre Mi", en: "About Me" },
+  proj_title: { es: "Proyectos que marcan mi experiencia", en: "Projects Experience" },
   proj_instruction: {
     es: "Cada tópico corresponde a un planeta, elegí el tópico que deseas visualizar.",
-    en: "Each topic is a planet; choose the one you want to explore.",
+    en: "Each topic corresponds to a planet; choose the world you wish to explore.",
   },
-  proj_back: { es: "← Volver al cosmos", en: "← Back to cosmos" },
+  proj_back: { es: "← Volver a la órbita", en: "← Back to orbit" },
+  proj_explore: { es: "Explorar este mundo →", en: "Explore this world →" },
+
+  career_path: { es: "TRAYECTORIA PROFESIONAL", en: "CAREER PATH" },
+  world: { es: "MUNDO", en: "WORLD" },
 
   contact_title: { es: "Charlemos", en: "Let's chat" },
 

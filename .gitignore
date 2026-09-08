@@ -42,6 +42,7 @@ next-env.d.ts
 
 # dev logs / binarios de apuntes copiados en build (regenerados por scripts/build-notes-index.mjs)
 dev.log
+prod.log
 /public/notes/
 
 # editor swap / junk
