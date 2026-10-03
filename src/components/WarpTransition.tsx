@@ -47,8 +47,14 @@ export function WarpTransition() {
       return { a, r: Math.random() * 40, speed: 3 + Math.random() * 6 };
     });
 
-    const DURATION = mobile ? 450 : 700;
+    const DURATION = mobile ? 300 : 480;
     const t0 = performance.now();
+
+    // Navegamos YA: el warp tapa el swap de escena en lugar de precederlo,
+    // así el "delay" percibido es sólo el efecto, no efecto + carga.
+    canvas.style.transition = "none";
+    canvas.style.opacity = "1";
+    router.push(href);
 
     const frame = (now: number) => {
       const t = Math.min(1, (now - t0) / DURATION);
@@ -72,12 +78,14 @@ export function WarpTransition() {
       if (t < 1) {
         requestAnimationFrame(frame);
       } else {
-        router.push(href);
+        // Fundimos el overlay revelando la nueva escena ya montada.
+        canvas.style.transition = "opacity 320ms ease";
+        canvas.style.opacity = "0";
         window.setTimeout(() => {
           lock.current = false;
           const c = canvasRef.current?.getContext("2d");
           if (c && canvasRef.current) c.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-        }, 350);
+        }, 360);
       }
     };
     requestAnimationFrame(frame);
