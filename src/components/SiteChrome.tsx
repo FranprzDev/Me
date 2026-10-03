@@ -4,20 +4,28 @@ import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Nav } from "@/components/Nav";
+import { PROJECTS } from "@/data/projects";
 
-// La escena 3D es client-only (WebGL); se carga sin SSR. Vive en el layout para
-// que el cosmos y la navegación sean consistentes en todas las rutas.
+// Las escenas 3D son client-only (WebGPU); se cargan sin SSR. El cosmos vive en
+// el layout para que la navegación sea consistente en todas las rutas.
 const Scene = dynamic(() => import("@/components/three/Scene"), { ssr: false });
+const PlanetScene = dynamic(() => import("@/components/three/PlanetScene"), { ssr: false });
 
 export function SiteChrome() {
   const pathname = usePathname();
   const [sceneReady, setSceneReady] = useState(false);
   const sceneBooted = useRef(false);
   const onHome = pathname === "/";
+  // Cada planeta tiene su propia escena, así que la ruta decide cuál se monta.
+  // Sólo para proyectos reales: un 404 no merece un canvas.
+  const slug = onHome ? null : pathname.replace(/^\/|\/$/g, "");
+  const worldSlug = slug && PROJECTS.some((p) => p.slug === slug) ? slug : null;
+
   // La escena 3D es lo más costoso del sitio. La diferimos para dejar que la
-  // UI textual pinte primero.
+  // UI textual pinte primero. Arranca una sola vez: navegar entre mundos después
+  // no vuelve a esperar, sólo cambia la escena montada.
   useEffect(() => {
-    if (!onHome || sceneBooted.current) return;
+    if (sceneBooted.current) return;
 
     sceneBooted.current = true;
     let timer: number | undefined;
@@ -39,11 +47,12 @@ export function SiteChrome() {
       if (idleId !== undefined) window.cancelIdleCallback(idleId);
       if (timer !== undefined) window.clearTimeout(timer);
     };
-  }, [onHome]);
+  }, []);
 
   return (
     <>
-      {onHome && sceneReady ? <Scene /> : null}
+      {sceneReady && onHome ? <Scene /> : null}
+      {sceneReady && worldSlug ? <PlanetScene slug={worldSlug} /> : null}
       <Nav />
     </>
   );

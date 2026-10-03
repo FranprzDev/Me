@@ -8,82 +8,26 @@
 /* Shaders de la capa cósmica: nebulosa procedural (fbm en esfera invertida) y
    planeta con atmósfera fresnel. Todo procedural: 0 KB de assets. */
 import { useFrame, useThree } from "@react-three/fiber";
-import { useMemo, useRef, type RefObject } from "react";
+import { useEffect, useMemo, useRef, type RefObject } from "react";
 import * as THREE from "three";
+import { MeshBasicNodeMaterial } from "three/webgpu";
+import type { Node } from "three/webgpu";
+import { normalView, positionLocal, positionViewDirection, uniform } from "three/tsl";
+import { tslExports } from "vgpu/three";
+import cosmosShader from "./shaders/nebula.wgsl";
 import { PROJECTS, type PlanetSpec } from "@/data/projects";
 import { bumpWeight, measuredSectionCenter } from "@/lib/scroll";
 import { getActiveProject, getSlideDirection } from "@/lib/projectFocus";
 import { useRouter } from "next/navigation";
 
-const NOISE_GLSL = /* glsl */ `
-  float hash(vec3 p) {
-    p = fract(p * 0.3183099 + vec3(0.71, 0.113, 0.419));
-    p *= 17.0;
-    return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
-  }
-  float vnoise(vec3 x) {
-    vec3 i = floor(x);
-    vec3 f = fract(x);
-    f = f * f * (3.0 - 2.0 * f);
-    return mix(
-      mix(mix(hash(i), hash(i + vec3(1,0,0)), f.x),
-          mix(hash(i + vec3(0,1,0)), hash(i + vec3(1,1,0)), f.x), f.y),
-      mix(mix(hash(i + vec3(0,0,1)), hash(i + vec3(1,0,1)), f.x),
-          mix(hash(i + vec3(0,1,1)), hash(i + vec3(1,1,1)), f.x), f.y),
-      f.z);
-  }
-  float fbm(vec3 p) {
-    float v = 0.0;
-    float a = 0.5;
-    for (int i = 0; i < OCTAVES; i++) {
-      v += a * vnoise(p);
-      p *= 2.03;
-      a *= 0.5;
-    }
-    return v;
-  }
-`;
+type CosmosShaderInputs = {
+  nebulaColor: { position: Node; time: Node; scroll: Node; intensity: Node; octaves: Node };
+  atmosphereColor: { normal: Node; viewDirection: Node; colorA: Node; colorB: Node };
+  atmosphereOpacity: { normal: Node; viewDirection: Node; opacity: Node };
+};
 
-const NEBULA_VERT = /* glsl */ `
-  varying vec3 vDir;
-  void main() {
-    vDir = position;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  }
-`;
-
-function nebulaFrag(octaves: number) {
-  return /* glsl */ `
-    precision mediump float;
-    #define OCTAVES ${octaves}
-    varying vec3 vDir;
-    uniform float uTime;
-    uniform float uScroll;
-    uniform float uIntensity;
-    ${NOISE_GLSL}
-
-    void main() {
-      vec3 dir = normalize(vDir);
-      // Deriva temporal lentísima + empuje por scroll.
-      vec3 q = dir * 3.2;
-      q.y += uScroll * 1.4;
-      q += vec3(uTime * 0.008, uTime * 0.005, 0.0);
-      float n = fbm(q);
-      float n2 = fbm(q * 2.1 + vec3(4.7));
-      float clouds = smoothstep(0.42, 0.85, n * 0.72 + n2 * 0.38);
-
-      vec3 deep   = vec3(0.02, 0.03, 0.09);
-      vec3 blue   = vec3(0.10, 0.20, 0.62);   // --space
-      vec3 violet = vec3(0.24, 0.16, 0.55);   // --space-2
-      vec3 gold   = vec3(0.91, 0.76, 0.44);   // --star
-
-      vec3 col = mix(deep, blue, smoothstep(0.15, 0.7, n));
-      col = mix(col, violet, clouds * 0.75);
-      col += gold * pow(clouds, 6.0) * 0.22; // núcleos cálidos muy raros
-      gl_FragColor = vec4(col * uIntensity, 1.0);
-    }
-  `;
-}
+const { nebulaColor, atmosphereColor, atmosphereOpacity } =
+  tslExports<CosmosShaderInputs>(cosmosShader)("nebulaColor", "atmosphereColor", "atmosphereOpacity");
 
 export function Nebula({
   pRef,
@@ -94,31 +38,24 @@ export function Nebula({
   reduced: boolean;
   performanceMode: boolean;
 }) {
-  const mat = useMemo(
-    () =>
-      new THREE.ShaderMaterial({
-        vertexShader: NEBULA_VERT,
-        fragmentShader: nebulaFrag(performanceMode ? 3 : 5),
-        uniforms: {
-          uTime: { value: 0 },
-          uScroll: { value: 0 },
-          uIntensity: { value: reduced ? 0.35 : 0.55 },
-        },
-        side: THREE.BackSide,
-        depthWrite: false,
-        fog: false,
-      }),
-    [reduced, performanceMode]
-  );
+  const time = useMemo(() => uniform(0), []);
+  const scroll = useMemo(() => uniform(0), []);
+  const intensity = useMemo(() => uniform(reduced ? 0.35 : 0.55), [reduced]);
+  const octaves = useMemo(() => uniform(performanceMode ? 3 : 5), [performanceMode]);
+  const mat = useMemo(() => {
+    const material = new MeshBasicNodeMaterial({ side: THREE.BackSide, depthWrite: false, fog: false });
+    material.colorNode = nebulaColor({ position: positionLocal, time, scroll, intensity, octaves });
+    return material;
+  }, [intensity, octaves, scroll, time]);
 
   const geo = useMemo(() => new THREE.SphereGeometry(70, 32, 24), []);
 
   useFrame((_, dt) => {
-    mat.uniforms.uScroll.value = pRef.current;
-    if (!reduced) mat.uniforms.uTime.value += dt;
+    scroll.value = pRef.current;
+    if (!reduced) time.value += dt;
   });
 
-  useMemo(() => () => {
+  useEffect(() => () => {
     mat.dispose();
     geo.dispose();
   }, [mat, geo]);
@@ -126,30 +63,21 @@ export function Nebula({
   return <mesh geometry={geo} material={mat} renderOrder={-10} frustumCulled={false} />;
 }
 
-const ATMO_VERT = /* glsl */ `
-  varying vec3 vNormal;
-  varying vec3 vView;
-  void main() {
-    vNormal = normalize(normalMatrix * normal);
-    vec4 mv = modelViewMatrix * vec4(position, 1.0);
-    vView = normalize(-mv.xyz);
-    gl_Position = projectionMatrix * mv;
-  }
-`;
-
-const ATMO_FRAG = /* glsl */ `
-  precision mediump float;
-  varying vec3 vNormal;
-  varying vec3 vView;
-uniform vec3 uColorA;
-uniform vec3 uColorB;
-uniform float uOpacity;
-void main() {
-  float rim = pow(1.0 - abs(dot(vNormal, vView)), 2.4);
-  vec3 col = mix(uColorA, uColorB, rim);
-  gl_FragColor = vec4(col, rim * 0.85 * uOpacity);
+function createAtmosphereMaterial(colorA: THREE.Color, colorB: THREE.Color, opacity: number) {
+  const opacityUniform = uniform(opacity);
+  const colorAUniform = uniform(colorA);
+  const colorBUniform = uniform(colorB);
+  const inputs = { normal: normalView, viewDirection: positionViewDirection };
+  const material = new MeshBasicNodeMaterial({
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    side: THREE.BackSide,
+  });
+  material.colorNode = atmosphereColor({ ...inputs, colorA: colorAUniform, colorB: colorBUniform });
+  material.opacityNode = atmosphereOpacity({ ...inputs, opacity: opacityUniform });
+  return { material, opacity: opacityUniform };
 }
-`;
 
 /**
  * Planeta lejano con atmósfera fresnel y anillo tenue: ancla visual que da
@@ -164,26 +92,18 @@ export function Planet({
 }) {
   const group = useRef<THREE.Group>(null);
 
-  const { bodyMat, atmoMat, ringMat, geo, atmoGeo, ringGeo } = useMemo(() => {
+  const { bodyMat, atmoMat, atmoOpacity, ringMat, geo, atmoGeo, ringGeo } = useMemo(() => {
     const bodyMat = new THREE.MeshStandardMaterial({
       color: new THREE.Color("#131f3d"),
       roughness: 0.95,
       metalness: 0.05,
       transparent: true,
     });
-    const atmoMat = new THREE.ShaderMaterial({
-      vertexShader: ATMO_VERT,
-      fragmentShader: ATMO_FRAG,
-      uniforms: {
-        uColorA: { value: new THREE.Color("#5b8cff") },
-        uColorB: { value: new THREE.Color("#c9b6ff") },
-        uOpacity: { value: 1 },
-      },
-      transparent: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      side: THREE.BackSide,
-    });
+    const { material: atmoMat, opacity: atmoOpacity } = createAtmosphereMaterial(
+      new THREE.Color("#5b8cff"),
+      new THREE.Color("#c9b6ff"),
+      1
+    );
     const ringMat = new THREE.MeshBasicMaterial({
       color: new THREE.Color("#8fa7ff"),
       transparent: true,
@@ -195,6 +115,7 @@ export function Planet({
     return {
       bodyMat,
       atmoMat,
+      atmoOpacity,
       ringMat,
       geo: new THREE.SphereGeometry(1, 48, 32),
       atmoGeo: new THREE.SphereGeometry(1.18, 48, 32),
@@ -202,7 +123,7 @@ export function Planet({
     };
   }, []);
 
-  useMemo(
+  useEffect(
     () => () => {
       bodyMat.dispose();
       atmoMat.dispose();
@@ -222,7 +143,7 @@ export function Planet({
     const t = Math.min(1, Math.max(0, (pRef.current - 0.42) / 0.16));
     const f = 1 - t * t * (3 - 2 * t);
     bodyMat.opacity = f;
-    atmoMat.uniforms.uOpacity.value = f;
+    atmoOpacity.value = f;
     ringMat.opacity = 0.16 * f;
     group.current.visible = f > 0.01;
   });
@@ -292,7 +213,7 @@ function ProjectPlanet({
   const hoverRef = useRef(0);
   const hoverTarget = useRef(0);
 
-  const { bodyMat, atmoMat, ringMat, geo, atmoGeo, ringGeo, hitGeo, hitMat } = useMemo(() => {
+  const { bodyMat, atmoMat, atmoOpacity, ringMat, geo, atmoGeo, ringGeo, hitGeo, hitMat } = useMemo(() => {
     const bodyMat = new THREE.MeshStandardMaterial({
       color: new THREE.Color(spec.body),
       // Emisión tenue del mismo tono: garantiza que el cuerpo se vea aunque
@@ -304,19 +225,11 @@ function ProjectPlanet({
       transparent: true,
       opacity: 0,
     });
-    const atmoMat = new THREE.ShaderMaterial({
-      vertexShader: ATMO_VERT,
-      fragmentShader: ATMO_FRAG,
-      uniforms: {
-        uColorA: { value: new THREE.Color(spec.atmoA) },
-        uColorB: { value: new THREE.Color(spec.atmoB) },
-        uOpacity: { value: 0 },
-      },
-      transparent: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      side: THREE.BackSide,
-    });
+    const { material: atmoMat, opacity: atmoOpacity } = createAtmosphereMaterial(
+      new THREE.Color(spec.atmoA),
+      new THREE.Color(spec.atmoB),
+      0
+    );
     const ringMat = spec.ring
       ? new THREE.MeshBasicMaterial({
           color: new THREE.Color(spec.ring),
@@ -330,6 +243,7 @@ function ProjectPlanet({
     return {
       bodyMat,
       atmoMat,
+      atmoOpacity,
       ringMat,
       geo: new THREE.SphereGeometry(1, 40, 28),
       atmoGeo: new THREE.SphereGeometry(1.18, 40, 28),
@@ -341,7 +255,7 @@ function ProjectPlanet({
     };
   }, [spec]);
 
-  useMemo(
+  useEffect(
     () => () => {
       bodyMat.dispose();
       atmoMat.dispose();
@@ -379,7 +293,7 @@ function ProjectPlanet({
 
     const f = inSection * s;
     bodyMat.opacity = f;
-    atmoMat.uniforms.uOpacity.value = f * (0.85 + 0.15 * hoverRef.current);
+    atmoOpacity.value = f * (0.85 + 0.15 * hoverRef.current);
     if (ringMat) ringMat.opacity = 0.26 * f;
     group.current.visible = f > 0.01;
   });
