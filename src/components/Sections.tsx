@@ -15,7 +15,7 @@ export function Hero() {
   const { t, tl } = useI18n();
   return (
     <section id="top" className="section" style={{ alignItems: "center", textAlign: "center", paddingTop: "5rem" }}>
-      <div className="wrap" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1.3rem" }}>
+      <div className="wrap hero-veil" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1.3rem" }}>
         <Reveal>
           <span className="eyebrow" style={{ color: "var(--space)", letterSpacing: "0.3em" }}>
             {tl(CV.location)}

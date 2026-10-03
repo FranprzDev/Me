@@ -85,7 +85,9 @@ body {
 .content-layer {
   position: relative;
   z-index: 10;
-  text-shadow: 0 1px 16px rgba(2, 4, 12, 0.7);
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.9),
+    0 2px 18px rgba(2, 4, 12, 0.85);
 }
 
 /* --- GSAP star aura layer (entre el canvas 3D y el contenido) --- */
@@ -223,6 +225,17 @@ body {
   50% {
     transform: translateY(5px);
   }
+}
+
+/* Halo legible detrás del héroe: la animación 3D sigue viéndose alrededor,
+   pero el texto nunca compite con estrellas/planetas. */
+.hero-veil {
+  padding: clamp(1.6rem, 4vw, 3rem) clamp(1rem, 3vw, 2.4rem);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 1.4rem;
+  background: radial-gradient(ellipse at center, rgba(4, 6, 16, 0.62), rgba(4, 6, 16, 0.35) 75%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 .wrap {
@@ -841,7 +854,12 @@ body {
   grid-template-columns: minmax(0, 1fr) minmax(230px, 300px);
   align-items: center;
   gap: clamp(1.2rem, 4vw, 3.2rem);
-  padding: clamp(1.6rem, 4vw, 3rem) 0 clamp(2rem, 5vw, 3.2rem);
+  padding: clamp(1.6rem, 4vw, 3rem) clamp(1.2rem, 3vw, 2rem) clamp(2rem, 5vw, 3.2rem);
+  border: 1px solid color-mix(in srgb, var(--planet) 24%, transparent);
+  border-radius: 1.2rem;
+  background: linear-gradient(150deg, rgba(10, 12, 30, 0.82), rgba(6, 9, 20, 0.9) 60%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .aula-kicker {
@@ -1018,7 +1036,12 @@ body {
   grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
   align-items: center;
   gap: clamp(1.2rem, 4vw, 3rem);
-  padding: clamp(1.6rem, 4vw, 3rem) 0 clamp(1.8rem, 4vw, 2.6rem);
+  padding: clamp(1.6rem, 4vw, 3rem) clamp(1.2rem, 3vw, 2rem) clamp(1.8rem, 4vw, 2.6rem);
+  border: 1px solid color-mix(in srgb, var(--planet) 24%, transparent);
+  border-radius: 1.2rem;
+  background: linear-gradient(150deg, rgba(10, 12, 30, 0.82), rgba(6, 9, 20, 0.9) 60%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .atlas-kicker {
@@ -1181,7 +1204,12 @@ body {
 
 .dossier-hero {
   margin-top: 1.75rem;
-  padding: clamp(1.5rem, 4vw, 2.6rem) 0 clamp(1.4rem, 3vw, 2rem);
+  padding: clamp(1.5rem, 4vw, 2.6rem) clamp(1.2rem, 3vw, 2rem);
+  border: 1px solid color-mix(in srgb, var(--planet) 24%, transparent);
+  border-radius: 1.2rem;
+  background: linear-gradient(150deg, rgba(10, 12, 30, 0.82), rgba(6, 9, 20, 0.9) 60%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 .dossier-hero .hud-kicker { color: var(--planet-2); }
 .dossier-hero h1 { color: #f7f4ff; }
