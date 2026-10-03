@@ -269,6 +269,28 @@ body {
   }
 }
 
+/* Microinteracciones: las cards "levantan vuelo" al pasar el cursor. */
+.glass,
+.glass-soft {
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+@media (hover: hover) {
+  .glass:hover,
+  .glass-soft:hover {
+    transform: translateY(-4px);
+    border-color: rgba(122, 162, 255, 0.35);
+    box-shadow:
+      0 14px 40px rgba(0, 0, 0, 0.4),
+      0 0 28px rgba(91, 140, 255, 0.14);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glass:hover,
+  .glass-soft:hover {
+    transform: none;
+  }
+}
+
 .eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.28em;

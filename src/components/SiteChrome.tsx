@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Nav } from "@/components/Nav";
 import { PROJECTS } from "@/data/projects";
+import { CursorTrail } from "@/components/CursorTrail";
+import { WarpTransition } from "@/components/WarpTransition";
 
 // Las escenas 3D son client-only (WebGPU); se cargan sin SSR. El cosmos vive en
 // el layout para que la navegación sea consistente en todas las rutas.
@@ -54,6 +56,8 @@ export function SiteChrome() {
       {sceneReady && onHome ? <Scene /> : null}
       {sceneReady && worldSlug ? <PlanetScene slug={worldSlug} /> : null}
       <Nav />
+      <CursorTrail />
+      <WarpTransition />
     </>
   );
 }
