@@ -196,6 +196,64 @@ body {
   }
 }
 
+/* Botones consola del héroe: badge arriba, acción abajo, sin superposición. */
+.hero-actions-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.9rem;
+  margin-top: 0.6rem;
+}
+
+.hero-console-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  padding: 0.85rem 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.9rem;
+  background: rgba(12, 14, 30, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--fg);
+  text-decoration: none;
+  transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.btn-badge {
+  font: 600 0.6rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--space);
+}
+
+.btn-text-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.btn-theme-projects { border-color: rgba(91, 140, 255, 0.4); box-shadow: 0 0 24px rgba(91, 140, 255, 0.15); }
+.btn-theme-cv { border-color: rgba(233, 194, 112, 0.35); }
+.btn-theme-github { border-color: rgba(155, 123, 255, 0.35); }
+.btn-theme-cv .btn-badge { color: var(--star); }
+.btn-theme-github .btn-badge { color: var(--space-2); }
+
+@media (hover: hover) {
+  .hero-console-btn:hover {
+    transform: translateY(-3px);
+    border-color: rgba(122, 162, 255, 0.55);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45), 0 0 26px rgba(91, 140, 255, 0.2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-console-btn:hover { transform: none; }
+}
+
 /* Indicador de scroll: flechas que laten hacia abajo. */
 .scroll-cue {
   display: flex;
