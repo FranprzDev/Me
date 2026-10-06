@@ -1,0 +1,43 @@
+name: Portfolio quality
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm exec tsc --noEmit
+      - run: pnpm check:shaders
+      - run: pnpm build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://franprzdev.github.io
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Browser and accessibility checks
+        run: |
+          pnpm start > /tmp/portfolio-server.log 2>&1 &
+          for attempt in {1..30}; do
+            if curl --fail --silent http://localhost:3000 > /dev/null; then break; fi
+            sleep 1
+          done
+          pnpm check:portfolio
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: portfolio-screenshots
+          path: artifacts/portfolio-quality
+          if-no-files-found: ignore

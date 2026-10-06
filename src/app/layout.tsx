@@ -8,23 +8,23 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https:/
 
 export const metadata: Metadata = {
   metadataBase: siteUrl ? new URL(siteUrl) : undefined,
-  title: "Francisco Miguel Perez — Ing. en Sistemas",
+  title: "Francisco Perez — AI Engineer & Product Developer",
   description:
-    "Portfolio de Francisco Miguel Perez, Ingeniero en Sistemas de Información. Un viaje en 3D por su experiencia, formación y proyectos.",
+    "Agentes de IA, automatización y productos web. Explorá el trabajo, la experiencia y la formación de Francisco Perez, AI Engineer en Tucumán, Argentina.",
   keywords: ["Francisco Miguel Perez", "Ingeniero en Sistemas", "portfolio", "desarrollo de software", "AI engineering"],
   alternates: siteUrl ? { canonical: "/" } : undefined,
   openGraph: {
-    title: "Francisco Miguel Perez — Ing. en Sistemas",
-    description: "Un viaje en 3D por mi experiencia, formación y proyectos.",
+    title: "Francisco Perez — AI Engineer & Product Developer",
+    description: "Agentes de IA, automatización y productos web para problemas reales.",
     type: "website",
     url: siteUrl || undefined,
     siteName: "Francisco Perez — Portfolio",
     locale: "es_AR",
   },
   twitter: {
-    card: "summary",
-    title: "Francisco Miguel Perez — Ing. en Sistemas",
-    description: "Portfolio de Francisco Miguel Perez, Ingeniero en Sistemas de Información.",
+    card: "summary_large_image",
+    title: "Francisco Perez — AI Engineer & Product Developer",
+    description: "Agentes de IA, automatización y productos web para problemas reales.",
   },
 };
 

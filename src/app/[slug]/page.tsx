@@ -21,6 +21,13 @@ export async function generateMetadata({
   return {
     title: `${p.name} — Francisco Miguel Perez`,
     description: p.description.es,
+    alternates: { canonical: `/${slug}` },
+    openGraph: {
+      title: `${p.name} — Francisco Perez`,
+      description: p.description.es,
+      url: `/${slug}`,
+      type: "website",
+    },
   };
 }
 
@@ -37,7 +44,7 @@ export default async function ProjectPage({
     <>
       <PlanetBackground slug={slug} />
       {/* content-layer: el DOM va por encima del canvas 3D (z-index 0). */}
-      <main className="section content-layer" style={{ paddingTop: "8rem", justifyContent: "flex-start" }}>
+      <main id="main-content" tabIndex={-1} className="section content-layer" style={{ paddingTop: "8rem", justifyContent: "flex-start" }}>
         <div className="wrap">
           <ProjectPageContent slug={slug} />
         </div>

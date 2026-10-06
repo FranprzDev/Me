@@ -56,7 +56,7 @@ export function BigBangIntro() {
       return { a, speed, r: 0, life: 0.5 + Math.random() * 0.5, size: 0.6 + Math.random() * 1.6 };
     });
 
-    const DURATION = 1500;
+    const DURATION = 900;
     const t0 = performance.now();
     let raf = 0;
 
@@ -65,8 +65,7 @@ export function BigBangIntro() {
       const cx = W() / 2;
       const cy = H() / 2;
 
-      ctx.fillStyle = `rgba(4, 6, 18, ${Math.min(1, t * 6) * (1 - Math.max(0, t - 0.55) / 0.45)})`;
-      ctx.fillRect(0, 0, W(), H());
+      ctx.clearRect(0, 0, W(), H());
 
       // Núcleo brillante que colapsa y explota.
       const coreR = t < 0.15 ? 8 + t * 160 : 120 * (1 - (t - 0.15) / 0.6);

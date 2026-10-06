@@ -339,7 +339,6 @@ function HackathonJourney({ project }: { project: Project }) {
               <div className="mission__body">
                 <div className="mission__meta">
                   <span>{item.year}</span>
-                  <span className="mission__code">MSN-{pad(i + 1)}</span>
                 </div>
                 <h3>{item.name}</h3>
                 <p>{tl(item.description)}</p>
@@ -715,9 +714,7 @@ function ProjectAtlas({ project }: { project: Project }) {
 
       <footer className="atlas-outro">
         <span>{tl({ es: "STACK", en: "STACK" })}</span>
-        <div className="atlas-stack">
-          {project.stack.map((tech) => <span key={tech}>{tech}</span>)}
-        </div>
+        <p className="stack-note">{project.stack.join(" · ")}</p>
         {project.link && <ExternalLink href={project.link} />}
       </footer>
 
@@ -850,8 +847,8 @@ function UniversityJourney({ project }: { project: Project }) {
             <path d="m119 72 3 8 8 3-8 3-3 8-3-8-8-3 8-3 3-8ZM350 260l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5Z" fill="#FFF1C9" />
             <circle cx="88" cy="137" r="2" fill="#fff" /><circle cx="328" cy="296" r="2" fill="#fff" />
           </svg>
-          <div className="edu-orbit__tag edu-orbit__tag--start"><span>INICIO</span><b>UTN · 2022</b></div>
-          <div className="edu-orbit__tag edu-orbit__tag--end"><span>DESTINO ABIERTO</span><b>En construcción ↗</b></div>
+          <div className="edu-orbit__tag edu-orbit__tag--start"><span>{tl({ es: "INICIO", en: "START" })}</span><b>UTN · 2022</b></div>
+          <div className="edu-orbit__tag edu-orbit__tag--end"><span>{tl({ es: "DESTINO ABIERTO", en: "OPEN DESTINATION" })}</span><b>{tl({ es: "En formación", en: "Still learning" })}</b></div>
           <div className="edu-orbit__legend"><i /> {tl({ es: "CONOCIMIENTO EN MOVIMIENTO", en: "KNOWLEDGE IN MOTION" })}</div>
         </div>
       </header>
@@ -1001,9 +998,7 @@ function DossierJourney({ project }: { project: Project }) {
 
       <footer className="dossier-outro">
         <span>{tl({ es: "STACK", en: "STACK" })}</span>
-        <div className="dossier-stack">
-          {project.stack.map((tech) => <span key={tech}>{tech}</span>)}
-        </div>
+        <p className="stack-note">{project.stack.join(" · ")}</p>
       </footer>
 
       <PlanetNav slug={project.slug} />

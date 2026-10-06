@@ -1,31 +1,18 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { isLiteMode } from "@/lib/lite";
 
-/**
- * Transición "warp" entre páginas: al hacer click en un link interno el
- * cosmos se acelera (estrellas alargadas desde el centro), y recién ahí se
- * navega. En móvil/reduce el warp se acorta o se saltea para no frenar.
- */
 export function WarpTransition() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const router = useRouter();
-  const pathname = usePathname();
   const lock = useRef(false);
+  const raf = useRef(0);
+  const timer = useRef<number | undefined>(undefined);
 
-  const runWarp = (href: string) => {
-    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      router.push(href);
-      lock.current = false;
-      return;
-    }
-
-    const mobile = window.innerWidth < 768;
+  const runWarp = () => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) {
-      router.push(href);
       lock.current = false;
       return;
     }
@@ -41,20 +28,17 @@ export function WarpTransition() {
     const H = window.innerHeight;
     const cx = W / 2;
     const cy = H / 2;
-    const N = mobile ? 60 : 130;
+    const N = 130;
     const stars = Array.from({ length: N }, () => {
       const a = Math.random() * Math.PI * 2;
       return { a, r: Math.random() * 40, speed: 3 + Math.random() * 6 };
     });
 
-    const DURATION = mobile ? 300 : 480;
+    const DURATION = 480;
     const t0 = performance.now();
 
-    // Navegamos YA: el warp tapa el swap de escena en lugar de precederlo,
-    // así el "delay" percibido es sólo el efecto, no efecto + carga.
     canvas.style.transition = "none";
     canvas.style.opacity = "1";
-    router.push(href);
 
     const frame = (now: number) => {
       const t = Math.min(1, (now - t0) / DURATION);
@@ -76,42 +60,45 @@ export function WarpTransition() {
         }
       }
       if (t < 1) {
-        requestAnimationFrame(frame);
+        raf.current = requestAnimationFrame(frame);
       } else {
         // Fundimos el overlay revelando la nueva escena ya montada.
         canvas.style.transition = "opacity 320ms ease";
         canvas.style.opacity = "0";
-        window.setTimeout(() => {
+        timer.current = window.setTimeout(() => {
           lock.current = false;
           const c = canvasRef.current?.getContext("2d");
           if (c && canvasRef.current) c.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
         }, 360);
       }
     };
-    requestAnimationFrame(frame);
+    raf.current = requestAnimationFrame(frame);
   };
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-      const a = (e.target as HTMLElement).closest("a");
+      if (isLiteMode()) return;
+      const a = e.target instanceof Element ? e.target.closest("a") : null;
       if (!a) return;
       if (a.target === "_blank" || a.hasAttribute("download")) return;
       const href = a.getAttribute("href");
       if (!href || !href.startsWith("/")) return;
-      const [path, hash] = href.split("#");
-      // Navegación dentro de la misma página (anclas): warp cortito opcional.
-      if (path === pathname && hash) return;
-      if (path === pathname) return;
-      e.preventDefault();
+      const target = new URL(a.href);
+      if (target.origin !== window.location.origin || target.pathname === window.location.pathname) return;
+      // El efecto decora el enlace; nunca intercepta ni bloquea la navegación.
       if (lock.current) return;
       lock.current = true;
-      runWarp(path + (hash ? `#${hash}` : ""));
+      runWarp();
     };
     document.addEventListener("click", onClick, true);
-    return () => document.removeEventListener("click", onClick, true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
+    return () => {
+      document.removeEventListener("click", onClick, true);
+      cancelAnimationFrame(raf.current);
+      window.clearTimeout(timer.current);
+      lock.current = false;
+    };
+  }, []);
 
   return (
     <canvas
@@ -122,7 +109,7 @@ export function WarpTransition() {
         inset: 0,
         zIndex: 85,
         pointerEvents: "none",
-        opacity: 1,
+        opacity: 0,
       }}
     />
   );

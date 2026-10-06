@@ -418,6 +418,7 @@ export default function Scene({ minimal = false }: { minimal?: boolean }) {
     <div
       aria-hidden
       data-scene-root=""
+      data-contact-heading={!minimal && !performanceMode}
       style={{
         position: "fixed",
         inset: 0,

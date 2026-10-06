@@ -14,8 +14,8 @@ import { Magnetic } from "@/components/Magnetic";
 export function Hero() {
   const { t, tl } = useI18n();
   return (
-    <section id="top" className="section" style={{ alignItems: "center", textAlign: "center", paddingTop: "5rem" }}>
-      <div className="wrap hero-veil" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1.3rem" }}>
+    <section id="top" className="section hero-section">
+      <div className="wrap hero-veil">
         <Reveal>
           <span className="eyebrow" style={{ color: "var(--space)", letterSpacing: "0.3em" }}>
             {tl(CV.location)}
@@ -34,13 +34,16 @@ export function Hero() {
               textShadow: "0 0 25px rgba(122,162,255,0.4)",
             }}
           >
-            {tl(CV.title)} · <span style={{ color: "var(--space-2)" }}>AI Engineer</span>
+            AI Engineer <span style={{ color: "var(--muted)" }}>· {tl({ es: "Desarrollo de producto", en: "Product development" })}</span>
           </p>
         </Reveal>
 
         <Reveal delay={0.18}>
-          <p style={{ maxWidth: 680, color: "var(--muted)", lineHeight: 1.75, fontSize: "1.05rem" }}>
-            {tl(CV.summary)}
+          <p className="hero-summary">
+            {tl({
+              es: "Transformo datos y procesos en software útil: agentes de IA, automatizaciones y productos web para problemas reales.",
+              en: "I turn data and processes into useful software: AI agents, automations and web products for real problems.",
+            })}
           </p>
         </Reveal>
 
@@ -48,9 +51,9 @@ export function Hero() {
           <div className="hero-actions-grid">
             <Magnetic strength={0.3}>
               <Link href="/#projects" className="hero-console-btn btn-theme-projects">
-                <span className="btn-badge">{tl({ es: "EXPLORAR // 04 MUNDOS", en: "EXPLORE // 04 WORLDS" })}</span>
+                <span className="btn-badge">{tl({ es: "EXPLORAR", en: "EXPLORE" })}{" // "}{String(PROJECTS.length).padStart(2, "0")} {tl({ es: "MUNDOS", en: "WORLDS" })}</span>
                 <span className="btn-text-row">
-                  <span className="btn-icon">✦</span>
+                  <span className="btn-icon" aria-hidden="true">✦</span>
                   <span>{t("hero_cta_projects")}</span>
                 </span>
               </Link>
@@ -59,7 +62,7 @@ export function Hero() {
               <a href={CV.cvPdf} download className="hero-console-btn btn-theme-cv">
                 <span className="btn-badge">{tl({ es: "CURRICULUM // PDF", en: "RESUME // PDF" })}</span>
                 <span className="btn-text-row">
-                  <span className="btn-icon">📄</span>
+                  <span className="btn-icon" aria-hidden="true">↓</span>
                   <span>{t("hero_cta_cv")}</span>
                 </span>
               </a>
@@ -68,7 +71,7 @@ export function Hero() {
               <a href={CV.github} target="_blank" rel="noreferrer" className="hero-console-btn btn-theme-github">
                 <span className="btn-badge">{tl({ es: "REPOSITORIOS // DEV", en: "REPOSITORIES // DEV" })}</span>
                 <span className="btn-text-row">
-                  <span className="btn-icon" style={{ display: "inline-flex", alignItems: "center" }}>
+                  <span className="btn-icon" aria-hidden="true" style={{ display: "inline-flex", alignItems: "center" }}>
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
                     </svg>
@@ -80,14 +83,10 @@ export function Hero() {
           </div>
         </Reveal>
 
-        {/* Tech Marquee Chips */}
         <Reveal delay={0.34}>
-          <div style={{ display: "flex", gap: "0.45rem", flexWrap: "wrap", justifyContent: "center", maxWidth: 680, marginTop: "0.4rem" }}>
-            {["LangChain", "LangGraph", "n8n", "Next.js", "TypeScript", "Python", "Docker", "PostgreSQL", "dbt", "Supabase"].map((tech) => (
-              <span key={tech} className="chip" style={{ fontSize: "0.72rem", background: "rgba(255,255,255,0.04)" }}>
-                {tech}
-              </span>
-            ))}
+          <div className="hero-proof">
+            <Link href="/hackathons">{tl({ es: "NASA Space Apps · Ganador nacional 2024", en: "NASA Space Apps · National winner 2024" })} ↗</Link>
+            <Link href="/curso-n8n">{tl({ es: "Docente n8n · Poder Judicial de Tucumán", en: "n8n instructor · Tucumán Judiciary" })} ↗</Link>
           </div>
         </Reveal>
 
@@ -120,7 +119,7 @@ export function Experience() {
           {CV.experience.map((e, i) => (
             <Reveal key={e.org + i} delay={i * 0.05}>
               <div className="timeline-row">
-                <div className="timeline-dot" style={{ borderColor: e.current ? "var(--japan)" : "var(--space)" }}>
+                <div className="timeline-dot" aria-hidden="true" style={{ borderColor: e.current ? "var(--japan)" : "var(--space)" }}>
                   {i === 0 ? "🤖" : i === 1 ? "🏛️" : i === 2 ? "🌐" : i === 3 ? "💻" : "👨‍🏫"}
                 </div>
                 <article
@@ -133,20 +132,14 @@ export function Experience() {
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "0.4rem", alignItems: "baseline" }}>
                     <h3 style={{ margin: 0, fontSize: "1.2rem", color: "var(--fg)" }}>{tl(e.role)}</h3>
-                    <span className="chip" style={e.current ? { color: "var(--japan)", borderColor: "var(--japan)", background: "rgba(155,123,255,0.1)" } : undefined}>
+                    <span className="experience-period" data-current={e.current}>
                       {tl(e.period)}
                     </span>
                   </div>
                   <p className="accent-japan" style={{ margin: "0.3rem 0 0.7rem", fontWeight: 600 }}>{e.org}</p>
                   <p style={{ margin: 0, color: "var(--muted)", lineHeight: 1.7 }}>{tl(e.description)}</p>
                   {e.stack && e.stack.length > 0 && (
-                    <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", marginTop: "0.8rem" }}>
-                      {e.stack.map((st) => (
-                        <span key={st} className="chip" style={{ fontSize: "0.7rem", opacity: 0.85 }}>
-                          {st}
-                        </span>
-                      ))}
-                    </div>
+                    <p className="stack-note">{e.stack.join(" · ")}</p>
                   )}
                 </article>
               </div>
@@ -234,6 +227,7 @@ export function Projects() {
         {/* Planeta actual centrado: HUD protagonista del slider */}
         <Reveal delay={0.1}>
           <div
+            id="world-details"
             className="planet-hud"
             style={{
               "--hud-glow": p.planet.atmoA,
@@ -244,13 +238,15 @@ export function Projects() {
               <span className="eyebrow" style={{ color: p.planet.atmoA, fontSize: "0.72rem" }}>
                 {t("world")} 0{idx + 1} / 0{total}
               </span>
-              <span className="chip" style={{ borderColor: p.planet.atmoA, color: p.planet.atmoA }}>
-                {p.year}{p.featured ? " ★" : ""}
+              <span style={{ color: "var(--muted)", fontSize: "0.8rem" }}>
+                {p.year}
               </span>
             </div>
 
             <Link href={`/${p.slug}`} style={{ textDecoration: "none" }}>
               <h3
+                aria-live="polite"
+                aria-atomic="true"
                 className="link-underline"
                 style={{
                   margin: 0,
@@ -267,22 +263,13 @@ export function Projects() {
               {tl(p.tagline)}
             </p>
 
-            <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", justifyContent: "center" }}>
-              {p.stack.map((s) => (
-                <span key={s} className="chip" style={{ borderColor: "rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.05)" }}>
-                  {s}
-                </span>
-              ))}
-            </div>
-
             <Magnetic strength={0.25}>
               <Link
                 href={`/${p.slug}`}
                 className="btn-cosmic-primary"
                 style={{
                   marginTop: "0.3rem",
-                  background: `linear-gradient(135deg, ${p.planet.body}, ${p.planet.atmoA})`,
-                  boxShadow: `0 0 30px ${p.planet.atmoA}55`,
+                  borderColor: p.planet.atmoA,
                 }}
               >
                 {t("proj_explore")}
@@ -298,15 +285,17 @@ export function Projects() {
               <button
                 key={proj.slug}
                 onClick={() => go(i, i > idx ? 1 : -1)}
+                aria-pressed={i === idx}
+                aria-controls="world-details"
                 className="chip"
                 style={{
                   cursor: "pointer",
                   color: i === idx ? "#ffffff" : "var(--muted)",
                   borderColor: i === idx ? proj.planet.atmoA : "rgba(255,255,255,0.12)",
-                  background: i === idx ? `color-mix(in srgb, ${proj.planet.atmoA} 25%, rgba(10,14,30,0.8))` : "rgba(255,255,255,0.03)",
+                  background: i === idx ? `color-mix(in srgb, ${proj.planet.atmoA} 25%, #0a0e1e)` : "#0a0e1e",
                   boxShadow: i === idx ? `0 0 15px ${proj.planet.atmoA}44` : "none",
                   transition: "all 0.25s ease",
-                  padding: "0.35rem 0.85rem",
+                  padding: "0.65rem 0.85rem",
                   fontSize: "0.75rem",
                   fontWeight: i === idx ? 600 : 400,
                 }}
@@ -318,19 +307,7 @@ export function Projects() {
         </Reveal>
       </div>
 
-      {/* Flechas a cada lado de la pantalla — más usable y el planeta queda protagonista. */}
-      <div
-        aria-hidden={false}
-        style={{
-          position: "absolute",
-          inset: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0 clamp(0.7rem, 3vw, 2rem)",
-          pointerEvents: "none",
-        }}
-      >
+      <div className="world-controls">
         <Magnetic strength={0.22}>
           <button
             onClick={() => go(idx - 1, -1)}
@@ -357,7 +334,7 @@ export function Projects() {
 }
 
 export function Contact() {
-  const { t } = useI18n();
+  const { t, tl } = useI18n();
   return (
     <section
       id="contact"
@@ -383,13 +360,10 @@ export function Contact() {
             paddingTop: "clamp(4.5rem, 11vh, 7rem)",
           }}
         >
-          {/* El título de la sección es la constelación "CHARLEMOS" que se ensambla
-              en el canvas 3D de fondo. Lo declaramos como heading oculto para
-              lectores de pantalla y el esquema del documento. */}
-          <h2 className="sr-only">{t("contact_title")}</h2>
-
-          {/* Espacio reservado para que la palabra-constelación 3D respire arriba. */}
-          <div aria-hidden className="contact-space" style={{ height: "clamp(120px, 18vh, 220px)" }} />
+          <div className="contact-copy">
+            <h2 className="h-display">{t("contact_title")}</h2>
+            <p>{tl({ es: "¿Tenés un proceso para automatizar o un producto para construir? Contame qué necesitás.", en: "Have a process to automate or a product to build? Tell me what you need." })}</p>
+          </div>
 
           <Reveal delay={0.1} className="contact-constellations">
             <ContactConstellations />
