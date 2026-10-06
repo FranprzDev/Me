@@ -22,6 +22,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm exec tsc --noEmit
+      - run: pnpm exec vgpu install-software-renderer
       - run: pnpm check:shaders
       - run: pnpm build
         env:
