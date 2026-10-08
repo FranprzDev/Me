@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import { useRef, useState, type ChangeEvent, type DragEvent, type FormEvent } from "react";
 import Link from "next/link";
 import { CV } from "@/data/cv";
 import { useI18n } from "@/lib/i18n";
@@ -40,6 +40,17 @@ export function AgentHiring() {
   async function uploadJobDescription(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
+    await processJobDescription(file);
+    event.target.value = "";
+  }
+
+  function dropJobDescription(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    const file = event.dataTransfer.files[0];
+    if (!busy && file) void processJobDescription(file);
+  }
+
+  async function processJobDescription(file: File) {
     setBusy(true);
     setError("");
     setStatus(tl({ es: "Convirtiendo el documento a Markdown…", en: "Converting the document to Markdown…" }));
@@ -70,7 +81,6 @@ export function AgentHiring() {
         : reason || tl({ es: "No pude procesar el documento.", en: "I couldn't process the document." }));
     } finally {
       setBusy(false);
-      event.target.value = "";
     }
   }
 
@@ -113,24 +123,27 @@ export function AgentHiring() {
   }
 
   return (
-    <main className="section recruiter" id="agent-hiring">
+    <main className="section recruiter" id="for-recruiters">
       <div className="wrap recruiter-wrap">
         <Link href="/#contact" className="link-underline recruiter-back">
           {tl({ es: "← Volver a contacto", en: "← Back to contact" })}
         </Link>
 
         <header className="recruiter-heading">
-          <span className="eyebrow">HIRING AGENTS · EMBEDDINGGEMMA 2</span>
-          <h1 className="h-display">{tl({ es: "Conocé mi experiencia", en: "Explore my experience" })}</h1>
-          <p>{tl({ es: "Subí la descripción del puesto y conversá con mi portfolio. Busco evidencia real y te digo también qué requisitos no puedo demostrar.", en: "Upload the job description and chat with my portfolio. I retrieve real evidence and show which requirements I can't substantiate." })}</p>
+          <span className="eyebrow">{tl({ es: "UN PERFIL · EVIDENCIA ABIERTA", en: "ONE PROFILE · OPEN EVIDENCE" })}</span>
+          <h1 className="h-display">{tl({ es: "¿Este puesto es un buen match?", en: "Could this role be a good match?" })}</h1>
+          <p>{tl({ es: "Compará los requisitos del puesto con mi experiencia real. Encontrá coincidencias, brechas y lo que todavía no puedo demostrar.", en: "Compare the role's requirements with my actual experience. See the matches, gaps, and what I can't substantiate yet." })}</p>
         </header>
 
-        <section className="glass recruiter-card" aria-label={tl({ es: "Asistente para reclutadores", en: "Recruiter assistant" })}>
+        <section className="glass recruiter-card" aria-label={tl({ es: "Evaluación local del puesto", en: "Local role review" })}>
           {!index ? (
             <div className="recruiter-upload">
-              <span className="recruiter-step">01 · JD</span>
-              <h2>{tl({ es: "Empezá por la descripción del puesto", en: "Start with the job description" })}</h2>
-              <p>{tl({ es: "Acepto PDF con texto seleccionable o DOCX. El documento se convierte a Markdown en tu navegador.", en: "Upload a text-based PDF or DOCX. The document is converted to Markdown in your browser." })}</p>
+              <div className="recruiter-upload-topline">
+                <span className="recruiter-step">01 / {tl({ es: "DESCRIPCIÓN DEL PUESTO", en: "JOB DESCRIPTION" })}</span>
+                <span className="recruiter-local-badge"><span aria-hidden="true">●</span> {tl({ es: "ANÁLISIS LOCAL", en: "LOCAL ANALYSIS" })}</span>
+              </div>
+              <h2>{tl({ es: "Traé el puesto. Revisemos la evidencia.", en: "Bring the role. Let's check the evidence." })}</h2>
+              <p>{tl({ es: "Subí un JD en PDF o DOCX. Lo leo y busco evidencia en mi portfolio directamente en tu navegador.", en: "Upload a job description as PDF or DOCX. I read it and search my portfolio for evidence right in your browser." })}</p>
               <input
                 ref={fileInput}
                 className="recruiter-file-input"
@@ -140,10 +153,17 @@ export function AgentHiring() {
                 onChange={uploadJobDescription}
                 disabled={busy}
               />
-              <button className="btn-cosmic-primary" type="button" onClick={() => fileInput.current?.click()} disabled={busy}>
-                {busy ? tl({ es: "Procesando…", en: "Processing…" }) : tl({ es: "Elegir PDF o DOCX →", en: "Choose PDF or DOCX →" })}
-              </button>
-              <p className="recruiter-note">{tl({ es: "La primera vez descarga el modelo de texto (~175 MB); luego queda en caché del navegador. El JD y tus preguntas no se envían a mi servidor.", en: "The first visit downloads the text model (~175 MB); the browser can cache it for later. Your JD and questions are not sent to my server." })}</p>
+              <div className="recruiter-dropzone" onDrop={dropJobDescription} onDragOver={(event) => event.preventDefault()}>
+                <span className="recruiter-upload-icon" aria-hidden="true">↑</span>
+                <p>{tl({ es: "Arrastrá el archivo acá", en: "Drop your file here" })}<span>{tl({ es: " o ", en: " or " })}</span></p>
+                <button className="btn-cosmic-primary" type="button" onClick={() => fileInput.current?.click()} disabled={busy}>
+                  {busy ? tl({ es: "Preparando análisis…", en: "Preparing review…" }) : tl({ es: "Elegir PDF o DOCX →", en: "Choose PDF or DOCX →" })}
+                </button>
+              </div>
+              <div className="recruiter-local-note">
+                <span className="recruiter-local-mark" aria-hidden="true">↳</span>
+                <p className="recruiter-note">{tl({ es: "El JD y tus preguntas se procesan en este navegador; no se envían a mi servidor. La primera vez se descarga EmbeddingGemma 2 (~175 MB) desde Hugging Face y queda en caché para próximas visitas.", en: "Your job description and questions stay in this browser; they aren't sent to my server. The first visit downloads EmbeddingGemma 2 (~175 MB) from Hugging Face and caches it for next time." })}</p>
+              </div>
             </div>
           ) : (
             <>

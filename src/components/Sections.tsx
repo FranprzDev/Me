@@ -368,8 +368,8 @@ export function Contact() {
             <ContactConstellations />
           </Reveal>
 
-          <Link className="hiring-agents-link" href="/for-agents">
-            Let your agent hire me
+          <Link className="hiring-agents-link" href="/for-recruiters">
+            For Recruiters →
           </Link>
         </div>
 

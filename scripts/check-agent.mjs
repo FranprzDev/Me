@@ -8,13 +8,19 @@ assert.doesNotMatch(home, /Contact me/);
 assert.doesNotMatch(home, /Soy un agente y quiero contratarte/);
 assert.doesNotMatch(home, /Have a process to automate/);
 assert.doesNotMatch(home, /I want to hire you/);
+assert.match(home, /href="\/for-recruiters"/);
 
-const agentPage = await fetch(`${baseUrl}/for-agents`);
+const agentPage = await fetch(`${baseUrl}/for-recruiters`);
 assert.equal(agentPage.status, 200);
 const agentHtml = await agentPage.text();
 assert.match(agentHtml, /PDF o DOCX/);
 assert.match(agentHtml, /EmbeddingGemma 2/);
 assert.match(agentHtml, /no se envían a mi servidor/);
+assert.match(agentHtml, /¿Este puesto es un buen match\?/);
+
+const oldRoute = await fetch(`${baseUrl}/for-agents`, { redirect: "manual" });
+assert.equal(oldRoute.status, 308);
+assert.equal(oldRoute.headers.get("location"), "/for-recruiters");
 
 const cardResponse = await fetch(`${baseUrl}/.well-known/agent-card.json`);
 assert.equal(cardResponse.status, 200);
