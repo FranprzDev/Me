@@ -9,14 +9,18 @@
     "start": "next start",
     "lint": "eslint",
     "check:portfolio": "node scripts/check-portfolio.mjs",
+    "check:agent": "node scripts/check-agent.mjs",
     "check:shaders": "vgpu check src/components/three/shaders/nebula.wgsl --require-validation"
   },
   "dependencies": {
+    "@huggingface/transformers": "^4.3.1",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
     "gsap": "^3.15.0",
+    "mammoth": "^1.13.0",
     "motion": "^12.40.0",
     "next": "16.2.7",
+    "pdfjs-dist": "^6.4.299",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "three": "^0.184.0",

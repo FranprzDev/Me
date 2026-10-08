@@ -34,7 +34,7 @@ export function Hero() {
               textShadow: "0 0 25px rgba(122,162,255,0.4)",
             }}
           >
-            AI Engineer <span style={{ color: "var(--muted)" }}>· {tl({ es: "Desarrollo de producto", en: "Product development" })}</span>
+            AI Engineer {tl({ es: "en Tucumán", en: "in Tucumán" })} <span style={{ color: "var(--muted)" }}>· {tl({ es: "Desarrollo de producto", en: "Product development" })}</span>
           </p>
         </Reveal>
 
@@ -334,7 +334,7 @@ export function Projects() {
 }
 
 export function Contact() {
-  const { t, tl } = useI18n();
+  const { t } = useI18n();
   return (
     <section
       id="contact"
@@ -362,12 +362,15 @@ export function Contact() {
         >
           <div className="contact-copy">
             <h2 className="h-display">{t("contact_title")}</h2>
-            <p>{tl({ es: "¿Tenés un proceso para automatizar o un producto para construir? Contame qué necesitás.", en: "Have a process to automate or a product to build? Tell me what you need." })}</p>
           </div>
 
           <Reveal delay={0.1} className="contact-constellations">
             <ContactConstellations />
           </Reveal>
+
+          <Link className="hiring-agents-link" href="/for-agents">
+            Let your agent hire me
+          </Link>
         </div>
 
         <footer style={{ padding: "2rem 0 0.5rem", textAlign: "center" }}>

@@ -35,6 +35,7 @@ jobs:
             if curl --fail --silent http://localhost:3000 > /dev/null; then break; fi
             sleep 1
           done
+          PORTFOLIO_URL=http://localhost:3000 pnpm check:agent
           pnpm check:portfolio
       - uses: actions/upload-artifact@v7
         if: always()
