@@ -6,19 +6,22 @@ import { CV } from "@/data/cv";
 import { useI18n } from "@/lib/i18n";
 import {
   createRecruiterIndex,
+  describeYearsEvidence,
   embedQuestion,
+  extractRequiredYears,
   jobDescriptionToMarkdown,
   rankEvidence,
   rankRequirements,
   type Evidence,
 } from "@/lib/recruiter-search";
+import { generateRecruiterAnswer } from "@/lib/recruiter-answer";
 
 interface ChatMessage {
   role: "recruiter" | "portfolio";
   text: string;
   sources?: Evidence[];
+  requirements?: string[];
 }
-
 const PROMPTS = [
   { es: "¿Francisco es adecuado para este puesto?", en: "Is Francisco a good fit for this role?" },
   { es: "¿Qué experiencia tiene con IA y RAG?", en: "What experience does he have with AI and RAG?" },
@@ -26,7 +29,7 @@ const PROMPTS = [
 ];
 
 export function AgentHiring() {
-  const { tl } = useI18n();
+  const { lang, tl } = useI18n();
   const fileInput = useRef<HTMLInputElement>(null);
   const [markdown, setMarkdown] = useState("");
   const [fileName, setFileName] = useState("");
@@ -62,7 +65,7 @@ export function AgentHiring() {
       setMarkdown(converted);
       setFileName(file.name);
       setStatus(tl({ es: "Preparando la búsqueda local…", en: "Preparing local search…" }));
-      const loadedIndex = await createRecruiterIndex(converted, setStatus);
+      const loadedIndex = await createRecruiterIndex(converted, setStatus, lang);
       setIndex(loadedIndex);
       setMessages([{
         role: "portfolio",
@@ -96,19 +99,28 @@ export function AgentHiring() {
     try {
       const vector = await embedQuestion(index, text);
       const evidence = rankEvidence(index, vector);
-      const relatedRequirements = rankRequirements(index);
-      const yearsRequired = findMinimumYears(markdown);
+      const relatedRequirements = rankRequirements(index, vector);
       const asksForFit = /\b(adecuad|encaj|contrat|candidat|match|fit|hire|suitab)\w*/i.test(text);
       const asksAboutRequirements = /\b(requisit|requirement|año|años|year|years)\w*/i.test(text);
-      const answer = buildAnswer({
+      const language = lang;
+      const yearsAssessment = asksForFit || asksAboutRequirements
+        ? describeYearsEvidence(extractRequiredYears(markdown), language)
+        : undefined;
+      const response = await generateRecruiterAnswer({
         evidence,
-        relatedRequirements,
-        yearsRequired: asksForFit || asksAboutRequirements ? yearsRequired : null,
-        asksForFit,
-        language: /\b(the|what|does|years|experience|role|candidate)\b/i.test(text) ? "en" : "es",
+        language,
+        question: text,
+        onProgress: setStatus,
       });
-      setMessages((current) => [...current, { role: "portfolio", text: answer, sources: evidence }]);
-      setStatus(tl({ es: `Búsqueda local lista · ${index.embedder.device === "webgpu" ? "WebGPU" : "procesador"}`, en: `Local search ready · ${index.embedder.device === "webgpu" ? "WebGPU" : "CPU"}` }));
+      setMessages((current) => [...current, {
+        role: "portfolio",
+        text: [response.text, yearsAssessment].filter(Boolean).join("\n\n"),
+        sources: evidence,
+        requirements: relatedRequirements.slice(0, 2).map((item) => item.text),
+      }]);
+      setStatus(response.device
+        ? tl({ es: `Respuesta local lista · Embeddings ${index.embedder.device === "webgpu" ? "WebGPU" : "CPU"} · sLLM ${response.device === "webgpu" ? "WebGPU" : "CPU"}`, en: `Local answer ready · Embeddings ${index.embedder.device === "webgpu" ? "WebGPU" : "CPU"} · sLLM ${response.device === "webgpu" ? "WebGPU" : "CPU"}` })
+        : tl({ es: "Respuesta de respaldo · evidencia local", en: "Fallback answer · local evidence" }));
     } catch {
       setError(tl({ es: "Falló la búsqueda local. Probá otra vez o usá WebGPU en un navegador compatible.", en: "Local search failed. Try again or use WebGPU in a compatible browser." }));
       setStatus("");
@@ -162,7 +174,7 @@ export function AgentHiring() {
               </div>
               <div className="recruiter-local-note">
                 <span className="recruiter-local-mark" aria-hidden="true">↳</span>
-                <p className="recruiter-note">{tl({ es: "El JD y tus preguntas se procesan en este navegador; no se envían a mi servidor. La primera vez se descarga EmbeddingGemma 2 (~175 MB) desde Hugging Face y queda en caché para próximas visitas.", en: "Your job description and questions stay in this browser; they aren't sent to my server. The first visit downloads EmbeddingGemma 2 (~175 MB) from Hugging Face and caches it for next time." })}</p>
+                <p className="recruiter-note">{tl({ es: "El JD y tus preguntas se procesan en este navegador; no se envían a mi servidor. Al cargar el JD se descarga EmbeddingGemma 2 (~175 MB). La primera pregunta descarga Qwen 0.5B (~500 MB); ambos modelos quedan en caché.", en: "Your job description and questions stay in this browser; they aren't sent to my server. Uploading the JD downloads EmbeddingGemma 2 (~175 MB). Your first question downloads Qwen 0.5B (~500 MB); both models are cached." })}</p>
               </div>
             </div>
           ) : (
@@ -180,11 +192,17 @@ export function AgentHiring() {
               <div className="recruiter-messages" aria-live="polite" aria-label={tl({ es: "Conversación", en: "Conversation" })}>
                 {messages.map((message, messageIndex) => (
                   <article className={`recruiter-message ${message.role}`} key={`${message.role}-${messageIndex}`}>
-                    <span>{message.role === "recruiter" ? tl({ es: "RECLUTADOR", en: "RECRUITER" }) : "FRANCISCO · PORTFOLIO"}</span>
+                    <span>{message.role === "recruiter" ? tl({ es: "RECLUTADOR", en: "RECRUITER" }) : tl({ es: "ASISTENTE LOCAL · PORTFOLIO", en: "LOCAL ASSISTANT · PORTFOLIO" })}</span>
                     <p>{message.text}</p>
+                    {message.requirements?.map((requirement, requirementIndex) => (
+                      <details className="recruiter-source" key={requirementIndex}>
+                        <summary>R{requirementIndex + 1} · {tl({ es: "Fragmento del JD más cercano", en: "Closest JD passage" })}</summary>
+                        <p>{requirement}</p>
+                      </details>
+                    ))}
                     {message.sources?.map((source) => (
                       <details className="recruiter-source" key={source.title}>
-                        <summary>{source.title}</summary>
+                        <summary>E{(message.sources?.indexOf(source) ?? -1) + 1} · {source.title}</summary>
                         <p>{source.text}</p>
                       </details>
                     ))}
@@ -223,66 +241,11 @@ export function AgentHiring() {
           <p className="recruiter-status" role="status" aria-live="polite">{status}</p>
           {error && <p className="recruiter-error" role="alert">{error}</p>}
           <footer className="recruiter-disclosure">
-            <p>{tl({ es: "EmbeddingGemma 2 solo recupera fragmentos relacionados; no genera texto ni decide contrataciones. La respuesta muestra el origen para que puedas verificarlo. Los años y otros requisitos explícitos se contrastan con lo declarado en el portfolio.", en: "EmbeddingGemma 2 only retrieves related passages; it does not generate text or make hiring decisions. Answers include their source so you can verify them. Explicit requirements such as years are compared with what the portfolio states." })}</p>
+            <p>{tl({ es: "EmbeddingGemma 2 recupera evidencia y un sLLM local selecciona los fragmentos más relevantes. La respuesta reproduce esos fragmentos literalmente; no decide contrataciones. Verificá cada afirmación en sus fuentes. Los años se contrastan con lo declarado en el portfolio y se marcan como no demostrados cuando falta evidencia.", en: "EmbeddingGemma 2 retrieves evidence and a local sLLM selects the most relevant passages. Answers reproduce those passages verbatim; the model does not make hiring decisions. Verify each claim against its sources. Years are compared with the portfolio and marked as unsubstantiated when evidence is missing." })}</p>
             <p>{tl({ es: "Para avanzar, escribime:", en: "To move forward, contact me:" })} <a className="link-underline" href={`mailto:${CV.email}`}>{CV.email}</a></p>
           </footer>
         </section>
       </div>
     </main>
   );
-}
-
-function findMinimumYears(markdown: string): number | null {
-  const numberWords: Record<string, number> = {
-    one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
-    un: 1, uno: 1, una: 1, dos: 2, tres: 3, cuatro: 4, cinco: 5, seis: 6, siete: 7, ocho: 8, nueve: 9, diez: 10,
-  };
-  const matches = [...markdown.matchAll(/\b(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten|un|uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\s*\+?\s*(?:years?|años?)\b/gi)];
-  const years = matches.map((match) => Number(match[1]) || numberWords[match[1].toLowerCase()]).filter(Number.isFinite);
-  return years.length ? Math.max(...years) : null;
-}
-
-function buildAnswer({
-  evidence,
-  relatedRequirements,
-  yearsRequired,
-  asksForFit,
-  language,
-}: {
-  evidence: ReturnType<typeof rankEvidence>;
-  relatedRequirements: ReturnType<typeof rankRequirements>;
-  yearsRequired: number | null;
-  asksForFit: boolean;
-  language: "es" | "en";
-}) {
-  const lead = language === "es"
-    ? "La búsqueda semántica encontró estos fragmentos del portfolio relacionados con tu pregunta:"
-    : "Semantic search found these portfolio passages related to your question:";
-  const relevantJD = language === "es" ? "Partes del JD cercanas a esa evidencia:" : "JD passages closest to that evidence:";
-  const yearsNote = yearsRequired
-    ? language === "es"
-      ? yearsRequired > 3
-        ? `El JD pide ${yearsRequired} años. El portfolio declara casi 3 años de experiencia en industria; no demuestra ese mínimo y la brecha aproximada es de ${yearsRequired - 3} años.`
-        : `El JD pide ${yearsRequired} años. El portfolio declara casi 3 años de experiencia en industria, aunque no detalla fechas suficientes para verificar ese mínimo con precisión.`
-      : yearsRequired > 3
-        ? `The JD asks for ${yearsRequired} years. The portfolio states nearly 3 years of industry experience; it does not substantiate that minimum, with an approximate gap of ${yearsRequired - 3} years.`
-        : `The JD asks for ${yearsRequired} years. The portfolio states nearly 3 years of industry experience, but does not provide enough exact dates to verify the minimum precisely.`
-    : "";
-  const fitNote = asksForFit
-    ? yearsRequired && yearsRequired > 3
-      ? language === "es"
-        ? "Evaluación provisional: si ese mínimo es excluyente, el portfolio no demuestra que Francisco lo cumpla y no lo marcaría como match completo."
-        : "Provisional assessment: if that minimum is mandatory, the portfolio does not show that Francisco meets it, so I wouldn't mark him as a complete match."
-      : language === "es"
-        ? "No puedo dar un sí/no general con embeddings. Los fragmentos son evidencia relacionada; confirmá los requisitos excluyentes y las fechas antes de decidir."
-        : "I can't give a general yes/no from embeddings. These passages are related evidence; verify mandatory requirements and dates before deciding."
-    : "";
-  const limitation = language === "es"
-    ? "Esto es recuperación semántica, no un puntaje de compatibilidad ni una decisión de contratación. Una coincidencia no prueba por sí sola que se cumpla un requisito; verificá cada fuente."
-    : "This is semantic retrieval, not a fit score or hiring decision. A related passage alone does not prove a requirement is met; verify each source.";
-  const evidenceText = evidence.length
-    ? evidence.map((item) => `• ${item.title}: ${item.text.slice(0, 360)}`).join("\n")
-    : language === "es" ? "No encontré evidencia en el portfolio para esta pregunta." : "I couldn't find portfolio evidence for this question.";
-  const requirementText = relatedRequirements.slice(0, 2).map((item) => `• ${item.text.replace(/\s+/g, " ").slice(0, 180)}\n  Evidencia recuperada: ${item.evidence.title} — ${item.evidence.text.slice(0, 240)}`).join("\n");
-  return [lead, evidenceText, requirementText ? `${relevantJD}\n${requirementText}` : "", yearsNote, fitNote, limitation].filter(Boolean).join("\n\n");
 }

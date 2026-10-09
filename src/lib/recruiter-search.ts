@@ -1,4 +1,4 @@
-import { CV } from "@/data/cv";
+import { CV, type Lang } from "@/data/cv";
 import { PROJECTS } from "@/data/projects";
 
 const MODEL_ID = "onnx-community/embeddinggemma-2-ONNX";
@@ -17,30 +17,30 @@ interface Embedder {
 
 let embedderPromise: Promise<Embedder> | undefined;
 
-export function portfolioEvidence(): Evidence[] {
+export function portfolioEvidence(language: Lang): Evidence[] {
   return [
-    { title: "Perfil", text: CV.summary.es },
+    { title: language === "es" ? "Perfil" : "Profile", text: CV.summary[language] },
     ...CV.experience.map((item) => ({
-      title: `${item.role.es} · ${item.org} · ${item.period.es}`,
-      text: `${item.description.es} Tecnologías: ${item.stack?.join(", ") ?? ""}`,
+      title: `${item.role[language]} · ${item.org} · ${item.period[language]}`,
+      text: `${item.description[language]} ${language === "es" ? "Tecnologías" : "Technologies"}: ${item.stack?.join(", ") ?? ""}`,
     })),
     ...CV.highlights.map((item) => ({
       title: `${item.title} · ${item.year}`,
-      text: item.detail.es,
+      text: item.detail[language],
     })),
     ...CV.education.map((item) => ({
       title: item.institution,
-      text: `${item.degree.es} · ${item.period.es}`,
+      text: `${item.degree[language]} · ${item.period[language]}`,
     })),
     ...CV.certifications.map((item) => ({
-      title: `${item.name.es} · ${item.school}`,
-      text: `${item.period.es}${item.highlight ? ` · ${item.highlight.es}` : ""}`,
+      title: `${item.name[language]} · ${item.school}`,
+      text: `${item.period[language]}${item.highlight ? ` · ${item.highlight[language]}` : ""}`,
     })),
     ...PROJECTS.flatMap((project) => [
-      { title: project.title?.es ?? project.name, text: `${project.tagline.es} ${project.description.es} Stack: ${project.stack.join(", ")}` },
+      { title: project.title?.[language] ?? project.name, text: `${project.tagline[language]} ${project.description[language]} Stack: ${project.stack.join(", ")}` },
       ...(project.items ?? []).map((item) => ({
         title: `${item.name} · ${project.name}`,
-        text: `${item.description.es}${item.highlight ? ` ${item.highlight.es}` : ""}`,
+        text: `${item.description[language]}${item.highlight ? ` ${item.highlight[language]}` : ""}`,
       })),
     ]),
   ];
@@ -116,9 +116,9 @@ export function chunkMarkdown(markdown: string, maxLength = 900): string[] {
   return chunks;
 }
 
-export async function createRecruiterIndex(markdown: string, onProgress: (message: string) => void) {
+export async function createRecruiterIndex(markdown: string, onProgress: (message: string) => void, language: Lang) {
   const embedder = await getEmbedder(onProgress);
-  const evidence = portfolioEvidence();
+  const evidence = portfolioEvidence(language);
   const requirements = chunkMarkdown(markdown);
   onProgress("Indexando experiencia pública del portfolio…");
   const evidenceVectors = await embedder.embed(evidence.map((item) => `title: ${item.title} | text: ${item.text}`), "document");
@@ -138,14 +138,43 @@ export function rankEvidence(index: Awaited<ReturnType<typeof createRecruiterInd
     .slice(0, 3);
 }
 
-export function rankRequirements(index: Awaited<ReturnType<typeof createRecruiterIndex>>) {
+export function rankRequirements(index: Awaited<ReturnType<typeof createRecruiterIndex>>, vector: number[]) {
   return index.requirements
     .map((text, requirementIndex) => ({
       text,
+      relevance: cosine(vector, index.requirementVectors[requirementIndex]),
       evidence: rankVector(index, index.requirementVectors[requirementIndex]),
     }))
-    .sort((left, right) => right.evidence.relevance - left.evidence.relevance)
+    .sort((left, right) => right.relevance - left.relevance)
     .slice(0, 4);
+}
+
+export function extractRequiredYears(markdown: string): number | null {
+  const numberWords: Record<string, number> = {
+    one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
+    un: 1, uno: 1, una: 1, dos: 2, tres: 3, cuatro: 4, cinco: 5, seis: 6, siete: 7, ocho: 8, nueve: 9, diez: 10,
+  };
+  const matches = [...markdown.matchAll(/\b(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten|un|uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\s*\+?\s*(?:years?|años?)\s*(?:(?:of|de)\s+)?(?:(?:professional|industry|relevant|ai|software|profesional|industrial|relevante)\s+)?(?:experience|experiencia)\b/gi)];
+  const years = matches.map((match) => Number(match[1]) || numberWords[match[1].toLowerCase()]).filter(Number.isFinite);
+  return years.length ? Math.max(...years) : null;
+}
+
+export function describeYearsEvidence(requiredYears: number | null, language: "es" | "en") {
+  if (requiredYears === null) {
+    return language === "es"
+      ? "No detecté un mínimo explícito de años en el JD; no lo doy por cumplido."
+      : "I couldn't detect an explicit minimum number of years in the JD, so I can't mark it as met.";
+  }
+
+  if (requiredYears > 3) {
+    return language === "es"
+      ? `El JD pide ${requiredYears} años. El perfil declara casi 3 años en industria, así que el portfolio no demuestra ese mínimo.`
+      : `The JD asks for ${requiredYears} years. The profile states nearly 3 years in industry, so the portfolio does not substantiate that minimum.`;
+  }
+
+  return language === "es"
+    ? `El JD pide ${requiredYears} años. El perfil declara casi 3 años en industria, pero no incluye fechas suficientes para verificar con precisión ese mínimo.`
+    : `The JD asks for ${requiredYears} years. The profile states nearly 3 years in industry, but does not provide enough dates to verify that minimum precisely.`;
 }
 
 function rankVector(index: Awaited<ReturnType<typeof createRecruiterIndex>>, vector: number[]) {
