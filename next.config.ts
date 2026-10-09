@@ -6,6 +6,12 @@ const nextConfig: NextConfig = {
   // un lockfile de un directorio superior).
   turbopack: {
     root: path.resolve(__dirname),
+    rules: {
+      "*.wgsl": {
+        loaders: ["@vgpu/wgsl/loader-webpack"],
+        as: "*.js",
+      },
+    },
   },
   // Fija también la raíz para el tracing/prerender del build. Sin esto, Next
   // infiere la raíz por los múltiples lockfiles (hay uno en el home del

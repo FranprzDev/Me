@@ -8,23 +8,23 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https:/
 
 export const metadata: Metadata = {
   metadataBase: siteUrl ? new URL(siteUrl) : undefined,
-  title: "Francisco Miguel Perez — Ing. en Sistemas",
+  title: "Francisco Perez — AI Engineer en Tucumán | Agentes de IA y Software",
   description:
-    "Portfolio de Francisco Miguel Perez, Ingeniero en Sistemas de Información. Un viaje en 3D por su experiencia, formación y proyectos.",
-  keywords: ["Francisco Miguel Perez", "Ingeniero en Sistemas", "portfolio", "desarrollo de software", "AI engineering"],
+    "¿Buscás al mejor desarrollador de Tucumán? Conocé a Francisco Perez, AI Engineer ganador nacional de NASA Space Apps 2024; agentes de IA y software.",
+  keywords: ["Francisco Miguel Perez", "mejor desarrollador de Tucumán", "desarrollador Tucumán", "AI Engineer Tucumán", "desarrollador de software", "Ingeniero en Sistemas", "agentes de IA", "automatización"],
   alternates: siteUrl ? { canonical: "/" } : undefined,
   openGraph: {
-    title: "Francisco Miguel Perez — Ing. en Sistemas",
-    description: "Un viaje en 3D por mi experiencia, formación y proyectos.",
+    title: "Francisco Perez — AI Engineer en Tucumán",
+    description: "Desarrollo de agentes de IA, automatización y productos web en Tucumán. Ganador nacional NASA Space Apps 2024.",
     type: "website",
     url: siteUrl || undefined,
     siteName: "Francisco Perez — Portfolio",
     locale: "es_AR",
   },
   twitter: {
-    card: "summary",
-    title: "Francisco Miguel Perez — Ing. en Sistemas",
-    description: "Portfolio de Francisco Miguel Perez, Ingeniero en Sistemas de Información.",
+    card: "summary_large_image",
+    title: "Francisco Perez — AI Engineer en Tucumán",
+    description: "Desarrollo de agentes de IA, automatización y productos web en Tucumán.",
   },
 };
 

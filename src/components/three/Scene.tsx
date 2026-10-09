@@ -10,13 +10,21 @@
 // warning de THREE.Clock deprecado que R3F dispara al crear su clock interno.
 import "@/lib/silenceR3FClockWarning";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Stars } from "@react-three/drei";
-import { useMemo, useRef, useState, useEffect, type RefObject } from "react";
+import { WebGPURenderer } from "three/webgpu";
+import { Component, useMemo, useRef, useState, useEffect, type ReactNode, type RefObject } from "react";
 import * as THREE from "three";
 import { getScrollProgress, measuredSectionCenter, bumpWeight } from "@/lib/scroll";
 import { getConstellations, type Constellation } from "@/data/constellations";
 import { useI18n } from "@/lib/i18n";
 import { Nebula, Planet, ProjectPlanets } from "./Cosmos";
+import {
+  StarShell,
+  WarpField,
+  dampingFactor,
+  isConstrainedDevice,
+  smoother,
+  useReducedMotion,
+} from "./shared";
 
 // Fondo de respaldo: clear-color del WebGL y fallback CSS. Siempre oscuro para
 // que NUNCA aparezca un flash blanco (p.ej. al redimensionar).
@@ -29,135 +37,16 @@ const C_BG_B = new THREE.Color("#0a0a22"); // medio (matiz violeta)
 const C_BG_C = new THREE.Color("#070b1d"); // fondo profundo
 const tmpColor = new THREE.Color();
 
-function dampingFactor(dt: number, speed: number) {
-  return 1 - Math.exp(-dt * speed);
-}
+class RendererFallback extends Component<{ children: ReactNode; fallback: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
 
-function prefersReducedMotion(): boolean {
-  return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
 
-function isConstrainedDevice(reduced: boolean): boolean {
-  if (typeof window === "undefined") return false;
-  const connection = (navigator as Navigator & {
-    connection?: { saveData?: boolean };
-  }).connection;
-  return (
-    window.innerWidth < 768 ||
-    reduced ||
-    (navigator.hardwareConcurrency > 0 && navigator.hardwareConcurrency <= 4) ||
-    connection?.saveData === true
-  );
-}
-
-function smoother(x: number, e0: number, e1: number): number {
-  const t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0)));
-  return t * t * (3 - 2 * t);
-}
-
-function useReducedMotion() {
-  const [reduced, setReduced] = useState(prefersReducedMotion);
-  useEffect(() => {
-    const m = window.matchMedia("(prefers-reduced-motion: reduce)");
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setReduced(m.matches);
-    const cb = () => setReduced(m.matches);
-    m.addEventListener("change", cb);
-    return () => m.removeEventListener("change", cb);
-  }, []);
-  return reduced;
-}
-
-/** Textura circular suave para que las estrellas se vean redondas y con halo. */
-function makeStarTexture(): THREE.Texture {
-  const size = 64;
-  const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = size;
-  const ctx = canvas.getContext("2d")!;
-  const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-  // Núcleo blanco compacto + halo ancho: reemplaza el glow que dejaba el Bloom.
-  g.addColorStop(0, "rgba(255,255,255,1)");
-  g.addColorStop(0.18, "rgba(255,255,255,1)");
-  g.addColorStop(0.4, "rgba(255,255,255,0.55)");
-  g.addColorStop(0.65, "rgba(255,255,255,0.18)");
-  g.addColorStop(1, "rgba(255,255,255,0)");
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, size, size);
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
-}
-
-/**
- * WARP / hiperespacio: campo de estrellas que vuela hacia la cámara. La
- * longitud de las estelas y la velocidad crecen con la velocidad de scroll
- * (velRef), convirtiendo "mirar puntos" en "viajar por el espacio".
- */
-function WarpField({
-  velRef,
-  reduced,
-  performanceMode,
-}: {
-  velRef: RefObject<number>;
-  reduced: boolean;
-  performanceMode: boolean;
-}) {
-  const { camera } = useThree();
-  const N = performanceMode ? 80 : reduced ? 120 : 260;
-
-  const { geo, mat, positions, stars } = useMemo(() => {
-    const positions = new Float32Array(N * 6);
-    const stars = Array.from({ length: N }, () => ({
-      x: (Math.random() * 2 - 1) * 16,
-      y: (Math.random() * 2 - 1) * 10,
-      z: -40 + Math.random() * 50,
-    }));
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    const mat = new THREE.LineBasicMaterial({
-      color: new THREE.Color("#cfe0ff"),
-      transparent: true,
-      opacity: 0.7,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
-    return { geo, mat, positions, stars };
-  }, [N]);
-
-  useEffect(() => {
-    return () => {
-      geo.dispose();
-      mat.dispose();
-    };
-  }, [geo, mat]);
-
-  useFrame((_, dt) => {
-    const warp = reduced ? 0 : velRef.current;
-    const speed = 2.5 + warp * 70; // unidades/seg: deriva suave + empuje al scrollear
-    const streak = Math.min(9, 0.06 + warp * 34); // largo de la estela
-    const camZ = camera.position.z;
-    const step = speed * Math.min(dt, 0.05);
-    for (let i = 0; i < N; i++) {
-      const s = stars[i];
-      s.z += step;
-      if (s.z > camZ + 6) {
-        s.z = camZ - 38 - Math.random() * 8;
-        s.x = (Math.random() * 2 - 1) * 16;
-        s.y = (Math.random() * 2 - 1) * 10;
-      }
-      const o = i * 6;
-      positions[o] = s.x;
-      positions[o + 1] = s.y;
-      positions[o + 2] = s.z;
-      positions[o + 3] = s.x;
-      positions[o + 4] = s.y;
-      positions[o + 5] = s.z - streak;
-    }
-    geo.attributes.position.needsUpdate = true;
-    mat.opacity = 0.7 + Math.min(0.3, warp * 0.7);
-  });
-
-  return <lineSegments geometry={geo} material={mat} />;
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children;
+  }
 }
 
 /**
@@ -168,13 +57,11 @@ function WarpField({
  */
 function ConstellationGroup({
   data,
-  starTex,
   pRef,
   reduced,
   performanceMode,
 }: {
   data: Constellation;
-  starTex: THREE.Texture;
   pRef: RefObject<number>;
   reduced: boolean;
   performanceMode: boolean;
@@ -237,7 +124,6 @@ function ConstellationGroup({
 
     const color = new THREE.Color(data.color);
     const pMat = new THREE.PointsMaterial({
-      map: starTex,
       color,
       size: 0.2,
       sizeAttenuation: true,
@@ -261,7 +147,6 @@ function ConstellationGroup({
     // estrellas. Da profundidad y "glow" barato sin Bloom ni engrosar el trazo.
     const hMat = hero
       ? new THREE.PointsMaterial({
-          map: starTex,
           color,
           size: 0.55,
           sizeAttenuation: true,
@@ -288,7 +173,7 @@ function ConstellationGroup({
     g.add(lines);
     g.add(points);
     return { group: g, pointsMat: pMat, lineMat: lMat, haloMat: hMat, geo: ptsGeo, home, target, phase, count };
-  }, [data, starTex, ppn, hero]);
+  }, [data, ppn, hero]);
 
   useEffect(() => {
     return () => {
@@ -387,10 +272,9 @@ function Rig({
 }) {
   const { scene, camera, gl } = useThree();
   const { lang } = useI18n();
-  const stars = useRef<THREE.Points>(null);
   const fog = useMemo(() => new THREE.FogExp2(C_BG_A.getHex(), 0.018), []);
   const background = useMemo(() => C_BG_A.clone(), []);
-  const starTex = useMemo(() => makeStarTexture(), []);
+  const starCount = reduced ? 900 : 2200;
   const lastCssBg = useRef("");
   // Progreso suavizado: desacopla la escena del scroll crudo (la rueda llega en
   // saltos discretos) para que el viaje y los cross-fade se sientan fluidos.
@@ -407,8 +291,7 @@ function Rig({
       document.documentElement.style.setProperty("--scene-bg", initialBg);
       lastCssBg.current = initialBg;
     }
-    return () => starTex.dispose();
-  }, [scene, fog, background, starTex]);
+  }, [scene, fog, background]);
 
   useFrame((_, dt) => {
     const raw = getScrollProgress();
@@ -429,8 +312,6 @@ function Rig({
     // junto al backdrop-filter de las tarjetas). El fondo vivo vive sólo acá.
     background.lerp(tmpColor, blend);
     fog.color.lerp(tmpColor, blend);
-
-    if (stars.current && !reduced) stars.current.rotation.y += dt * 0.006;
 
     // Cámara: viaja hacia el fondo del cosmos (-z) con leve parallax.
     const targetZ = 6 - p * 8; // 6 -> -2
@@ -454,8 +335,6 @@ function Rig({
     }
   });
 
-  const starCount = reduced ? 900 : 2200;
-
   return (
     <>
       <ambientLight intensity={0.5} />
@@ -464,18 +343,9 @@ function Rig({
       {!performanceMode && <Planet reduced={reduced} pRef={pRef} />}
       <ProjectPlanets reduced={reduced} pRef={pRef} />
 
-      <Stars
-        ref={stars as never}
-        radius={90}
-        depth={50}
-        count={starCount}
-        factor={4}
-        saturation={0}
-        fade
-        speed={reduced ? 0 : 0.2}
-      />
+      <StarShell count={starCount} reduced={reduced} spin={0.006} opacity={0.85} />
 
-      <WarpField velRef={velRef} reduced={reduced} performanceMode={performanceMode} />
+      <WarpField velocity={velRef} reduced={reduced} performanceMode={performanceMode} />
 
       {/* En modo minimal sólo quedan los puntos viajando, sin constelaciones. */}
       {!minimal &&
@@ -483,7 +353,6 @@ function Rig({
           <ConstellationGroup
             key={c.id}
             data={c}
-            starTex={starTex}
             pRef={pRef}
             reduced={reduced}
             performanceMode={performanceMode}
@@ -501,6 +370,7 @@ export default function Scene({ minimal = false }: { minimal?: boolean }) {
   // Pausamos el loop cuando la pestaña queda oculta: no tiene sentido animar
   // estrellas que nadie ve (ahorra GPU/CPU y batería en segundo plano).
   const [frameloop, setFrameloop] = useState<"always" | "never">("always");
+  const [webgpuReady, setWebgpuReady] = useState(false);
 
   useEffect(() => {
     const onVis = () =>
@@ -530,10 +400,25 @@ export default function Scene({ minimal = false }: { minimal?: boolean }) {
     return () => window.removeEventListener("resize", apply);
   }, [reduced]);
 
+  useEffect(() => {
+    let active = true;
+    const gpu = (navigator as Navigator & { gpu?: { requestAdapter(): Promise<unknown> } }).gpu;
+    if (!gpu) return;
+    void gpu.requestAdapter().then((adapter) => {
+      if (active) setWebgpuReady(Boolean(adapter));
+    }).catch(() => {
+      if (active) setWebgpuReady(false);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
     <div
       aria-hidden
       data-scene-root=""
+      data-contact-heading={!minimal && !performanceMode}
       style={{
         position: "fixed",
         inset: 0,
@@ -543,23 +428,26 @@ export default function Scene({ minimal = false }: { minimal?: boolean }) {
         background: `var(--scene-bg, ${FALLBACK_BG})`,
       }}
     >
-      <Canvas
+      {webgpuReady && <RendererFallback fallback={null}><Canvas
         camera={{ position: [0, 0.3, 6], fov: 60 }}
         dpr={dpr}
         frameloop={frameloop}
         // Debounce del resize: re-mide tras 50ms en lugar de en cada píxel.
         resize={{ scroll: false, debounce: { scroll: 0, resize: 50 } }}
         // alpha:false -> canvas OPACO. Sin transparencia no hay flash blanco.
-        gl={{
-          antialias: !performanceMode,
-          powerPreference: performanceMode ? "low-power" : "high-performance",
-          alpha: false,
+        gl={async (props) => {
+          const renderer = new WebGPURenderer({
+            ...props,
+            antialias: !performanceMode,
+            powerPreference: performanceMode ? "low-power" : "high-performance",
+            alpha: false,
+          } as ConstructorParameters<typeof WebGPURenderer>[0]);
+          await renderer.init();
+          return renderer;
         }}
         style={{ background: FALLBACK_BG }}
         onCreated={({ gl }) => {
           gl.setClearColor(FALLBACK_BG, 1);
-          const canvas = gl.domElement;
-          canvas.addEventListener("webglcontextlost", (e) => e.preventDefault(), false);
         }}
       >
         <Rig
@@ -567,7 +455,7 @@ export default function Scene({ minimal = false }: { minimal?: boolean }) {
           minimal={minimal || performanceMode}
           performanceMode={performanceMode}
         />
-      </Canvas>
+      </Canvas></RendererFallback>}
     </div>
   );
 }

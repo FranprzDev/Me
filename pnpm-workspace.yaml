@@ -1,4 +1,8 @@
 allowBuilds:
+  '@vgpu/adapter-node': false
+  onnxruntime-node: false
+  protobufjs: false
   sharp: false
   tesseract.js: false
   unrs-resolver: false
+  webgpu: false

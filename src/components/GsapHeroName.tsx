@@ -10,7 +10,8 @@ export function GsapHeroName({ text }: { text: string }) {
     const el = ref.current;
     if (!el) return;
 
-    const ctx = gsap.context(() => {
+    const media = gsap.matchMedia();
+    media.add("(prefers-reduced-motion: no-preference)", () => {
       const letters = el.querySelectorAll<HTMLElement>(".hero-letter");
 
       gsap.set(letters, { yPercent: 120, opacity: 0, rotateX: -80 });
@@ -40,7 +41,7 @@ export function GsapHeroName({ text }: { text: string }) {
       });
     }, ref);
 
-    return () => ctx.revert();
+    return () => media.revert();
   }, [text]);
 
   const words = text.split(" ");

@@ -107,17 +107,17 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: "curso-n8n",
-    name: "Curso de Automatización con n8n",
-    title: { es: "Curso de Automatización con n8n", en: "n8n Automation Course" },
+    name: "Mentorías",
+    title: { es: "Mentorías", en: "Teaching & Mentorship" },
     tagline: {
-      es: "10 clases (20 h) de automatización para el Poder Judicial de Tucumán.",
-      en: "10 sessions (20h) of automation for the Tucumán Judiciary.",
+      es: "Compartir lo que sé y acompañar a otros en su recorrido técnico.",
+      en: "Sharing what I know and guiding others on their technical journey.",
     },
     description: {
-      es: "Diseño e impartición de un curso completo de automatización de procesos con n8n para personal del Poder Judicial: modelado de flujos, integración con APIs y webhooks, pipelines de RAG y automatizaciones Human-in-the-Loop.",
-      en: "Designed and delivered a full process-automation course with n8n for Judiciary staff: flow modeling, API/webhook integration, RAG pipelines and Human-in-the-Loop automations.",
+      es: "Espacios de formación práctica en desarrollo y automatización. El curso de n8n para el Poder Judicial de Tucumán es una de esas experiencias.",
+      en: "Hands-on learning experiences in development and automation. The n8n course for the Tucumán Judiciary is one of them.",
     },
-    stack: ["n8n", "APIs", "Webhooks", "RAG"],
+    stack: ["Mentorías", "Docencia", "n8n", "Automatización"],
     year: "2025",
     planet: {
       body: "#6b4a1d",
@@ -127,6 +127,15 @@ export const PROJECTS: Project[] = [
     },
     items: [
       {
+        name: "Curso de Automatización de Procesos con n8n — Poder Judicial de Tucumán",
+        description: {
+          es: "Diseño e impartición de un curso de 10 clases (20 horas) para personal del Poder Judicial de Tucumán, con modelado de flujos, APIs y webhooks, automatización de tareas, RAG y Human-in-the-Loop.",
+          en: "Designed and taught a 10-session (20-hour) course for Tucumán Judiciary staff, covering workflow modeling, APIs and webhooks, task automation, RAG and Human-in-the-Loop.",
+        },
+        year: "2025",
+        category: { es: "Curso destacado", en: "Featured course" },
+      },
+      {
         name: "n8n-workflows-course",
         description: {
           es: "Workflows de las sesiones 2 a 10 del curso: el material práctico que construimos en vivo con el grupo.",
@@ -134,7 +143,7 @@ export const PROJECTS: Project[] = [
         },
         year: "2025",
         link: "https://github.com/FranprzDev/n8n-workflows-course",
-        category: { es: "Material del curso", en: "Course material" },
+        category: { es: "Materiales del curso", en: "Course materials" },
       },
       {
         name: "n8n-curso-vivo",
@@ -144,7 +153,7 @@ export const PROJECTS: Project[] = [
         },
         year: "2025",
         link: "https://github.com/FranprzDev/n8n-curso-vivo",
-        category: { es: "Material del curso", en: "Course material" },
+        category: { es: "Materiales del curso", en: "Course materials" },
       },
     ],
   },

@@ -3,7 +3,7 @@ import { StarAura } from "@/components/StarAura";
 
 export default function Home() {
   return (
-    <main className="content-layer">
+    <main id="main-content" className="content-layer" tabIndex={-1}>
       <StarAura />
       <Hero />
       <Experience />
