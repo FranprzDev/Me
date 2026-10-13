@@ -1882,3 +1882,106 @@ button:focus-visible {
 .mission__body .story-link + .story-link {
   margin-left: 1.1rem;
 }
+
+/* --- Launch loader: rocket climbs while the 3D background compiles --- */
+.rocket-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 2; /* above the canvas (0), below stars (5) and content (10) */
+  pointer-events: none;
+  overflow: hidden;
+}
+.rocket-loader__veil {
+  position: absolute;
+  inset: 0;
+  background: var(--scene-bg, #040612);
+  transition: opacity 600ms ease;
+}
+.rocket-loader.is-burst .rocket-loader__veil {
+  opacity: 0;
+  transition-duration: 900ms;
+  transition-delay: 120ms;
+}
+.rocket-loader.is-exit .rocket-loader__veil {
+  opacity: 0;
+}
+.rocket-loader__flight {
+  position: absolute;
+  left: 50%;
+  top: 16vh; /* parking spot, matches the burst origin in RocketLoader.tsx */
+  width: 40px;
+  height: 84px;
+  margin-left: -20px;
+  animation: rocket-ascent 1300ms cubic-bezier(0.22, 0.8, 0.3, 1) both;
+}
+.rocket-loader.is-hover .rocket-loader__flight {
+  animation: rocket-hover 1600ms ease-in-out infinite alternate;
+}
+.rocket-loader.is-burst .rocket-loader__flight {
+  animation: none;
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+.rocket-loader.is-exit .rocket-loader__flight {
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+.rocket-loader__rocket {
+  position: relative;
+  display: block;
+  filter: drop-shadow(0 0 12px rgba(91, 140, 255, 0.55));
+}
+.rocket-loader__flame {
+  transform-origin: 20px 58px;
+  animation: rocket-flame 120ms ease-in-out infinite alternate;
+}
+.rocket-loader__trail {
+  position: absolute;
+  left: 50%;
+  top: 70px;
+  width: 4px;
+  height: 0;
+  margin-left: -2px;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, rgba(255, 191, 92, 0.85), rgba(91, 140, 255, 0.25) 40%, transparent);
+  animation: rocket-trail 1300ms cubic-bezier(0.22, 0.8, 0.3, 1) both;
+}
+.rocket-loader.is-hover .rocket-loader__trail {
+  height: 18vh;
+  animation: none;
+  opacity: 0.6;
+}
+.rocket-loader__burst {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes rocket-ascent {
+  from { transform: translateY(calc(84vh + 100px)); }
+  to { transform: translateY(0); }
+}
+@keyframes rocket-hover {
+  from { transform: translateY(0); }
+  to { transform: translateY(-8px); }
+}
+@keyframes rocket-flame {
+  from { transform: scaleY(0.85); }
+  to { transform: scaleY(1.15); }
+}
+@keyframes rocket-trail {
+  from { height: 0; }
+  to { height: 40vh; opacity: 0.7; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .world-card__panel,
+  .world-card__chev {
+    transition: none;
+  }
+  .rocket-loader__veil {
+    transition: opacity 400ms ease !important;
+  }
+}
