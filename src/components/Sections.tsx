@@ -263,8 +263,6 @@ export function Projects() {
                 key={proj.slug}
                 href={`/${proj.slug}`}
                 className="chip world-pill"
-                onMouseEnter={() => i !== idx && go(i, i > idx ? 1 : -1)}
-                onFocus={() => i !== idx && go(i, i > idx ? 1 : -1)}
                 style={{
                   cursor: "pointer",
                   textDecoration: "none",

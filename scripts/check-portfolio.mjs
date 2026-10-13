@@ -127,8 +127,7 @@ async function main() {
       }
       assert.equal(await page.locator("#projects").getByText("Cerrar", { exact: true }).count(), 0, "Worlds section has no Close button");
       // A pill goes straight to its world.
-      await pills.nth(1).click();
-      await page.waitForURL(`**${routes[2]}`);
+      await Promise.all([page.waitForURL(`**${routes[2]}`), pills.nth(1).click()]);
       await page.goBack();
       await page.waitForURL((url) => new URL(url).pathname === "/");
       // Enter on the focused card goes straight to the world.
