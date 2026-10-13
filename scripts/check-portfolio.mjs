@@ -102,7 +102,7 @@ async function main() {
         await page.locator("#mobile-menu").getByRole("link", { name: "Proyectos" }).click();
         assert.equal(await page.locator("#mobile-menu").count(), 0);
       } else {
-        await page.getByRole("link", { name: "Explorar mi trabajo", exact: false }).click();
+        await page.locator("nav").getByRole("link", { name: "Proyectos", exact: true }).first().click();
       }
       await page.waitForTimeout(1200);
       assert.equal(new URL(page.url()).hash, "#projects");
