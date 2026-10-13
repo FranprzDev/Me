@@ -224,5 +224,7 @@ async function main() {
 
 main().catch((error) => {
   console.error(error);
+  // Surface the failing assertion as a GitHub annotation (visible without log access).
+  if (process.env.GITHUB_ACTIONS) console.log(`::error title=check-portfolio::${String(error?.message ?? error).replace(/\r?\n/g, "%0A").slice(0, 3000)}`);
   process.exitCode = 1;
 });

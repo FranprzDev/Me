@@ -1953,7 +1953,7 @@ button:focus-visible {
   will-change: transform;
 }
 /* Not enough gutter for labels: a slim rail on the edge, dots only. */
-@media (max-width: 1399px) {
+@media (max-width: 1599px) {
   .trajectory {
     left: 0.35rem;
     width: 1.6rem;
