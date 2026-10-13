@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+import { useEffect, type ReactNode } from "react";
 
 /**
  * Carta estelar: el viaje es un único cosmos. La página tiene SECTION_COUNT
@@ -67,30 +60,55 @@ export function bumpWeight(p: number, center: number, halfWidth = 0.16): number 
   return t * t * (3 - 2 * t);
 }
 
-/** Singleton leído por el render loop 3D (evita re-renders en cada scroll). */
-const state = { progress: 0 };
+/** Singleton read by the 3D render loop (no React re-render on scroll). */
+const state = { progress: 0, y: 0 };
 
 export function getScrollProgress(): number {
   return state.progress;
 }
 
-const ProgressCtx = createContext<number>(0);
+export interface ScrollSnapshot {
+  /** Page scroll progress, 0..1. */
+  progress: number;
+  /** window.scrollY in px. */
+  y: number;
+}
 
+type ScrollListener = (snapshot: ScrollSnapshot) => void;
+const listeners = new Set<ScrollListener>();
+
+/**
+ * Subscribe to the site's single scroll listener. Callbacks run inside one
+ * requestAnimationFrame per frame, after the only layout read, so subscribers
+ * should only write (transform, attributes) and never measure.
+ */
+export function subscribeScroll(listener: ScrollListener): () => void {
+  listeners.add(listener);
+  listener({ progress: state.progress, y: state.y });
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+/**
+ * Owns the one passive scroll/resize listener of the site. It never stores
+ * scroll state in React: re-rendering on every scroll frame is what made the
+ * page feel heavy on phones.
+ */
 export function ScrollProvider({ children }: { children: ReactNode }) {
-  const [progress, setProgress] = useState(0);
-  const raf = useRef<number | null>(null);
-
   useEffect(() => {
+    let raf = 0;
     const update = () => {
+      raf = 0;
       const doc = document.documentElement;
       const max = doc.scrollHeight - window.innerHeight;
-      const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
-      state.progress = p;
-      setProgress(p);
-      raf.current = null;
+      const y = window.scrollY;
+      state.y = y;
+      state.progress = max > 0 ? Math.min(1, Math.max(0, y / max)) : 0;
+      for (const listener of listeners) listener({ progress: state.progress, y });
     };
     const onScroll = () => {
-      if (raf.current == null) raf.current = window.requestAnimationFrame(update);
+      if (!raf) raf = window.requestAnimationFrame(update);
     };
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -98,14 +116,9 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
     return () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
-      if (raf.current != null) cancelAnimationFrame(raf.current);
+      if (raf) cancelAnimationFrame(raf);
     };
   }, []);
 
-  return <ProgressCtx.Provider value={progress}>{children}</ProgressCtx.Provider>;
-}
-
-/** Hook reactivo (para UI que necesita re-render con el progreso). */
-export function useScrollProgress(): number {
-  return useContext(ProgressCtx);
+  return <>{children}</>;
 }
