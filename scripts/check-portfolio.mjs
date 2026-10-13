@@ -109,11 +109,30 @@ async function main() {
       const selectors = page.locator("button[aria-controls='world-details']");
       assert.equal(await selectors.count(), 4);
       assert.equal(await page.locator("#world-details .chip").count(), 0, "No decorative project chips");
+      const worldToggle = page.locator("#world-details button[aria-controls='world-panel']");
+      const worldPanel = page.locator("#world-panel");
+      const worldRoute = page.locator("#world-panel a.world-card__route");
       for (let index = 0; index < 4; index++) {
         await selectors.nth(index).click();
         assert.equal(await selectors.nth(index).getAttribute("aria-pressed"), "true");
-        assert.equal(await page.locator("#world-details a").first().getAttribute("href"), routes[index + 1]);
+        assert.equal(await worldToggle.getAttribute("aria-expanded"), "false", "A new world starts collapsed");
+        assert.equal(await worldPanel.evaluate((el) => el.inert), true, "Collapsed panel is inert");
+        await worldToggle.click();
+        assert.equal(await worldToggle.getAttribute("aria-expanded"), "true", "Card expands inline");
+        assert.equal(await worldRoute.getAttribute("href"), routes[index + 1], "Expanded card links to its dedicated route");
+        await page.locator("#world-panel .world-card__close").click();
+        assert.equal(await worldToggle.getAttribute("aria-expanded"), "false", "Close collapses the card");
       }
+      // The whole card surface toggles too, and the keyboard control works.
+      await page.locator("#world-details > p").first().click();
+      assert.equal(await worldToggle.getAttribute("aria-expanded"), "true", "Clicking the card surface expands it");
+      await worldToggle.focus();
+      await page.keyboard.press("Enter");
+      assert.equal(await worldToggle.getAttribute("aria-expanded"), "false", "Enter on the toggle collapses it");
+      await page.keyboard.press("Space");
+      assert.equal(await worldToggle.getAttribute("aria-expanded"), "true", "Space on the toggle expands it");
+      await page.locator("#world-panel .world-card__close").click();
+      assert.equal(await page.getByText("Explorar este mundo").count(), 0, "Old explore button is gone");
       await page.getByRole("button", { name: "Siguiente planeta" }).click();
       assert.equal(await selectors.first().getAttribute("aria-pressed"), "true", "World selector wraps");
       await page.getByRole("button", { name: "Planeta anterior" }).click();
@@ -126,6 +145,11 @@ async function main() {
       assert.equal(cv.status(), 200);
       assert.match(cv.headers()["content-type"], /pdf/);
       assert.equal((await cv.body()).subarray(0, 4).toString(), "%PDF");
+      await page.goto(`${baseURL}/hackathons`);
+      assert.equal(await page.locator("#arena-missions-title").textContent(), "Voy a hackathones por amor al arte");
+      for (const entry of ["Proofy", "Contar con Datos 2026"]) {
+        assert.equal(await page.locator(".mission-rail h3", { hasText: entry }).count(), 1, `Hackathon entry ${entry}`);
+      }
       for (const route of routes.slice(1)) {
         await page.goto(`${baseURL}${route}`);
         assert.equal(new URL(await page.locator("link[rel='canonical']").getAttribute("href")).pathname, route);
