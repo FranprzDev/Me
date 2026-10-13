@@ -5,7 +5,7 @@ import AxeBuilder from "@axe-core/playwright";
 
 const baseURL = process.env.PORTFOLIO_URL || "http://localhost:3000";
 const output = `artifacts/portfolio-quality/${process.env.HEADFUL === "1" ? "headful" : "headless"}`;
-const routes = ["/", "/hackathons", "/curso-n8n", "/projects", "/university"];
+const routes = ["/", "/hackathons", "/teaching", "/projects", "/education"];
 
 async function checkPage(page, route, name) {
   const errors = [];
@@ -109,30 +109,27 @@ async function main() {
       const selectors = page.locator("button[aria-controls='world-details']");
       assert.equal(await selectors.count(), 4);
       assert.equal(await page.locator("#world-details .chip").count(), 0, "No decorative project chips");
-      const worldToggle = page.locator("#world-details button[aria-controls='world-panel']");
-      const worldPanel = page.locator("#world-panel");
-      const worldRoute = page.locator("#world-panel a.world-card__route");
+      const worldCard = page.locator("#world-details");
       for (let index = 0; index < 4; index++) {
         await selectors.nth(index).click();
         assert.equal(await selectors.nth(index).getAttribute("aria-pressed"), "true");
-        assert.equal(await worldToggle.getAttribute("aria-expanded"), "false", "A new world starts collapsed");
-        assert.equal(await worldPanel.evaluate((el) => el.inert), true, "Collapsed panel is inert");
-        await worldToggle.click();
-        assert.equal(await worldToggle.getAttribute("aria-expanded"), "true", "Card expands inline");
-        assert.equal(await worldRoute.getAttribute("href"), routes[index + 1], "Expanded card links to its dedicated route");
-        await page.locator("#world-panel .world-card__close").click();
-        assert.equal(await worldToggle.getAttribute("aria-expanded"), "false", "Close collapses the card");
+        assert.equal(await worldCard.evaluate((el) => el.tagName), "A", "World card is a real link");
+        assert.equal(await worldCard.getAttribute("href"), routes[index + 1], "World card links to its world page");
       }
-      // The whole card surface toggles too, and the keyboard control works.
-      await page.locator("#world-details > p").first().click();
-      assert.equal(await worldToggle.getAttribute("aria-expanded"), "true", "Clicking the card surface expands it");
-      await worldToggle.focus();
-      await page.keyboard.press("Enter");
-      assert.equal(await worldToggle.getAttribute("aria-expanded"), "false", "Enter on the toggle collapses it");
-      await page.keyboard.press("Space");
-      assert.equal(await worldToggle.getAttribute("aria-expanded"), "true", "Space on the toggle expands it");
-      await page.locator("#world-panel .world-card__close").click();
+      assert.equal(await page.locator("#world-panel, .world-card__toggle, .world-card__close, [aria-expanded]#world-details").count(), 0, "No inline expansion");
       assert.equal(await page.getByText("Explorar este mundo").count(), 0, "Old explore button is gone");
+      // Enter on the focused card goes straight to the world.
+      await selectors.first().click();
+      await worldCard.focus();
+      await page.keyboard.press("Enter");
+      await page.waitForURL(`**${routes[1]}`);
+      assert.equal(await page.locator("[data-rocket-loader]").count(), 0, "Launch loader never replays on client navigation");
+      await page.locator(".story-back").click();
+      await page.waitForURL("**/#projects");
+      assert.equal(await page.locator("[data-rocket-loader]").count(), 0, "Launch loader never replays going back home");
+      await page.reload();
+      await page.waitForTimeout(400);
+      assert.equal(await page.locator("[data-rocket-loader]").count(), 0, "Launch loader shows once per browser session");
       await page.getByRole("button", { name: "Siguiente planeta" }).click();
       assert.equal(await selectors.first().getAttribute("aria-pressed"), "true", "World selector wraps");
       await page.getByRole("button", { name: "Planeta anterior" }).click();
@@ -146,14 +143,50 @@ async function main() {
       assert.match(cv.headers()["content-type"], /pdf/);
       assert.equal((await cv.body()).subarray(0, 4).toString(), "%PDF");
       await page.goto(`${baseURL}/hackathons`);
+      assert.equal(await page.locator("h1").textContent(), "Ideas contra el reloj.");
       assert.equal(await page.locator("#arena-missions-title").textContent(), "Voy a hackathones por amor al arte");
-      for (const entry of ["Proofy", "Contar con Datos 2026"]) {
-        assert.equal(await page.locator(".mission-rail h3", { hasText: entry }).count(), 1, `Hackathon entry ${entry}`);
+      for (const gone of ["HACKATHONS · TRABAJO EN EQUIPO · TUCUMÁN", "Hackathones bajo presión", "Espacios donde el tiempo, el equipo", "Sin ideas cerradas"]) {
+        assert.equal(await page.getByText(gone).count(), 0, `Hackathons no longer shows "${gone}"`);
+      }
+      assert.equal(await page.locator(".hud-stats").count(), 0, "Hackathons stats are gone");
+      assert.equal(await page.getByText("Si hay comida gratis, llámame.").count(), 1);
+      const missionYears = await page.locator(".mission__meta span").allTextContents();
+      assert.deepEqual(missionYears, [...missionYears].sort((a, b) => Number(a.slice(0, 4)) - Number(b.slice(0, 4))), "Hackathons run oldest to newest");
+      assert.deepEqual(await page.locator(".mission-rail h3").allTextContents(), [
+        "BeeAgro",
+        "Hackathon n8n — Vortex IT",
+        "Youth Hackathon 2025 — UNESCO",
+        "Proofy — Superteam Argentina × Colosseum (Solana)",
+        "Contar con Datos 2026 — UdeSA × SSCyT Tucumán",
+      ], "Hackathon entries in chronological order");
+      await page.goto(`${baseURL}/teaching`);
+      assert.equal(await page.locator("h1").textContent(), "Cursos dictados");
+      for (const gone of ["ENSEÑAR · ACOMPAÑAR · COMPARTIR", "Espacios de formación práctica", "El aula sigue abierta"]) {
+        assert.equal(await page.getByText(gone).count(), 0, `Teaching no longer shows "${gone}"`);
+      }
+      assert.equal(await page.locator(".aula-book h3", { hasText: "platzi-hydratation-demo" }).count(), 1, "Platzi demo entry");
+      await page.goto(`${baseURL}/projects`);
+      assert.equal(await page.locator(".atlas-row").count(), 7);
+      assert.equal(await page.locator(".atlas-specs, .atlas-category").count(), 0, "Projects page is one short catalogue");
+      const projectYears = await page.locator(".atlas-row__year").allTextContents();
+      assert.deepEqual(projectYears, [...projectYears].sort((a, b) => Number(a.slice(0, 4)) - Number(b.slice(0, 4))), "Projects run oldest to newest");
+      await page.goto(`${baseURL}/education`);
+      assert.equal(await page.locator("h1").textContent(), "Always Exploring");
+      for (const gone of ["BITÁCORA DE EXPLORACIÓN", "26°49′S", "RUTA ACTIVA", "La exploración sigue", "El camino hacia un nuevo mundo"]) {
+        assert.equal(await page.getByText(gone).count(), 0, `Education no longer shows "${gone}"`);
+      }
+      assert.equal(await page.locator(".trajectory .trajectory__node").count() > 1, true, "Scroll trajectory nodes");
+      for (const [from, to] of [["/curso-n8n", "/teaching"], ["/university", "/education"]]) {
+        const redirect = await page.request.get(`${baseURL}${from}`, { maxRedirects: 0 });
+        assert.equal(redirect.status(), 308, `${from} redirects permanently`);
+        assert.equal(new URL(redirect.headers().location, baseURL).pathname, to);
       }
       for (const route of routes.slice(1)) {
         await page.goto(`${baseURL}${route}`);
         assert.equal(new URL(await page.locator("link[rel='canonical']").getAttribute("href")).pathname, route);
-        await page.locator(".story-back, .edu-back").click();
+        assert.equal(await page.locator(".story-back").textContent(), "← Volver al universo");
+        assert.equal(await page.getByText(/órbita/).count(), 0, "No 'órbita' copy on world pages");
+        await page.locator(".story-back").click();
         await page.waitForURL("**/#projects");
       }
       if (name === "reduced-motion") {
