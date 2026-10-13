@@ -233,7 +233,6 @@ body {
   font-weight: 600;
 }
 
-.btn-theme-projects { border-color: rgba(91, 140, 255, 0.4); box-shadow: 0 0 24px rgba(91, 140, 255, 0.15); }
 .btn-theme-cv { border-color: rgba(233, 194, 112, 0.35); }
 .btn-theme-github { border-color: rgba(155, 123, 255, 0.35); }
 .btn-theme-cv .btn-badge { color: var(--star); }
@@ -310,17 +309,6 @@ body {
   font-size: clamp(1rem, 2vw, 1.18rem);
   line-height: 1.7;
   text-wrap: pretty;
-}
-
-.hero-console-btn.btn-theme-projects {
-  background: #bed0ff;
-  border-color: #bed0ff;
-  color: #10182c;
-  text-shadow: none;
-}
-
-.btn-theme-projects .btn-badge {
-  color: #283c69;
 }
 
 .hero-proof {
@@ -508,9 +496,6 @@ button:focus-visible {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.6rem;
-  }
-  .hero-actions-grid > :first-child {
-    grid-column: 1 / -1;
   }
   .hero-console-btn {
     width: 100%;

@@ -50,15 +50,6 @@ export function Hero() {
         <Reveal delay={0.28}>
           <div className="hero-actions-grid">
             <Magnetic strength={0.3}>
-              <Link href="/#projects" className="hero-console-btn btn-theme-projects">
-                <span className="btn-badge">{tl({ es: "EXPLORAR", en: "EXPLORE" })}{" // "}{String(PROJECTS.length).padStart(2, "0")} {tl({ es: "MUNDOS", en: "WORLDS" })}</span>
-                <span className="btn-text-row">
-                  <span className="btn-icon" aria-hidden="true">✦</span>
-                  <span>{t("hero_cta_projects")}</span>
-                </span>
-              </Link>
-            </Magnetic>
-            <Magnetic strength={0.3}>
               <a href={CV.cvPdf} download className="hero-console-btn btn-theme-cv">
                 <span className="btn-badge">{tl({ es: "CURRICULUM // PDF", en: "RESUME // PDF" })}</span>
                 <span className="btn-text-row">

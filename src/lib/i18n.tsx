@@ -19,7 +19,6 @@ const UI = {
   nav_projects: { es: "Proyectos", en: "Projects" },
   nav_contact: { es: "Contacto", en: "Contact" },
 
-  hero_cta_projects: { es: "Explorar mi trabajo", en: "Explore my work" },
   hero_cta_cv: { es: "Descargar CV", en: "Download Resume" },
 
   exp_title: { es: "Experiencia profesional", en: "Professional experience" },
