@@ -102,6 +102,10 @@ async function main() {
         assert.equal(await page.getByRole("button", { name: "Switch to Spanish" }).count(), 1);
         await page.getByRole("button", { name: "Switch to Spanish" }).click();
       }
+      if (fallback) {
+        // Without a WebGPU adapter the 3D chunk is never downloaded or mounted.
+        assert.equal(await page.locator("[data-scene-root]").count(), 0, `${name}: no 3D backdrop without WebGPU`);
+      }
       await page.goto(baseURL);
       assert.deepEqual(await page.evaluate(() => ["/hackathons", "/projects"].map((href) => {
         const anchor = document.createElement("a");

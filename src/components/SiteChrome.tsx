@@ -10,6 +10,8 @@ import { CursorTrail } from "@/components/CursorTrail";
 import { WarpTransition } from "@/components/WarpTransition";
 import { RocketLoader } from "@/components/RocketLoader";
 import { expireLaunchLoader } from "@/lib/launchLoader";
+import { hasWebGPU } from "@/lib/webgpu";
+import { SceneStatus, setSceneStatus } from "@/lib/sceneStatus";
 import type { BackdropView } from "@/components/three/Backdrop";
 
 // One client-only chunk holds the whole 3D layer (home cosmos + every world),
@@ -45,23 +47,32 @@ export function SiteChrome() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // The 3D layer is the heaviest thing on the site: let the text UI paint
-  // first, start the chunk download on idle, then mount it once. It is never
-  // unmounted afterwards, so navigating home <-> worlds reuses the same
-  // renderer and canvas.
+  // The 3D layer is the heaviest thing on the site (~420 KB gzipped): let the
+  // text UI paint first, then on idle probe for a WebGPU adapter, and only
+  // download and mount the chunk when one exists. Devices without WebGPU never
+  // fetch or parse it and keep the CSS background. Once mounted it is never
+  // unmounted, so navigating home <-> worlds reuses the same renderer.
   useEffect(() => {
+    let alive = true;
     let timer: number | undefined;
     let idleId: number | undefined;
-    const start = () => {
+    const start = async () => {
+      const supported = await hasWebGPU();
+      if (!alive) return;
+      if (!supported) {
+        setSceneStatus(SceneStatus.Failed);
+        return;
+      }
       if (onSceneRoute) void loadBackdrop();
       timer = window.setTimeout(() => setSceneReady(true), 450);
     };
     if ("requestIdleCallback" in window) {
-      idleId = window.requestIdleCallback(start, { timeout: 900 });
+      idleId = window.requestIdleCallback(() => void start(), { timeout: 900 });
     } else {
-      start();
+      void start();
     }
     return () => {
+      alive = false;
       if (idleId !== undefined) window.cancelIdleCallback(idleId);
       if (timer !== undefined) window.clearTimeout(timer);
     };

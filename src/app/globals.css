@@ -442,6 +442,9 @@ button.chip {
 }
 
 .hiring-agents-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px; /* WCAG 2.2 target size */
   margin-top: 1rem;
   color: var(--muted);
   font-size: 0.85rem;
@@ -1689,8 +1692,9 @@ button:focus-visible {
   .glass-soft {
     --glass-tint: rgba(7, 10, 24, 0.5);
   }
-  /* Phones: lighter blur keeps scrolling smooth on weaker GPUs. */
-  @media (max-width: 767px) {
+  /* Phones and touch screens: no blur (see the rule at the end of this
+     file), so the tint is denser to keep body copy readable. */
+  @media (hover: none), (max-width: 767px) {
     .glass,
     .glass-soft,
     .glass-panel,
@@ -1705,9 +1709,7 @@ button:focus-visible {
     .edu-degree,
     .edu-certificate,
     .dossier-hero {
-      --glass-tint: rgba(7, 10, 24, 0.66);
-      -webkit-backdrop-filter: blur(10px) saturate(150%);
-      backdrop-filter: blur(10px) saturate(150%);
+      --glass-tint: rgba(7, 10, 24, 0.8);
     }
   }
 }
@@ -2055,4 +2057,20 @@ button:focus-visible {
 .agents-note { margin-top: 1rem !important; font-size: 0.85rem; }
 @media (max-width: 600px) {
   .agents-tools li { grid-template-columns: 1fr; gap: 0.2rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Phones and touch-first screens: no backdrop blur anywhere.
+   Every blurred surface sits over an animated canvas, so the browser has to
+   re-blur it on every frame, and while scrolling on every scroll frame, which
+   is heavy for a phone GPU. Surfaces keep a denser tint instead, so text
+   contrast does not depend on the blur.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (hover: none), (max-width: 767px) {
+  *,
+  *::before,
+  *::after {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
 }
