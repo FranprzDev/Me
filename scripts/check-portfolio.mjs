@@ -217,8 +217,11 @@ async function main() {
       // Fixed header: transparent at the top, solid band once the page scrolls.
       await page.evaluate(() => window.scrollTo({ top: 600, behavior: "instant" }));
       await page.waitForFunction(() => document.querySelector(".site-nav")?.hasAttribute("data-scrolled"));
-      await page.waitForTimeout(300);
-      assert.equal(await page.locator(".site-nav").evaluate((el) => getComputedStyle(el, "::before").opacity), "1", "Header band behind the logo while scrolled");
+      // The band fades in; wait for the end of the transition, then check it is opaque.
+      await page.waitForFunction(() => getComputedStyle(document.querySelector(".site-nav"), "::before").opacity === "1");
+      if (options.isMobile) {
+        assert.equal(await page.locator(".site-nav").evaluate((el) => getComputedStyle(el, "::before").backgroundColor.startsWith("rgb(")), true, "Header band is a solid colour on touch screens");
+      }
       await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
       for (const [from, to] of [["/curso-n8n", "/teaching"], ["/university", "/education"]]) {
         const redirect = await page.request.get(`${baseURL}${from}`, { maxRedirects: 0 });
