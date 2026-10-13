@@ -128,14 +128,14 @@ async function main() {
       assert.equal(await page.locator("#projects").getByText("Cerrar", { exact: true }).count(), 0, "Worlds section has no Close button");
       // A pill goes straight to its world.
       await Promise.all([page.waitForURL(`**${routes[2]}`), pills.nth(1).click()]);
-      await page.goBack();
-      await page.waitForURL((url) => new URL(url).pathname === "/");
+      await page.goto(`${baseURL}/#projects`);
+      await page.locator("#world-details").waitFor();
       // Enter on the focused card goes straight to the world.
       await page.locator("#projects").scrollIntoViewIfNeeded();
       while ((await worldCard.getAttribute("href")) !== routes[1]) await page.getByRole("button", { name: "Siguiente planeta" }).click();
       await worldCard.focus();
-      await page.keyboard.press("Enter");
-      await page.waitForURL(`**${routes[1]}`);
+      await Promise.all([page.waitForURL(`**${routes[1]}`), page.keyboard.press("Enter")]);
+      await page.locator(".story-back").waitFor();
       assert.equal(await page.locator("[data-rocket-loader]").count(), 0, "Launch loader never replays on client navigation");
       await page.locator(".story-back").click();
       await page.waitForURL("**/#projects");
