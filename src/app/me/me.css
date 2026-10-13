@@ -161,13 +161,6 @@ html:has(.me-root) body {
 .me-pill-dark:hover {
   background: var(--me-accent);
 }
-.me-pill-outline {
-  box-shadow: inset 0 0 0 1px var(--me-hairline-strong);
-  color: var(--me-ink);
-}
-.me-pill-outline:hover {
-  box-shadow: inset 0 0 0 1px var(--me-ink);
-}
 .me-pill-ghost {
   margin-top: 1.4rem;
   padding: 0.65rem 1.1rem;
@@ -725,84 +718,6 @@ html:has(.me-root) body {
   font-size: 0.93rem;
   color: var(--me-on-dark-soft);
   max-width: 26rem;
-}
-
-/* ---------- Ask your agent + index ---------- */
-.me-btn-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 2rem;
-}
-.me-btn-row .me-pill {
-  margin-top: 0;
-}
-.me-prompt {
-  margin-top: 1.4rem;
-  max-width: 30rem;
-  font-size: 0.68rem;
-  letter-spacing: 0.02em;
-  text-transform: none;
-  line-height: 1.7;
-  color: var(--me-mute);
-  word-break: break-word;
-}
-.me-prompt-actions {
-  display: flex;
-  gap: 1.6rem;
-  margin-top: 1.4rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--me-hairline);
-  max-width: 34rem;
-}
-.me-prompt-actions .me-mono {
-  font-size: 0.64rem;
-  color: var(--me-mute);
-  transition: color 0.18s ease;
-}
-.me-prompt-actions .me-mono:hover {
-  color: var(--me-ink);
-}
-.me-index-head {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.62rem;
-  color: var(--me-accent);
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--me-hairline);
-}
-.me-index-head span:last-child {
-  color: var(--me-mute);
-}
-.me-index li {
-  display: grid;
-  grid-template-columns: 2.2rem 1fr auto;
-  gap: 0.5rem;
-  align-items: baseline;
-  padding: 0.95rem 0;
-  border-bottom: 1px solid var(--me-hairline);
-  transition: padding-left 0.32s var(--me-ease-out);
-}
-.me-index li:hover {
-  padding-left: 0.4rem;
-}
-.me-index-num,
-.me-index-year {
-  font-size: 0.62rem;
-  color: var(--me-mute);
-}
-.me-index-title {
-  font-family: var(--me-display-font);
-  font-size: 1.14rem;
-  color: var(--me-ink);
-  line-height: 1.3;
-}
-.me-index-meta {
-  display: block;
-  margin-top: 0.2rem;
-  font-size: 0.6rem;
-  color: var(--me-mute);
-  letter-spacing: 0.08em;
 }
 
 /* ---------- Closing CTA + footer ---------- */

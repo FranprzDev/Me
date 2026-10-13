@@ -31,12 +31,6 @@ export interface MeProject {
   link: { label: Localized<string>; href: string };
 }
 
-export interface MeIndexItem {
-  title: Localized<string>;
-  meta: string;
-  year: string;
-}
-
 export const ME = {
   name: "Francisco Perez",
   email: CV.email,
@@ -242,60 +236,6 @@ export const ME = {
       link: { label: { es: "Jugar", en: "Play" }, href: "https://exogames.vercel.app" },
     },
   ] satisfies MeProject[],
-
-  agent: {
-    title: { es: "Preguntale a tu agente por mí.", en: "Ask your agent about me." },
-    lead: {
-      es: "¿Estás evaluando si encajo en un rol?",
-      en: "Evaluating whether I fit a role?",
-    },
-    body: {
-      es: "Abrí este prompt en tu asistente: lee mi CV y esta página, y te devuelve una evaluación honesta contra tu búsqueda.",
-      en: "Open this prompt in your assistant: it reads my resume and this page, and gives you an honest read against your opening.",
-    },
-    prompt: {
-      es: "Leé {cv} y {page}. Después preguntame por el rol que estoy cubriendo y decime, con argumentos, si Francisco Perez encaja.",
-      en: "Read {cv} and {page}. Then ask me about the role I'm hiring for and tell me, with reasons, whether Francisco Perez is a fit.",
-    },
-    openChatGPT: { es: "Abrir en ChatGPT", en: "Open in ChatGPT" },
-    openClaude: { es: "Abrir en Claude", en: "Open in Claude" },
-    copy: { es: "Copiar prompt", en: "Copy prompt" },
-    copied: { es: "Copiado", en: "Copied" },
-    download: { es: "Descargar CV", en: "Download resume" },
-    indexLabel: { es: "FORMACIÓN · RECONOCIMIENTOS", en: "EDUCATION · RECOGNITION" },
-    index: [
-      {
-        title: { es: "Ingeniería en Sistemas de Información", en: "Information Systems Engineering" },
-        meta: "UTN-FRT",
-        year: "2022 – 2027",
-      },
-      {
-        title: { es: "NASA Space Apps · Ganador nacional", en: "NASA Space Apps · National winner" },
-        meta: "ExoGames",
-        year: "2024",
-      },
-      {
-        title: { es: "FullStack Developer (MERN) · Alumno destacado", en: "FullStack Developer (MERN) · Outstanding student" },
-        meta: "RollingCode School",
-        year: "2023",
-      },
-      {
-        title: { es: "React Avanzado", en: "Advanced React" },
-        meta: "RollingCode School",
-        year: "2024",
-      },
-      {
-        title: { es: "Next.js Avanzado", en: "Advanced Next.js" },
-        meta: "RollingCode School",
-        year: "2025",
-      },
-      {
-        title: { es: "Data Engineer", en: "Data Engineer" },
-        meta: "RollingCode School",
-        year: "2025",
-      },
-    ] satisfies MeIndexItem[],
-  },
 
   cta: {
     title: {

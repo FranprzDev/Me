@@ -2,18 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { ME } from "@/data/me";
 import { MeReveal } from "@/components/me/MeReveal";
 import { MeLayers } from "@/components/me/MeLayers";
-
-const FALLBACK_ORIGIN =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://me-pink-ten.vercel.app";
-
-const noopSubscribe = () => () => {};
-const useOrigin = () =>
-  useSyncExternalStore(noopSubscribe, () => window.location.origin, () => FALLBACK_ORIGIN);
 
 function Header() {
   const { lang, setLang } = useI18n();
@@ -252,84 +245,6 @@ function Projects() {
   );
 }
 
-function AskYourAgent() {
-  const { tl } = useI18n();
-  const origin = useOrigin();
-  const [copied, setCopied] = useState(false);
-  const prompt = tl(ME.agent.prompt)
-    .replace("{cv}", `${origin}${ME.cvPdf}`)
-    .replace("{page}", `${origin}/me`);
-  const q = encodeURIComponent(prompt);
-
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(prompt);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1800);
-    } catch {
-      setCopied(false);
-    }
-  };
-
-  return (
-    <section className="me-paper me-section" aria-labelledby="me-agent-title">
-      <div className="me-wrap me-split me-split-top">
-        <div className="me-split-text">
-          <MeReveal>
-            <h2 id="me-agent-title" className="me-display me-display-lg me-ink">
-              {tl(ME.agent.title)}
-            </h2>
-          </MeReveal>
-          <MeReveal delay={80}>
-            <p className="me-lead">{tl(ME.agent.lead)}</p>
-            <p className="me-copy">{tl(ME.agent.body)}</p>
-          </MeReveal>
-          <MeReveal delay={140}>
-            <div className="me-btn-row">
-              <a className="me-pill me-pill-dark" href={`https://claude.ai/new?q=${q}`} target="_blank" rel="noopener noreferrer">
-                {tl(ME.agent.openClaude)} ↗
-              </a>
-              <a className="me-pill me-pill-outline" href={`https://chatgpt.com/?q=${q}`} target="_blank" rel="noopener noreferrer">
-                {tl(ME.agent.openChatGPT)} ↗
-              </a>
-            </div>
-            <p className="me-mono me-prompt">
-              <span aria-hidden>› </span>
-              {prompt}
-            </p>
-            <div className="me-prompt-actions">
-              <button type="button" className="me-mono" onClick={copy}>
-                {copied ? tl(ME.agent.copied) : tl(ME.agent.copy)}
-              </button>
-              <a className="me-mono" href={ME.cvPdf} download>
-                {tl(ME.agent.download)} ↓
-              </a>
-            </div>
-          </MeReveal>
-        </div>
-        <MeReveal delay={120} className="me-index-wrap">
-          <div className="me-index-head me-mono">
-            <span>{tl(ME.agent.indexLabel)}</span>
-            <span>0{ME.agent.index.length}</span>
-          </div>
-          <ol className="me-index">
-            {ME.agent.index.map((item, i) => (
-              <li key={item.title.en}>
-                <span className="me-mono me-index-num">0{i + 1}</span>
-                <span className="me-index-title">
-                  {tl(item.title)}
-                  <span className="me-mono me-index-meta">{item.meta}</span>
-                </span>
-                <span className="me-mono me-index-year">{item.year}</span>
-              </li>
-            ))}
-          </ol>
-        </MeReveal>
-      </div>
-    </section>
-  );
-}
-
 function ClosingCta() {
   const { tl } = useI18n();
   return (
@@ -380,7 +295,6 @@ export function MePage({ fontClassName }: { fontClassName: string }) {
         <About />
         <Process />
         <Projects />
-        <AskYourAgent />
         <ClosingCta />
       </main>
     </div>
