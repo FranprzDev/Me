@@ -15,6 +15,8 @@ import {
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { WebGPURenderer } from "three/webgpu";
 import * as THREE from "three";
+import { SceneStatus, setSceneStatus } from "@/lib/sceneStatus";
+import { FirstFrameSignal } from "./FirstFrameSignal";
 import { worldFor, type WorldSpec } from "@/data/worlds";
 import {
   StarShell,
@@ -43,6 +45,10 @@ class RendererFallback extends Component<
 
   static getDerivedStateFromError() {
     return { failed: true };
+  }
+
+  componentDidCatch() {
+    setSceneStatus(SceneStatus.Failed);
   }
 
   render() {
@@ -167,10 +173,15 @@ export default function PlanetScene({ slug }: { slug: string }) {
   useEffect(() => {
     let active = true;
     const gpu = (navigator as Navigator & { gpu?: { requestAdapter(): Promise<unknown> } }).gpu;
-    if (!gpu) return;
+    if (!gpu) {
+      setSceneStatus(SceneStatus.Failed);
+      return;
+    }
     void gpu.requestAdapter().then((adapter) => {
+      if (!adapter) setSceneStatus(SceneStatus.Failed);
       if (active) setWebgpuReady(Boolean(adapter));
     }).catch(() => {
+      setSceneStatus(SceneStatus.Failed);
       if (active) setWebgpuReady(false);
     });
     return () => {
@@ -222,6 +233,7 @@ export default function PlanetScene({ slug }: { slug: string }) {
               gl.setClearColor(FALLBACK_BG, 1);
             }}
           >
+            <FirstFrameSignal />
             <WorldContents world={world} reduced={reduced} performanceMode={performanceMode} />
           </Canvas>
         </RendererFallback>

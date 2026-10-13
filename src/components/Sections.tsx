@@ -190,17 +190,22 @@ export function Education() {
 export function Projects() {
   const { t, tl } = useI18n();
   const [idx, setIdx] = useState(0);
+  const [expanded, setExpanded] = useState(false);
   const total = PROJECTS.length;
 
   const go = (next: number, dir: number) => {
     setActiveProject((next + total) % total, dir);
     setIdx((next + total) % total);
+    // A new world always starts collapsed: the reveal belongs to the card.
+    setExpanded(false);
   };
   useEffect(() => {
     setActiveProject(idx, 1);
   }, [idx]);
 
   const p = PROJECTS[idx];
+  const title = p.title ? tl(p.title) : p.name;
+  const items = p.items ?? [];
   return (
     <section id="projects" className="section" style={{ position: "relative", textAlign: "center" }}>
       <div className="wrap" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.9rem" }}>
@@ -217,9 +222,16 @@ export function Projects() {
 
         {/* Planeta actual centrado: HUD protagonista del slider */}
         <Reveal delay={0.1}>
+          {/* The whole card toggles the reveal; the heading button is the
+              keyboard/screen-reader control (Enter/Space), so pointer clicks on
+              the card surface are a convenience only. */}
           <div
             id="world-details"
-            className="planet-hud"
+            className={`planet-hud world-card ${expanded ? "is-open" : ""}`}
+            onClick={(event) => {
+              if ((event.target as HTMLElement).closest("a, button")) return;
+              setExpanded((v) => !v);
+            }}
             style={{
               "--hud-glow": p.planet.atmoA,
               marginTop: "0.4rem",
@@ -234,38 +246,68 @@ export function Projects() {
               </span>
             </div>
 
-            <Link href={`/${p.slug}`} style={{ textDecoration: "none" }}>
-              <h3
-                aria-live="polite"
-                aria-atomic="true"
-                className="link-underline"
-                style={{
-                  margin: 0,
-                  fontSize: "clamp(1.6rem, 3.5vw, 2.2rem)",
-                  color: p.planet.atmoA,
-                  textShadow: `0 0 30px ${p.planet.atmoA}66`,
-                }}
+            <h3
+              aria-live="polite"
+              aria-atomic="true"
+              style={{ margin: 0, fontSize: "clamp(1.6rem, 3.5vw, 2.2rem)" }}
+            >
+              <button
+                type="button"
+                className="world-card__toggle"
+                aria-expanded={expanded}
+                aria-controls="world-panel"
+                onClick={() => setExpanded((v) => !v)}
+                style={{ color: p.planet.atmoA, textShadow: `0 0 30px ${p.planet.atmoA}66` }}
               >
-                {p.title ? tl(p.title) : p.name}
-              </h3>
-            </Link>
+                {title}
+                <span className="world-card__chev" aria-hidden="true">+</span>
+              </button>
+            </h3>
 
             <p style={{ margin: 0, color: "var(--fg)", fontSize: "1.05rem", fontWeight: 500, maxWidth: 500, lineHeight: 1.5 }}>
               {tl(p.tagline)}
             </p>
 
-            <Magnetic strength={0.25}>
-              <Link
-                href={`/${p.slug}`}
-                className="btn-cosmic-primary"
-                style={{
-                  marginTop: "0.3rem",
-                  borderColor: p.planet.atmoA,
-                }}
-              >
-                {t("proj_explore")}
-              </Link>
-            </Magnetic>
+            <div
+              id="world-panel"
+              className="world-card__panel"
+              role="region"
+              aria-label={title}
+              inert={!expanded}
+            >
+              <div className="world-card__panel-inner">
+                <p className="world-card__desc">{tl(p.description)}</p>
+                {items.length > 0 && (
+                  <ul className="world-card__items">
+                    {items.slice(0, 4).map((item) => (
+                      <li key={item.name}>
+                        <span>{item.name}</span>
+                        <span className="world-card__year">{item.year}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {items.length > 4 && (
+                  <p className="world-card__more">
+                    {tl({ es: `+${items.length - 4} más en la ruta completa`, en: `+${items.length - 4} more on the full page` })}
+                  </p>
+                )}
+                <div className="world-card__actions">
+                  <Link href={`/${p.slug}`} className="world-card__route">
+                    {tl({ es: "Abrir página completa", en: "Open full page" })} →
+                  </Link>
+                  <button type="button" className="world-card__close" onClick={() => setExpanded(false)}>
+                    {tl({ es: "Cerrar", en: "Close" })}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <span className="world-card__hint" aria-hidden="true">
+              {expanded
+                ? tl({ es: "Tocá la tarjeta para cerrar", en: "Tap the card to close" })
+                : tl({ es: "Tocá la tarjeta para ver este mundo", en: "Tap the card to see this world" })}
+            </span>
           </div>
         </Reveal>
 

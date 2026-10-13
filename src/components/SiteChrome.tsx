@@ -8,12 +8,12 @@ import { Nav } from "@/components/Nav";
 import { PROJECTS } from "@/data/projects";
 import { CursorTrail } from "@/components/CursorTrail";
 import { WarpTransition } from "@/components/WarpTransition";
+import { RocketLoader } from "@/components/RocketLoader";
 
 // Las escenas 3D son client-only (WebGPU); se cargan sin SSR. El cosmos vive en
 // el layout para que la navegación sea consistente en todas las rutas.
 const Scene = dynamic(() => import("@/components/three/Scene"), { ssr: false });
 const PlanetScene = dynamic(() => import("@/components/three/PlanetScene"), { ssr: false });
-const BigBangIntro = dynamic(() => import("@/components/BigBangIntro").then((module) => module.BigBangIntro), { ssr: false });
 
 export function SiteChrome() {
   const pathname = usePathname();
@@ -60,7 +60,8 @@ export function SiteChrome() {
       </a>
       {sceneReady && onHome ? <Scene /> : null}
       {sceneReady && worldSlug ? <PlanetScene slug={worldSlug} /> : null}
-      {onHome ? <BigBangIntro /> : null}
+      {/* Launch loader: covers the canvas until its first real frame, then bursts. */}
+      {onHome || worldSlug ? <RocketLoader /> : null}
       <Nav />
       <CursorTrail />
       <WarpTransition />

@@ -19,6 +19,8 @@ export interface ProjectItem {
   description: Localized<string>;
   year: string;
   link?: string;
+  /** Enlaces secundarios (repo, página del concurso) además de `link`. */
+  extraLinks?: string[];
   highlight?: Localized<string>;
   category?: Localized<string>;
 }
@@ -58,7 +60,7 @@ export const PROJECTS: Project[] = [
       en: "Spaces where time, team and a real problem matter: from NASA Space Apps (BeeAgro and national winner ExoGames 2024) to Vortex IT's n8n hackathon and UNESCO's Youth Hackathon 2025.",
     },
     stack: ["Teamwork", "Open Data", "Rapid Prototyping", "n8n"],
-    year: "2023 – 2025",
+    year: "2023 – 2026",
     featured: true,
     planet: {
       body: "#2e5c38",
@@ -102,6 +104,25 @@ export const PROJECTS: Project[] = [
           en: "Participation in UNESCO Youth Hackathon 2025.",
         },
         year: "2025",
+      },
+      {
+        name: "Proofy — Superteam Argentina × Colosseum (Solana)",
+        description: {
+          es: "Octubre 2026, junto a Dylan como co-creador. Proofy convierte contratos de software en pagos por hito verificables en Solana: un agente de IA transforma el alcance acordado en escenarios de prueba y revisa cada entrega contra la evidencia de CI/CD, y un escrow en Anchor libera SOL por hito solo cuando esa evidencia se sostiene. Prototipo funcional en devnet, sin auditar.",
+          en: "October 2026, with Dylan as co-creator. Proofy turns software contracts into verifiable milestone payments on Solana: an AI agent converts the agreed scope into test scenarios and checks each delivery against CI/CD evidence, and an Anchor escrow releases SOL per milestone only when that evidence holds. Working prototype on devnet, not audited.",
+        },
+        year: "2026",
+        link: "https://proofyai.vercel.app",
+        extraLinks: ["https://github.com/FranprzDev/Proofy", "https://colosseum.com/arena/projects/proofy-1"],
+      },
+      {
+        name: "Contar con Datos 2026 — UdeSA × SSCyT Tucumán",
+        description: {
+          es: "Octubre 2026. Participación en la categoría Historia visual del concurso de visualización de datos: un video de 60 segundos sobre los incendios en Argentina hecho solo con datos abiertos (focos de calor VIIRS de NASA FIRMS, área quemada MODIS y Copernicus Sentinel-2), renderizado íntegramente en código. Sin resultado todavía.",
+          en: "October 2026. Entry in the Visual Story category of the data-visualization contest: a 60-second data video on wildfires in Argentina built from open data only (NASA FIRMS VIIRS hotspots, MODIS burned area and Copernicus Sentinel-2), rendered entirely in code. No outcome yet.",
+        },
+        year: "2026",
+        link: "https://github.com/FranprzDev/donde-arde-argentina",
       },
     ],
   },

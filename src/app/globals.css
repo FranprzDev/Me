@@ -1759,3 +1759,229 @@ button:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* --- Home "Cuatro mundos": the world card expands in place --- */
+.world-card {
+  cursor: pointer;
+  transition: border-color 220ms ease, box-shadow 220ms ease;
+}
+.world-card:hover,
+.world-card.is-open {
+  border-color: color-mix(in srgb, var(--hud-glow, var(--space)) 75%, transparent);
+  box-shadow: 0 0 36px color-mix(in srgb, var(--hud-glow, var(--space)) 22%, transparent);
+}
+.world-card__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  line-height: 1.15;
+  cursor: pointer;
+}
+.world-card__chev {
+  display: inline-grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  line-height: 1;
+  transition: transform 260ms ease;
+}
+.world-card.is-open .world-card__chev {
+  transform: rotate(45deg);
+}
+.world-card__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  width: 100%;
+  opacity: 0;
+  transition: grid-template-rows 320ms ease, opacity 240ms ease;
+}
+.world-card.is-open .world-card__panel {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.world-card__panel-inner {
+  min-height: 0;
+  overflow: hidden;
+  text-align: left;
+}
+.world-card__desc {
+  margin: 0.2rem 0 0.8rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+.world-card__items {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.world-card__items li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--fg);
+  font-size: 0.88rem;
+}
+.world-card__year {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.world-card__more {
+  margin: 0.6rem 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.world-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.9rem;
+}
+.world-card__route {
+  color: var(--hud-glow, var(--space));
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.world-card__route:hover {
+  color: #fff;
+}
+.world-card__close {
+  padding: 0.35rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.world-card__close:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+.world-card__hint {
+  font: 500 0.66rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.8;
+}
+.mission__body .story-link + .story-link {
+  margin-left: 1.1rem;
+}
+
+/* --- Launch loader: rocket climbs while the 3D background compiles --- */
+.rocket-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 2; /* above the canvas (0), below stars (5) and content (10) */
+  pointer-events: none;
+  overflow: hidden;
+}
+.rocket-loader__veil {
+  position: absolute;
+  inset: 0;
+  background: var(--scene-bg, #040612);
+  transition: opacity 600ms ease;
+}
+.rocket-loader.is-burst .rocket-loader__veil {
+  opacity: 0;
+  transition-duration: 900ms;
+  transition-delay: 120ms;
+}
+.rocket-loader.is-exit .rocket-loader__veil {
+  opacity: 0;
+}
+.rocket-loader__flight {
+  position: absolute;
+  left: 50%;
+  top: 16vh; /* parking spot, matches the burst origin in RocketLoader.tsx */
+  width: 40px;
+  height: 84px;
+  margin-left: -20px;
+  animation: rocket-ascent 1300ms cubic-bezier(0.22, 0.8, 0.3, 1) both;
+}
+.rocket-loader.is-hover .rocket-loader__flight {
+  animation: rocket-hover 1600ms ease-in-out infinite alternate;
+}
+.rocket-loader.is-burst .rocket-loader__flight {
+  animation: none;
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+.rocket-loader.is-exit .rocket-loader__flight {
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+.rocket-loader__rocket {
+  position: relative;
+  display: block;
+  filter: drop-shadow(0 0 12px rgba(91, 140, 255, 0.55));
+}
+.rocket-loader__flame {
+  transform-origin: 20px 58px;
+  animation: rocket-flame 120ms ease-in-out infinite alternate;
+}
+.rocket-loader__trail {
+  position: absolute;
+  left: 50%;
+  top: 70px;
+  width: 4px;
+  height: 0;
+  margin-left: -2px;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, rgba(255, 191, 92, 0.85), rgba(91, 140, 255, 0.25) 40%, transparent);
+  animation: rocket-trail 1300ms cubic-bezier(0.22, 0.8, 0.3, 1) both;
+}
+.rocket-loader.is-hover .rocket-loader__trail {
+  height: 18vh;
+  animation: none;
+  opacity: 0.6;
+}
+.rocket-loader__burst {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes rocket-ascent {
+  from { transform: translateY(calc(84vh + 100px)); }
+  to { transform: translateY(0); }
+}
+@keyframes rocket-hover {
+  from { transform: translateY(0); }
+  to { transform: translateY(-8px); }
+}
+@keyframes rocket-flame {
+  from { transform: scaleY(0.85); }
+  to { transform: scaleY(1.15); }
+}
+@keyframes rocket-trail {
+  from { height: 0; }
+  to { height: 40vh; opacity: 0.7; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .world-card__panel,
+  .world-card__chev {
+    transition: none;
+  }
+  .rocket-loader__veil {
+    transition: opacity 400ms ease !important;
+  }
+}
