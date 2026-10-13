@@ -24,6 +24,8 @@ const nextConfig: NextConfig = {
     return [
       { source: "/curso-n8n", destination: "/teaching", permanent: true },
       { source: "/university", destination: "/education", permanent: true },
+      // The in-browser recruiter model was replaced by the MCP server.
+      { source: "/for-recruiters", destination: "/me", permanent: true },
     ];
   },
   // /_next/static is already served immutable by Next. Files in /public are

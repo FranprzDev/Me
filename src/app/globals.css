@@ -592,112 +592,6 @@ button:focus-visible {
   text-shadow: 0 0 22px rgba(122, 162, 255, 0.5), 0 0 44px rgba(179, 136, 255, 0.4);
 }
 
-.recruiter-wrap {
-  max-width: 900px;
-  padding-top: clamp(6rem, 13vh, 8rem);
-}
-
-.recruiter-back { color: var(--muted); }
-
-.recruiter-heading { max-width: 740px; margin: clamp(2.5rem, 7vh, 4.5rem) 0 2.25rem; }
-.recruiter-heading h1 { margin: 0.8rem 0 1rem; font-size: clamp(2.6rem, 7vw, 5rem); line-height: 0.98; letter-spacing: -0.045em; }
-.recruiter-heading p,
-.recruiter-upload > p,
-.recruiter-disclosure { max-width: 68ch; color: var(--muted); line-height: 1.7; }
-.recruiter-card { position: relative; overflow: hidden; padding: clamp(1.25rem, 4vw, 2.75rem); border-color: rgba(160, 178, 255, 0.2); background: linear-gradient(145deg, rgba(30, 39, 74, 0.62), rgba(8, 10, 26, 0.82)); box-shadow: 0 24px 100px rgba(41, 57, 122, 0.18); }
-.recruiter-upload { position: relative; padding: clamp(1rem, 3vw, 2rem); border: 1px solid rgba(183, 195, 255, 0.2); border-radius: 1.2rem; background: radial-gradient(ellipse at 100% 0%, rgba(117, 137, 255, 0.12), transparent 55%), rgba(4, 6, 18, 0.32); }
-.recruiter-upload-topline { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
-.recruiter-upload h2,
-.recruiter-chat-header h2 { margin: 0.7rem 0; font-size: clamp(1.2rem, 3vw, 1.7rem); overflow-wrap: anywhere; }
-.recruiter-step { color: var(--space); font: 600 0.72rem/1.4 var(--font-mono); letter-spacing: 0.14em; }
-.recruiter-local-badge { display: inline-flex; align-items: center; gap: 0.45rem; color: #b5f4d0; font: 600 0.68rem/1.4 var(--font-mono); letter-spacing: 0.1em; }
-.recruiter-local-badge span { color: #68e5a2; font-size: 0.55rem; text-shadow: 0 0 12px #68e5a2; }
-.recruiter-dropzone { display: flex; min-height: 190px; flex-direction: column; align-items: center; justify-content: center; margin-top: 1.25rem; border: 1px dashed rgba(159, 178, 255, 0.38); border-radius: 1rem; background: rgba(9, 13, 34, 0.44); text-align: center; transition: border-color 180ms ease, background 180ms ease; }
-.recruiter-dropzone:hover { border-color: rgba(159, 178, 255, 0.8); background: rgba(29, 39, 79, 0.32); }
-.recruiter-upload-icon { display: grid; width: 2.5rem; height: 2.5rem; place-items: center; border: 1px solid rgba(159, 178, 255, 0.3); border-radius: 50%; color: var(--space); font-size: 1.4rem; }
-.recruiter-dropzone > p { margin: 0.65rem 0 0; color: var(--fg); font-size: 0.95rem; }
-.recruiter-dropzone > p span { color: var(--muted); }
-.recruiter-dropzone .btn-cosmic-primary { margin: 0.65rem 0 0; }
-
-.recruiter-file-input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-.recruiter-upload .btn-cosmic-primary { margin-top: 0.75rem; }
-.recruiter-local-note { display: flex; align-items: flex-start; gap: 0.8rem; max-width: 70ch; margin-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1rem; }
-.recruiter-local-mark { color: #8de9b7; font-size: 1.2rem; line-height: 1.4; }
-.recruiter-note { margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.65; }
-.recruiter-chat-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
-
-.recruiter-change-file,
-.recruiter-prompts button {
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
-  background: rgba(4, 6, 18, 0.45);
-  color: var(--fg);
-  padding: 0.65rem 0.9rem;
-  font: inherit;
-  cursor: pointer;
-}
-
-.recruiter-change-file:hover,
-.recruiter-prompts button:hover { border-color: var(--space); }
-.recruiter-messages { display: grid; gap: 1rem; max-height: 52vh; min-height: 12rem; overflow: auto; padding: 1rem 0; }
-
-.recruiter-message {
-  width: min(92%, 680px);
-  padding: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1rem;
-  background: rgba(4, 6, 18, 0.55);
-}
-
-.recruiter-message.recruiter { justify-self: end; background: rgba(91, 140, 255, 0.13); }
-.recruiter-message > span { color: var(--space); font: 600 0.65rem/1.4 var(--font-mono); letter-spacing: 0.12em; }
-.recruiter-message > p { margin: 0.5rem 0 0; white-space: pre-wrap; line-height: 1.65; }
-.recruiter-source { margin-top: 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 0.65rem; color: var(--muted); font-size: 0.88rem; }
-.recruiter-source summary,
-.recruiter-markdown summary { cursor: pointer; }
-.recruiter-source p { margin-bottom: 0; line-height: 1.6; }
-.recruiter-prompts { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.3rem 0 1rem; }
-.recruiter-prompts button { color: var(--muted); font-size: 0.82rem; }
-
-.recruiter-form { display: flex; align-items: end; gap: 0.75rem; }
-.recruiter-form textarea {
-  flex: 1;
-  min-width: 0;
-  resize: vertical;
-  padding: 0.9rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 0.7rem;
-  background: rgba(4, 6, 18, 0.7);
-  color: var(--fg);
-  font: inherit;
-}
-
-.recruiter-status,
-.recruiter-error { min-height: 1.4em; color: var(--muted); font-size: 0.82rem; }
-.recruiter-error { color: #ff9c9c; }
-.recruiter-disclosure { margin-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.12); padding-top: 0.75rem; font-size: 0.82rem; }
-.recruiter-disclosure a { color: var(--fg); }
-.recruiter-markdown { margin-top: 1rem; color: var(--muted); font-size: 0.84rem; }
-.recruiter-markdown pre { max-height: 20rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }
-.recruiter button:disabled { cursor: wait; opacity: 0.6; }
-
-@media (max-width: 560px) {
-  .recruiter-upload-topline { align-items: flex-start; flex-direction: column; gap: 0.6rem; }
-  .recruiter-chat-header,
-  .recruiter-form { align-items: stretch; flex-direction: column; }
-  .recruiter-change-file,
-  .recruiter-form .btn-cosmic-primary { align-self: flex-start; }
-  .recruiter-message { width: 100%; }
-}
-
 .edu-page {
   --planet: #9b7bff;
   width: min(100%, 1100px);
@@ -900,7 +794,6 @@ button:focus-visible {
    /hackathons → consola de lanzamiento · /teaching → aula · /projects → atlas
    /education → bitácora (edu-*) · fallback → expediente
    ═══════════════════════════════════════════════════════════════════════════ */
-
 
 .arena-page,
 .aula-page,
@@ -1628,8 +1521,6 @@ button:focus-visible {
   margin-left: 1.1rem;
 }
 
-
-
 /* ═══════════════════════════════════════════════════════════════════════════
    Glass surfaces: translucent panels over the 3D background so the planet
    shows through. Only card-sized elements blur (never a full-screen layer).
@@ -2066,4 +1957,31 @@ button:focus-visible {
   .rocket-loader__veil {
     transition: opacity 400ms ease !important;
   }
+}
+
+/* --- /for-agents: how to connect to the MCP server --- */
+.agents-wrap { display: grid; gap: 1.4rem; max-width: 820px; padding-top: 6rem; }
+.agents-heading h1 { margin: 0.6rem 0 0.8rem; font-size: clamp(2.4rem, 6vw, 4rem); }
+.agents-heading p { max-width: 68ch; color: var(--muted); line-height: 1.7; }
+.agents-card { padding: clamp(1.2rem, 3vw, 2rem); }
+.agents-card h2 { margin: 0 0 0.8rem; font-size: 1.3rem; }
+.agents-card h3 { margin: 1.4rem 0 0.4rem; font-size: 1rem; }
+.agents-card p { margin: 0.3rem 0; color: var(--muted); line-height: 1.6; }
+.agents-card pre {
+  margin: 0.6rem 0 0;
+  padding: 0.8rem 1rem;
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.7rem;
+  background: rgba(4, 6, 16, 0.85);
+  color: #e6ecff;
+  font: 0.82rem/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.agents-tools { display: grid; gap: 0.6rem; margin: 0; padding: 0; list-style: none; }
+.agents-tools li { display: grid; grid-template-columns: minmax(9rem, auto) 1fr; gap: 0.8rem; align-items: baseline; }
+.agents-tools code { color: var(--space); font-size: 0.85rem; }
+.agents-tools span { color: var(--fg); font-size: 0.9rem; }
+.agents-note { margin-top: 1rem !important; font-size: 0.85rem; }
+@media (max-width: 600px) {
+  .agents-tools li { grid-template-columns: 1fr; gap: 0.2rem; }
 }

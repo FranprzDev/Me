@@ -344,8 +344,8 @@ export function Contact() {
             <ContactConstellations />
           </Reveal>
 
-          <Link className="hiring-agents-link" href="/for-recruiters">
-            For Recruiters →
+          <Link className="hiring-agents-link" href="/for-agents">
+            For AI agents (MCP) →
           </Link>
         </div>
 
