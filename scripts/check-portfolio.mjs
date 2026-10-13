@@ -51,6 +51,9 @@ async function checkPage(page, route, name) {
   }
 }
 
+/** Scenario + page being checked, reported with any failure. */
+const progress = { scenario: "", page: null };
+
 async function main() {
   await mkdir(output, { recursive: true });
   const browser = await chromium.launch({ headless: process.env.HEADFUL !== "1" });
@@ -65,6 +68,8 @@ async function main() {
       const context = await browser.newContext(options);
       if (fallback) await context.addInitScript(() => Object.defineProperty(navigator, "gpu", { value: undefined }));
       const page = await context.newPage();
+      progress.scenario = name;
+      progress.page = page;
       page.setDefaultTimeout(15000);
       page.setDefaultNavigationTimeout(15000);
       for (const route of routes) {
@@ -231,8 +236,22 @@ async function main() {
   }
 }
 
-main().catch((error) => {
+main().catch(async (error) => {
   console.error(error);
+  if (progress.page && !progress.page.isClosed()) {
+    const where = await progress.page.evaluate(() => ({
+      url: location.href,
+      h1: document.querySelector("h1")?.textContent,
+      back: (() => {
+        const el = document.querySelector(".story-back");
+        if (!el) return "missing";
+        const style = getComputedStyle(el);
+        const box = el.getBoundingClientRect();
+        return `opacity=${style.opacity} visibility=${style.visibility} display=${style.display} box=${Math.round(box.width)}x${Math.round(box.height)}@${Math.round(box.top)}`;
+      })(),
+    })).catch((e) => ({ evalError: String(e) }));
+    error.message = `[${progress.scenario}] ${JSON.stringify(where)}\n${error.message}`;
+  }
   // Surface the failing assertion as a GitHub annotation (visible without log access).
   if (process.env.GITHUB_ACTIONS) console.log(`::error title=check-portfolio::${String(error?.message ?? error).replace(/\r?\n/g, "%0A").slice(0, 3000)}`);
   process.exitCode = 1;
