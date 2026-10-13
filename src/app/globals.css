@@ -1760,6 +1760,125 @@ button:focus-visible {
   }
 }
 
+/* --- Home "Cuatro mundos": the world card expands in place --- */
+.world-card {
+  cursor: pointer;
+  transition: border-color 220ms ease, box-shadow 220ms ease;
+}
+.world-card:hover,
+.world-card.is-open {
+  border-color: color-mix(in srgb, var(--hud-glow, var(--space)) 75%, transparent);
+  box-shadow: 0 0 36px color-mix(in srgb, var(--hud-glow, var(--space)) 22%, transparent);
+}
+.world-card__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  line-height: 1.15;
+  cursor: pointer;
+}
+.world-card__chev {
+  display: inline-grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  line-height: 1;
+  transition: transform 260ms ease;
+}
+.world-card.is-open .world-card__chev {
+  transform: rotate(45deg);
+}
+.world-card__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  width: 100%;
+  opacity: 0;
+  transition: grid-template-rows 320ms ease, opacity 240ms ease;
+}
+.world-card.is-open .world-card__panel {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.world-card__panel-inner {
+  min-height: 0;
+  overflow: hidden;
+  text-align: left;
+}
+.world-card__desc {
+  margin: 0.2rem 0 0.8rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+.world-card__items {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.world-card__items li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--fg);
+  font-size: 0.88rem;
+}
+.world-card__year {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.world-card__more {
+  margin: 0.6rem 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.world-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.9rem;
+}
+.world-card__route {
+  color: var(--hud-glow, var(--space));
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.world-card__route:hover {
+  color: #fff;
+}
+.world-card__close {
+  padding: 0.35rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.world-card__close:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+.world-card__hint {
+  font: 500 0.66rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.8;
+}
 .mission__body .story-link + .story-link {
   margin-left: 1.1rem;
 }
