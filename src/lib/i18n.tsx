@@ -33,7 +33,7 @@ const UI = {
     es: "Hackathones, mentorías, productos y formación. Elegí un mundo y descubrí qué construí en él.",
     en: "Hackathons, teaching, products and education. Choose a world and discover what I built there.",
   },
-  proj_back: { es: "← Volver a la órbita", en: "← Back to orbit" },
+  proj_back: { es: "← Volver al universo", en: "← Back to the universe" },
 
   career_path: { es: "TRAYECTORIA PROFESIONAL", en: "CAREER PATH" },
   world: { es: "MUNDO", en: "WORLD" },

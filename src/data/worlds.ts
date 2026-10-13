@@ -41,9 +41,9 @@ function palette(slug: string) {
 }
 
 const hackathons = palette("hackathons");
-const curso = palette("curso-n8n");
+const teaching = palette("teaching");
 const projects = palette("projects");
-const university = palette("university");
+const education = palette("education");
 
 export const WORLDS: Record<string, WorldSpec> = {
   /* Consola de lanzamiento: se entra al planeta por arriba, como quien se asoma
@@ -60,12 +60,12 @@ export const WORLDS: Record<string, WorldSpec> = {
 
   /* Aula: se entra de costado, a la altura del anillo, como sentarse en la
      primera fila. Ámbar cálido. */
-  "curso-n8n": {
+  teaching: {
     kind: "classroom",
     bg: ["#150e06", "#0a0703"],
     fog: { color: "#1d1409", density: 0.022 },
-    key: { color: curso.atmoB, intensity: 1.2 },
-    tint: curso.atmoA,
+    key: { color: teaching.atmoB, intensity: 1.2 },
+    tint: teaching.atmoA,
     shell: 12,
     camera: { dir: [0.12, 0.28, 0.95], from: 32, depth: 5, fov: 55 },
   },
@@ -84,12 +84,12 @@ export const WORLDS: Record<string, WorldSpec> = {
 
   /* Bitácora orbital: se entra en diagonal, mirando el planeta de canto, que
      es como se lee una órbita. Violeta. */
-  university: {
+  education: {
     kind: "expedition",
     bg: ["#0d0a1e", "#040310"],
     fog: { color: "#150f2e", density: 0.015 },
-    key: { color: university.atmoB, intensity: 1.15 },
-    tint: university.atmoA,
+    key: { color: education.atmoB, intensity: 1.15 },
+    tint: education.atmoA,
     shell: 12,
     camera: { dir: [0.16, 0.34, 0.93], from: 33, depth: 5.4, fov: 52 },
   },

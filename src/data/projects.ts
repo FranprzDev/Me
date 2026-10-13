@@ -23,6 +23,10 @@ export interface ProjectItem {
   extraLinks?: string[];
   highlight?: Localized<string>;
   category?: Localized<string>;
+  /** One-line pitch shown on dense pages; `description` keeps the full copy. */
+  pitch?: Localized<string>;
+  /** Stack tags taken from the item's own copy or repository metadata. */
+  stack?: string[];
 }
 
 export interface Project {
@@ -127,7 +131,7 @@ export const PROJECTS: Project[] = [
     ],
   },
   {
-    slug: "curso-n8n",
+    slug: "teaching",
     name: "Mentorías",
     title: { es: "Mentorías", en: "Teaching & Mentorship" },
     tagline: {
@@ -176,6 +180,17 @@ export const PROJECTS: Project[] = [
         link: "https://github.com/FranprzDev/n8n-curso-vivo",
         category: { es: "Materiales del curso", en: "Course materials" },
       },
+      {
+        name: "platzi-hydratation-demo",
+        description: {
+          es: "Prueba técnica para Platzi: demo práctica de cómo funciona la hydration en React con Next.js (SSR, un error de hydration reproducible con contenido no determinista y su solución).",
+          en: "Technical test for Platzi: a hands-on demo of how hydration works in React with Next.js (SSR, a reproducible hydration error with non-deterministic content, and its fix).",
+        },
+        year: "2026",
+        link: "https://github.com/FranprzDev/platzi-hydratation-demo",
+        category: { es: "Demos técnicas", en: "Technical demos" },
+        stack: ["React", "Next.js", "SSR"],
+      },
     ],
   },
   {
@@ -208,6 +223,11 @@ export const PROJECTS: Project[] = [
         },
         year: "2025",
         link: "https://github.com/FranprzDev/apuntes-cli",
+        pitch: {
+          es: "CLI/plugin que genera FAQs y apuntes finales compactos por materia.",
+          en: "CLI/plugin that generates compact FAQs and final notes by subject.",
+        },
+        stack: ["Go", "CLI"],
         category: { es: "Developer Tools", en: "Developer Tools" },
       },
       {
@@ -218,6 +238,11 @@ export const PROJECTS: Project[] = [
         },
         year: "2025",
         link: "https://github.com/FranprzDev/mac-brainroot-cli",
+        pitch: {
+          es: "CLI para abrir rápido flujos de trabajo con herramientas de IA desde macOS.",
+          en: "CLI to quickly launch AI tool workflows from macOS.",
+        },
+        stack: ["Python", "CLI", "macOS"],
         category: { es: "Developer Tools", en: "Developer Tools" },
       },
       {
@@ -228,6 +253,11 @@ export const PROJECTS: Project[] = [
         },
         year: "2025",
         link: "https://github.com/FranprzDev/n8n-nodes-timed-buffer",
+        pitch: {
+          es: "Nodo comunitario de n8n que agrupa mensajes por tiempo con Redis.",
+          en: "Community n8n node that batches messages over time with Redis.",
+        },
+        stack: ["JavaScript", "n8n", "Redis"],
         category: { es: "Developer Tools", en: "Developer Tools" },
       },
       {
@@ -238,6 +268,11 @@ export const PROJECTS: Project[] = [
         },
         year: "2025 – en curso",
         link: "https://github.com/FranprzDev/Scrapping-Repuestos-UY-API",
+        pitch: {
+          es: "API de scraping de catálogos de repuestos: HTTP + HTML/JSON-LD primero, Playwright solo como fallback.",
+          en: "Spare-parts catalog scraping API: HTTP + HTML/JSON-LD first, Playwright only as fallback.",
+        },
+        stack: ["NestJS", "TypeScript", "Playwright", "Railway"],
         category: { es: "IA y Automatización", en: "AI & Automation" },
       },
       {
@@ -248,6 +283,11 @@ export const PROJECTS: Project[] = [
         },
         year: "2025",
         link: "https://github.com/FranprzDev/FinalProject-DataEng",
+        pitch: {
+          es: "Modern Open Source Data Stack integrado sobre PostgreSQL.",
+          en: "Modern Open Source Data Stack integrated over PostgreSQL.",
+        },
+        stack: ["Airflow", "dbt", "Great Expectations", "Superset", "PostgreSQL"],
         category: { es: "Data Engineering", en: "Data Engineering" },
       },
       {
@@ -259,6 +299,10 @@ export const PROJECTS: Project[] = [
         year: "2024",
         link: "https://github.com/FranprzDev/Psichomatch-No-Country-",
         highlight: { es: "Seleccionado No Country ★", en: "Selected No Country ★" },
+        pitch: {
+          es: "Plataforma de matching y salud mental hecha en equipo, seleccionada por No Country.",
+          en: "Team-built mental health and matching platform, selected by No Country.",
+        },
         category: { es: "Prácticas y Simulación", en: "Practice & Simulation" },
       },
       {
@@ -269,12 +313,17 @@ export const PROJECTS: Project[] = [
         },
         year: "2025",
         link: "https://pozos-delfingallo.vercel.app",
+        pitch: {
+          es: "Juego 2D educativo que compara tu plan de inversión en una red de agua con un óptimo de Programación Lineal.",
+          en: "Educational 2D game that compares your water-network investment plan with a Linear Programming optimum.",
+        },
+        stack: ["Linear Programming"],
         category: { es: "Productos Web", en: "Web Products" },
       },
     ],
   },
   {
-    slug: "university",
+    slug: "education",
     name: "Educación",
     title: { es: "Educación & Formación", en: "Education & Degree" },
     tagline: {

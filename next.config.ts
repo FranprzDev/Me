@@ -19,6 +19,27 @@ const nextConfig: NextConfig = {
   // prerender -> "Expected workStore to be initialized". Forzar la raíz al
   // proyecto evita ese cruce.
   outputFileTracingRoot: path.resolve(__dirname),
+  // Renamed world routes: old links keep working (308, permanent).
+  async redirects() {
+    return [
+      { source: "/curso-n8n", destination: "/teaching", permanent: true },
+      { source: "/university", destination: "/education", permanent: true },
+    ];
+  },
+  // /_next/static is already served immutable by Next. Files in /public are
+  // not content-hashed, so they get a long but revalidating cache instead.
+  async headers() {
+    return [
+      {
+        source: "/me/:file*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" }],
+      },
+      {
+        source: "/cv/:file*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

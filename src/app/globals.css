@@ -705,13 +705,6 @@ button:focus-visible {
   padding: 0.25rem 0 3rem;
 }
 
-.edu-back {
-  color: rgba(232, 227, 255, 0.76);
-  font-size: 0.9rem;
-  text-decoration: none;
-}
-
-.edu-back:hover,
 .edu-project a:hover { color: #fff; }
 
 .edu-hero {
@@ -725,7 +718,6 @@ button:focus-visible {
 
 .edu-hero__copy { position: relative; z-index: 1; }
 
-.edu-kicker,
 .edu-section__heading > span {
   color: #eac984;
   font: 600 0.7rem ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -749,17 +741,6 @@ button:focus-visible {
   line-height: 1.8;
 }
 
-.edu-hero__coordinates {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  margin-top: 1.7rem;
-  color: rgba(222, 217, 244, 0.72);
-  font: 0.66rem ui-monospace, SFMono-Regular, Menlo, monospace;
-  letter-spacing: 0.1em;
-}
-
-.edu-hero__coordinates i,
 .edu-orbit__legend i {
   width: 7px;
   height: 7px;
@@ -884,8 +865,6 @@ button:focus-visible {
 .edu-project h3 { margin: 0.35rem 0 0; color: #e6e1f2; font-size: 0.95rem; }
 .edu-project p { margin: 0.4rem 0 0; color: #b9b6cd; font-size: 0.8rem; line-height: 1.6; }
 .edu-project a { display: inline-block; margin-top: 0.65rem; color: #c5b3ff; font-size: 0.76rem; text-decoration: none; }
-.edu-outro { display: flex; align-items: center; gap: 0.7rem; margin: 2.5rem 0 0; color: #eac984; font: 0.76rem ui-monospace, monospace; letter-spacing: .06em; }
-.edu-outro span { font-size: 1rem; }
 
 @media (max-width: 820px) {
   .edu-hero { grid-template-columns: minmax(0, 1fr) minmax(300px, .88fr); min-height: 410px; }
@@ -918,19 +897,10 @@ button:focus-visible {
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Páginas de planeta. Cada mundo tiene su propio lenguaje visual:
-   /hackathons → consola de lanzamiento · /curso-n8n → aula · /projects → atlas
-   /university → bitácora (edu-*) · fallback → expediente
+   /hackathons → consola de lanzamiento · /teaching → aula · /projects → atlas
+   /education → bitácora (edu-*) · fallback → expediente
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.story-back {
-  display: inline-block;
-  color: rgba(232, 227, 255, 0.72);
-  font-size: 0.9rem;
-  text-decoration: none;
-  transition: color 160ms ease, transform 160ms ease;
-}
-
-.story-back:hover { color: #fff; transform: translateX(-3px); }
 
 .arena-page,
 .aula-page,
@@ -951,9 +921,6 @@ button:focus-visible {
   text-wrap: balance;
 }
 
-.arena-hero__lede,
-.aula-hero__lede,
-.atlas-hero__lede,
 .dossier-hero__lede {
   max-width: 54ch;
   margin: 1.1rem 0 0;
@@ -962,9 +929,6 @@ button:focus-visible {
   line-height: 1.55;
 }
 
-.arena-hero__body,
-.aula-hero__body,
-.atlas-hero__body,
 .dossier-hero__body {
   max-width: 60ch;
   margin: 0.85rem 0 0;
@@ -1047,28 +1011,6 @@ button:focus-visible {
 
 .arena-hero .hud-kicker { color: var(--planet); }
 .arena-hero h1 { color: #f2fff5; text-shadow: 0 0 44px color-mix(in srgb, var(--planet) 30%, transparent); }
-.arena-hero__lede { color: var(--planet-2); }
-
-.hud-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: clamp(1rem, 3vw, 2.6rem);
-  margin: 1.8rem 0 0;
-  padding-top: 1.1rem;
-  border-top: 1px solid color-mix(in srgb, var(--planet) 18%, transparent);
-}
-.hud-stats div { display: flex; flex-direction: column; gap: 0.35rem; }
-.hud-stats dd {
-  margin: 0;
-  color: var(--planet-2);
-  font: 500 1.45rem/1 Georgia, serif;
-}
-.hud-stats dt {
-  color: color-mix(in srgb, var(--planet-2) 62%, transparent);
-  font: 600 0.6rem/1 ui-monospace, monospace;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
 
 .arena-radar { display: flex; flex-direction: column; align-items: center; gap: 0.85rem; }
 .arena-radar svg { width: min(100%, 252px); overflow: visible; }
@@ -1227,9 +1169,6 @@ button:focus-visible {
 .mission__body p { margin: 0.45rem 0 0; color: #c4cfc6; font-size: 0.88rem; line-height: 1.68; }
 
 .arena-outro,
-.aula-outro,
-.edu-outro,
-.atlas-outro,
 .dossier-outro {
   display: flex;
   align-items: center;
@@ -1241,7 +1180,7 @@ button:focus-visible {
 .arena-outro { color: color-mix(in srgb, var(--planet-2) 62%, transparent); }
 .arena-outro span { color: var(--planet); }
 
-/* ── /curso-n8n · el aula ──────────────────────────────────────────────── */
+/* ── /teaching · el aula ──────────────────────────────────────────────── */
 
 .aula-page {
   --ink: #f6ecd8;
@@ -1261,16 +1200,8 @@ button:focus-visible {
   -webkit-backdrop-filter: blur(10px);
 }
 
-.aula-kicker {
-  display: inline-block;
-  margin: 0 0 1rem;
-  color: var(--chalk);
-  font: 600 0.62rem/1.4 ui-monospace, monospace;
-  letter-spacing: 0.2em;
-}
-
 .aula-page h1 { color: #fff8ea; text-shadow: 0 0 46px color-mix(in srgb, var(--planet) 32%, transparent); }
-.aula-hero__lede { color: var(--chalk); }
+
 .aula-hero__copy { position: relative; }
 
 .aula-facts {
@@ -1419,9 +1350,6 @@ button:focus-visible {
 .aula-book__copy p { margin: 0.4rem 0 0; color: #c8c2b5; font-size: 0.87rem; line-height: 1.65; }
 .aula-book .story-link { margin-top: 0; }
 
-.aula-outro { color: color-mix(in srgb, var(--chalk) 60%, transparent); }
-.aula-outro span { color: var(--planet); }
-
 /* ── /projects · atlas de herramientas ─────────────────────────────────── */
 
 .atlas-page { --ink: #e8f4fb; }
@@ -1449,7 +1377,7 @@ button:focus-visible {
   text-transform: uppercase;
 }
 .atlas-page h1 { color: #f2faff; }
-.atlas-hero__lede { color: #d3ecf9; }
+
 .atlas-hero .story-link { margin-top: 1.2rem; }
 
 .atlas-blueprint { margin: 0; display: grid; justify-items: center; gap: 0.9rem; }
@@ -1462,60 +1390,7 @@ button:focus-visible {
   text-transform: uppercase;
 }
 
-.atlas-specs {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1px;
-  margin: 0;
-  border: 1px solid rgba(126, 215, 246, 0.16);
-  border-radius: 0.95rem;
-  background: rgba(126, 215, 246, 0.1);
-  overflow: hidden;
-}
-.atlas-specs div {
-  display: grid;
-  gap: 0.4rem;
-  padding: 1.05rem 1.2rem;
-  background: rgba(11, 24, 34, 0.86);
-}
-.atlas-specs dt {
-  color: color-mix(in srgb, var(--planet-2) 62%, transparent);
-  font: 600 0.58rem/1.3 ui-monospace, monospace;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-.atlas-specs dd { margin: 0; color: #eaf6fd; font: 500 1.2rem/1.1 Georgia, serif; }
-
 .atlas-catalog { margin-top: clamp(2.6rem, 6vw, 4rem); }
-
-.atlas-category {
-  padding: clamp(1.8rem, 4vw, 2.6rem) 0;
-  border-top: 1px solid rgba(126, 215, 246, 0.14);
-  scroll-margin-top: 2rem;
-}
-.atlas-category__head {
-  display: grid;
-  grid-template-columns: 3rem minmax(0, 1fr) auto;
-  align-items: baseline;
-  gap: 1rem;
-  margin-bottom: 1.1rem;
-}
-.atlas-category__head span {
-  color: var(--planet);
-  font: 500 1.1rem/1 Georgia, serif;
-}
-.atlas-category__head h2 {
-  margin: 0;
-  color: #eaf6fd;
-  font: 500 clamp(1.3rem, 2.4vw, 1.85rem)/1.15 Georgia, serif;
-  letter-spacing: -0.02em;
-}
-.atlas-category__head i {
-  color: color-mix(in srgb, var(--planet-2) 62%, transparent);
-  font: normal 0.62rem/1 ui-monospace, monospace;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
 
 .atlas-rows { margin: 0; padding: 0; list-style: none; }
 
@@ -1574,16 +1449,6 @@ button:focus-visible {
   letter-spacing: 0.06em;
 }
 .atlas-row__aside .story-link { margin-top: 0.2rem; }
-
-.atlas-outro {
-  flex-wrap: wrap;
-  gap: 0.9rem;
-  padding-top: 1.6rem;
-  border-top: 1px solid rgba(126, 215, 246, 0.14);
-  color: color-mix(in srgb, var(--planet-2) 62%, transparent);
-}
-.atlas-outro > span { font-size: 0.6rem; letter-spacing: 0.2em; }
-.atlas-outro .story-link { margin-top: 0; margin-left: auto; }
 
 /* ── fallback genérico · expediente ────────────────────────────────────── */
 
@@ -1710,7 +1575,7 @@ button:focus-visible {
   .arena-trophy__badge { justify-items: start; text-align: left; }
   .arena-trophy__ribbon { display: none; }
   .aula-syllabus { grid-template-columns: minmax(0, 1fr); }
-  .atlas-specs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
   .atlas-row,
   .dossier-row { grid-template-columns: minmax(0, 1fr); gap: 0.7rem; }
   .atlas-row__aside,
@@ -1718,11 +1583,10 @@ button:focus-visible {
 }
 
 @media (max-width: 560px) {
-  .hud-stats { gap: 1.1rem; }
+
   .aula-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
   .aula-book { grid-template-columns: minmax(0, 1fr); gap: 0.5rem; }
-  .atlas-category__head { grid-template-columns: 2.2rem minmax(0, 1fr); }
-  .atlas-category__head i { grid-column: 2; }
+
   .planet-nav { grid-template-columns: minmax(0, 1fr); justify-items: stretch; gap: 0.5rem; }
   .planet-nav__orbit { justify-content: center; order: -1; padding-bottom: 0.4rem; }
   .planet-nav__side--next { justify-content: flex-start; text-align: left; flex-direction: row-reverse; }
@@ -1760,130 +1624,369 @@ button:focus-visible {
   }
 }
 
-/* --- Home "Cuatro mundos": the world card expands in place --- */
-.world-card {
-  cursor: pointer;
-  transition: border-color 220ms ease, box-shadow 220ms ease;
-}
-.world-card:hover,
-.world-card.is-open {
-  border-color: color-mix(in srgb, var(--hud-glow, var(--space)) 75%, transparent);
-  box-shadow: 0 0 36px color-mix(in srgb, var(--hud-glow, var(--space)) 22%, transparent);
-}
-.world-card__toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  padding: 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  line-height: 1.15;
-  cursor: pointer;
-}
-.world-card__chev {
-  display: inline-grid;
-  place-items: center;
-  width: 1.4rem;
-  height: 1.4rem;
-  border: 1px solid currentColor;
-  border-radius: 999px;
-  font-size: 0.95rem;
-  line-height: 1;
-  transition: transform 260ms ease;
-}
-.world-card.is-open .world-card__chev {
-  transform: rotate(45deg);
-}
-.world-card__panel {
-  display: grid;
-  grid-template-rows: 0fr;
-  width: 100%;
-  opacity: 0;
-  transition: grid-template-rows 320ms ease, opacity 240ms ease;
-}
-.world-card.is-open .world-card__panel {
-  grid-template-rows: 1fr;
-  opacity: 1;
-}
-.world-card__panel-inner {
-  min-height: 0;
-  overflow: hidden;
-  text-align: left;
-}
-.world-card__desc {
-  margin: 0.2rem 0 0.8rem;
-  color: var(--muted);
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
-.world-card__items {
-  display: grid;
-  gap: 0.4rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.world-card__items li {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.45rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--fg);
-  font-size: 0.88rem;
-}
-.world-card__year {
-  flex-shrink: 0;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-.world-card__more {
-  margin: 0.6rem 0 0;
-  color: var(--muted);
-  font-size: 0.8rem;
-}
-.world-card__actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-top: 0.9rem;
-}
-.world-card__route {
-  color: var(--hud-glow, var(--space));
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-decoration: none;
-}
-.world-card__route:hover {
-  color: #fff;
-}
-.world-card__close {
-  padding: 0.35rem 0.8rem;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--muted);
-  font-size: 0.78rem;
-  cursor: pointer;
-}
-.world-card__close:hover {
-  border-color: rgba(255, 255, 255, 0.4);
-  color: #fff;
-}
-.world-card__hint {
-  font: 500 0.66rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--muted);
-  opacity: 0.8;
-}
 .mission__body .story-link + .story-link {
   margin-left: 1.1rem;
 }
 
-/* --- Launch loader: rocket climbs while the 3D background compiles --- */
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Glass surfaces: translucent panels over the 3D background so the planet
+   shows through. Only card-sized elements blur (never a full-screen layer).
+   Without backdrop-filter support every surface keeps a near-solid tint, so
+   text contrast never depends on the effect.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Dim tint behind text: keeps body copy above WCAG AA over bright planets. */
+  --glass-tint: rgba(7, 10, 24, 0.56);
+  --glass-tint-solid: rgba(8, 11, 26, 0.93);
+  --glass-sheen: linear-gradient(155deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.012) 42%, rgba(255, 255, 255, 0) 70%);
+  --glass-edge: rgba(255, 255, 255, 0.13);
+  --glass-blur: blur(16px) saturate(165%);
+  --glass-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.025),
+    0 18px 48px rgba(0, 0, 0, 0.38);
+}
+
+.glass,
+.glass-soft,
+.glass-panel,
+.planet-hud,
+.arena-hero,
+.arena-trophy,
+.mission__body,
+.aula-hero,
+.aula-course,
+.atlas-hero,
+.atlas-rows,
+.edu-degree,
+.edu-certificate,
+.dossier-hero {
+  border-color: var(--glass-edge);
+  background: var(--glass-tint-solid);
+  box-shadow:
+    var(--glass-shadow),
+    0 0 42px color-mix(in srgb, var(--hud-glow, var(--planet, #5b8cff)) 13%, transparent);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass,
+  .glass-soft,
+  .glass-panel,
+  .planet-hud,
+  .arena-hero,
+  .arena-trophy,
+  .mission__body,
+  .aula-hero,
+  .aula-course,
+  .atlas-hero,
+  .atlas-rows,
+  .edu-degree,
+  .edu-certificate,
+  .dossier-hero {
+    background:
+      var(--glass-sheen),
+      radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--hud-glow, var(--planet, #5b8cff)) 12%, transparent), transparent 60%),
+      var(--glass-tint);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+  }
+  .glass-soft {
+    --glass-tint: rgba(7, 10, 24, 0.5);
+  }
+  /* Phones: lighter blur keeps scrolling smooth on weaker GPUs. */
+  @media (max-width: 767px) {
+    .glass,
+    .glass-soft,
+    .glass-panel,
+    .planet-hud,
+    .arena-hero,
+    .arena-trophy,
+    .mission__body,
+    .aula-hero,
+    .aula-course,
+    .atlas-hero,
+    .atlas-rows,
+    .edu-degree,
+    .edu-certificate,
+    .dossier-hero {
+      --glass-tint: rgba(7, 10, 24, 0.66);
+      -webkit-backdrop-filter: blur(10px) saturate(150%);
+      backdrop-filter: blur(10px) saturate(150%);
+    }
+  }
+}
+
+.atlas-rows {
+  overflow: hidden;
+  border: 1px solid var(--glass-edge);
+  border-radius: 1.1rem;
+}
+.atlas-row + .atlas-row {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* --- Home "Cuatro mundos": the whole card is a link to its world --- */
+.world-card {
+  position: relative;
+  color: var(--fg);
+  text-decoration: none;
+  transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+}
+.world-card:hover,
+.world-card:focus-visible {
+  border-color: color-mix(in srgb, var(--hud-glow, var(--space)) 75%, transparent);
+  box-shadow:
+    var(--glass-shadow),
+    0 0 56px color-mix(in srgb, var(--hud-glow, var(--space)) 30%, transparent);
+  transform: translateY(-3px);
+}
+.world-card:focus-visible {
+  outline: 2px solid var(--hud-glow, var(--space));
+  outline-offset: 4px;
+}
+.world-card__title {
+  margin: 0;
+  font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+  line-height: 1.15;
+}
+.world-card__tagline {
+  max-width: 500px;
+  color: var(--fg);
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.world-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--hud-glow, var(--space)) 55%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--hud-glow, var(--space)) 12%, rgba(7, 10, 24, 0.6));
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.world-card__cta span {
+  transition: transform 220ms ease;
+}
+.world-card:hover .world-card__cta span,
+.world-card:focus-visible .world-card__cta span {
+  transform: translateX(4px);
+}
+
+/* --- "← Volver al universo": prominent glass pill with a nudging rocket --- */
+.story-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 48px;
+  margin-bottom: 1.2rem;
+  padding: 0.7rem 1.35rem 0.7rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--planet, #8fb3ff) 45%, rgba(255, 255, 255, 0.14));
+  border-radius: 999px;
+  background: rgba(8, 11, 26, 0.9);
+  box-shadow: var(--glass-shadow), 0 0 28px color-mix(in srgb, var(--planet, #5b8cff) 22%, transparent);
+  color: #fff;
+  font-size: clamp(1rem, 1.6vw, 1.12rem);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .story-back {
+    background: var(--glass-sheen), rgba(8, 11, 26, 0.58);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+  }
+}
+.story-back__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--planet, #5b8cff) 22%, rgba(255, 255, 255, 0.04));
+  color: var(--planet-2, #dfe8ff);
+}
+.story-back__icon svg {
+  transition: transform 260ms cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+.story-back:hover,
+.story-back:focus-visible {
+  border-color: var(--planet, #8fb3ff);
+  box-shadow: var(--glass-shadow), 0 0 40px color-mix(in srgb, var(--planet, #5b8cff) 38%, transparent);
+  transform: translateY(-2px);
+}
+.story-back:hover .story-back__icon svg,
+.story-back:focus-visible .story-back__icon svg {
+  transform: translate(3px, -3px) rotate(-8deg);
+}
+.story-back:focus-visible {
+  outline: 2px solid var(--planet-2, #dfe8ff);
+  outline-offset: 3px;
+}
+
+/* --- Stack tags on dense world pages --- */
+.stack-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.stack-tags li {
+  padding: 0.18rem 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--planet, #8fb3ff) 40%, transparent);
+  border-radius: 999px;
+  background: rgba(7, 10, 24, 0.55);
+  color: #e8f3fb;
+  font: 500 0.7rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* --- Scroll-driven trajectory on world pages --- */
+.trajectory {
+  position: fixed;
+  top: 50%;
+  left: max(0.6rem, calc((100vw - 1080px) / 2 - 15.5rem));
+  z-index: 9; /* above the scene and aura, below the content layer (10) */
+  width: 13.5rem;
+  height: min(68vh, 620px);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.trajectory__rail {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3.4rem;
+}
+.trajectory__rail svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.trajectory__base {
+  fill: none;
+  stroke: color-mix(in srgb, var(--planet, #8f7bff) 35%, transparent);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 7;
+}
+.trajectory__glow {
+  fill: none;
+  stroke: url(#trajectory-glow);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--planet, #8f7bff) 70%, transparent));
+}
+.trajectory__node {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  transform: translate(-0.4rem, -50%);
+}
+.trajectory__node i {
+  flex: none;
+  width: 0.8rem;
+  height: 0.8rem;
+  border: 2px solid color-mix(in srgb, var(--planet, #8f7bff) 55%, transparent);
+  border-radius: 999px;
+  background: #0b0d1f;
+  transition: background 260ms ease, border-color 260ms ease, box-shadow 260ms ease, transform 260ms ease;
+}
+.trajectory__node.is-lit i {
+  border-color: var(--planet-2, #f3c779);
+  background: var(--planet, #8f7bff);
+}
+.trajectory__node.is-active i {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--planet, #8f7bff) 25%, transparent), 0 0 18px var(--planet, #8f7bff);
+  transform: scale(1.25);
+}
+.trajectory__label {
+  display: grid;
+  width: 10rem;
+  overflow: hidden;
+  color: rgba(232, 236, 255, 0.55);
+  font-size: 0.7rem;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  transition: color 260ms ease;
+}
+.trajectory__label small {
+  color: color-mix(in srgb, var(--planet-2, #f3c779) 70%, transparent);
+  font: 600 0.6rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.08em;
+}
+.trajectory__node.is-active .trajectory__label {
+  color: #fff;
+}
+.trajectory__marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0.9rem;
+  height: 0.9rem;
+  margin: -0.45rem 0 0 -0.45rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, #fff 0 30%, var(--planet-2, #f3c779) 45%, transparent 72%);
+  box-shadow: 0 0 16px var(--planet-2, #f3c779), 0 0 34px var(--planet, #8f7bff);
+  will-change: transform;
+}
+/* Not enough gutter for labels: a slim rail on the edge, dots only. */
+@media (max-width: 1399px) {
+  .trajectory {
+    left: 0.35rem;
+    width: 1.6rem;
+    height: min(56vh, 460px);
+  }
+  .trajectory__rail { width: 1.6rem; }
+  .trajectory__label { display: none; }
+  .trajectory__node i { width: 0.6rem; height: 0.6rem; }
+}
+@media (max-width: 767px) {
+  .trajectory {
+    left: auto;
+    right: 0.2rem;
+    opacity: 0.85;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .trajectory__marker { display: none; }
+  .story-back:hover,
+  .story-back:focus-visible,
+  .world-card:hover,
+  .world-card:focus-visible { transform: none; }
+  .story-back:hover .story-back__icon svg,
+  .story-back:focus-visible .story-back__icon svg,
+  .world-card:hover .world-card__cta span { transform: none; }
+}
+
+/* --- One-time launch loader: tangent-curve flight, burst and iris reveal --- */
+@property --iris {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
 .rocket-loader {
   position: fixed;
   inset: 0;
@@ -1894,93 +1997,72 @@ button:focus-visible {
 .rocket-loader__veil {
   position: absolute;
   inset: 0;
-  background: var(--scene-bg, #040612);
+  background:
+    radial-gradient(circle at 50% 120%, rgba(91, 140, 255, 0.12), transparent 55%),
+    var(--scene-bg, #040612);
   transition: opacity 600ms ease;
 }
+/* Iris: the veil opens from the burst point, revealing the planet behind. */
 .rocket-loader.is-burst .rocket-loader__veil {
+  -webkit-mask-image: radial-gradient(circle at var(--burst-x, 50%) var(--burst-y, 20%), transparent var(--iris), #000 calc(var(--iris) + 12%));
+  mask-image: radial-gradient(circle at var(--burst-x, 50%) var(--burst-y, 20%), transparent var(--iris), #000 calc(var(--iris) + 12%));
+  animation: rocket-iris 1000ms cubic-bezier(0.6, 0, 0.3, 1) 80ms both;
   opacity: 0;
-  transition-duration: 900ms;
-  transition-delay: 120ms;
+  transition: opacity 500ms ease 650ms; /* fallback where @property is missing */
+}
+.rocket-loader.is-burst {
+  animation: rocket-shake 420ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 .rocket-loader.is-exit .rocket-loader__veil {
   opacity: 0;
 }
-.rocket-loader__flight {
-  position: absolute;
-  left: 50%;
-  top: 16vh; /* parking spot, matches the burst origin in RocketLoader.tsx */
-  width: 40px;
-  height: 84px;
-  margin-left: -20px;
-  animation: rocket-ascent 1300ms cubic-bezier(0.22, 0.8, 0.3, 1) both;
-}
-.rocket-loader.is-hover .rocket-loader__flight {
-  animation: rocket-hover 1600ms ease-in-out infinite alternate;
-}
-.rocket-loader.is-burst .rocket-loader__flight {
-  animation: none;
-  opacity: 0;
-  transform: scale(0.4);
-  transition: opacity 180ms ease, transform 180ms ease;
-}
-.rocket-loader.is-exit .rocket-loader__flight {
-  opacity: 0;
-  transition: opacity 400ms ease;
-}
-.rocket-loader__rocket {
-  position: relative;
-  display: block;
-  filter: drop-shadow(0 0 12px rgba(91, 140, 255, 0.55));
-}
-.rocket-loader__flame {
-  transform-origin: 20px 58px;
-  animation: rocket-flame 120ms ease-in-out infinite alternate;
-}
-.rocket-loader__trail {
-  position: absolute;
-  left: 50%;
-  top: 70px;
-  width: 4px;
-  height: 0;
-  margin-left: -2px;
-  border-radius: 4px;
-  background: linear-gradient(to bottom, rgba(255, 191, 92, 0.85), rgba(91, 140, 255, 0.25) 40%, transparent);
-  animation: rocket-trail 1300ms cubic-bezier(0.22, 0.8, 0.3, 1) both;
-}
-.rocket-loader.is-hover .rocket-loader__trail {
-  height: 18vh;
-  animation: none;
-  opacity: 0.6;
-}
-.rocket-loader__burst {
+.rocket-loader__canvas {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
+.rocket-loader__rocket {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: clamp(64px, 8vmin, 96px);
+  aspect-ratio: 40 / 84;
+  opacity: 0;
+  filter: drop-shadow(0 0 16px rgba(91, 140, 255, 0.7)) drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
+  transition: opacity 160ms ease;
+  will-change: transform;
+}
+.rocket-loader__rocket svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.rocket-loader__flame {
+  transform-origin: 20px 58px;
+  animation: rocket-flame 90ms ease-in-out infinite alternate;
+}
+.rocket-loader.is-exit .rocket-loader__rocket {
+  opacity: 0 !important;
+}
 
-@keyframes rocket-ascent {
-  from { transform: translateY(calc(84vh + 100px)); }
-  to { transform: translateY(0); }
-}
-@keyframes rocket-hover {
-  from { transform: translateY(0); }
-  to { transform: translateY(-8px); }
-}
 @keyframes rocket-flame {
-  from { transform: scaleY(0.85); }
-  to { transform: scaleY(1.15); }
+  from { transform: scaleY(0.8) scaleX(0.95); }
+  to { transform: scaleY(1.25) scaleX(1.05); }
 }
-@keyframes rocket-trail {
-  from { height: 0; }
-  to { height: 40vh; opacity: 0.7; }
+@keyframes rocket-iris {
+  from { --iris: 0%; }
+  to { --iris: 160%; }
+}
+@keyframes rocket-shake {
+  10%, 90% { transform: translate(-2px, 1px); }
+  20%, 80% { transform: translate(4px, -2px); }
+  30%, 50%, 70% { transform: translate(-6px, 3px); }
+  40%, 60% { transform: translate(6px, -3px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .world-card__panel,
-  .world-card__chev {
-    transition: none;
-  }
+  .rocket-loader.is-burst { animation: none; }
   .rocket-loader__veil {
     transition: opacity 400ms ease !important;
   }
