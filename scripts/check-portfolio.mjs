@@ -138,7 +138,7 @@ async function main() {
       await page.locator(".story-back").waitFor();
       assert.equal(await page.locator("[data-rocket-loader]").count(), 0, "Launch loader never replays on client navigation");
       await page.locator(".story-back").click();
-      await page.waitForURL("**/#projects");
+      await page.waitForURL((url) => new URL(url).pathname === "/" && new URL(url).hash.startsWith("#projects"));
       assert.equal(await page.locator("[data-rocket-loader]").count(), 0, "Launch loader never replays going back home");
       await page.reload();
       await page.waitForTimeout(400);
@@ -196,7 +196,7 @@ async function main() {
         assert.equal(await page.locator(".story-back").textContent(), "← Volver al universo");
         assert.equal(await page.getByText(/órbita/).count(), 0, "No 'órbita' copy on world pages");
         await page.locator(".story-back").click();
-        await page.waitForURL("**/#projects");
+        await page.waitForURL((url) => new URL(url).pathname === "/" && new URL(url).hash.startsWith("#projects"));
       }
       if (name === "reduced-motion") {
         assert.equal(await page.locator(".hero-letter").first().evaluate((el) => getComputedStyle(el).transform), "none");
