@@ -212,7 +212,14 @@ async function main() {
       for (const gone of ["BITÁCORA DE EXPLORACIÓN", "26°49′S", "RUTA ACTIVA", "La exploración sigue", "El camino hacia un nuevo mundo"]) {
         assert.equal(await page.getByText(gone).count(), 0, `Education no longer shows "${gone}"`);
       }
-      assert.equal(await page.locator(".trajectory .trajectory__node").count() > 1, true, "Scroll trajectory nodes");
+      assert.equal(await page.locator(".entry-index a").count() > 1, true, "On-this-page index entries");
+      assert.equal(await page.locator(".planet-nav__orbit a[aria-current='page']").count(), 1, "World dots mark the current world");
+      // Fixed header: transparent at the top, solid band once the page scrolls.
+      await page.evaluate(() => window.scrollTo({ top: 600, behavior: "instant" }));
+      await page.waitForFunction(() => document.querySelector(".site-nav")?.hasAttribute("data-scrolled"));
+      await page.waitForTimeout(300);
+      assert.equal(await page.locator(".site-nav").evaluate((el) => getComputedStyle(el, "::before").opacity), "1", "Header band behind the logo while scrolled");
+      await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
       for (const [from, to] of [["/curso-n8n", "/teaching"], ["/university", "/education"]]) {
         const redirect = await page.request.get(`${baseURL}${from}`, { maxRedirects: 0 });
         assert.equal(redirect.status(), 308, `${from} redirects permanently`);

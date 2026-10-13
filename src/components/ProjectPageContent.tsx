@@ -6,8 +6,8 @@ import { CV } from "@/data/cv";
 import { PROJECTS, type Project, type ProjectItem } from "@/data/projects";
 import { useI18n } from "@/lib/i18n";
 import gsap from "gsap";
-import { ScrollTrajectory, type TrajectoryNode } from "@/components/ScrollTrajectory";
-import { countUp, drawOnEnter, drawOnScroll, revealStagger, scrubNumber, useScrollScene } from "@/lib/scrollFX";
+import { EntryIndex, type IndexEntry } from "@/components/EntryIndex";
+import { countUp, drawOnEnter, drawOnScroll, revealStagger, scrollLinked, scrubNumber, useScrollScene } from "@/lib/scrollFX";
 
 function pad(value: number) {
   return String(value).padStart(2, "0");
@@ -39,7 +39,7 @@ function byYear(items: ProjectItem[]) {
   return [...items].sort((a, b) => startYear(a) - startYear(b));
 }
 
-/** Stable DOM id for a trajectory node, derived from the entry name. */
+/** Stable DOM id for an index entry, derived from the entry name. */
 function nodeId(prefix: string, name: string) {
   return `${prefix}-${name.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
 }
@@ -106,18 +106,22 @@ function PlanetNav({ slug }: { slug: string }) {
         </div>
       </Link>
 
-      <span className="planet-nav__orbit" aria-hidden="true">
-        {PROJECTS.map((p) => (
-          <i
-            key={p.slug}
-            style={{
-              background: p.planet.atmoA,
-              opacity: p.slug === slug ? 1 : 0.25,
-              boxShadow: p.slug === slug ? `0 0 10px ${p.planet.atmoA}` : "none",
-            }}
-          />
-        ))}
-      </span>
+      {/* Where this world sits among the others; each dot jumps straight there. */}
+      <ol className="planet-nav__orbit">
+        {PROJECTS.map((p) => {
+          const current = p.slug === slug;
+          return (
+            <li key={p.slug}>
+              <Link
+                href={`/${p.slug}`}
+                aria-label={nameOf(p)}
+                aria-current={current ? "page" : undefined}
+                style={{ "--dot": p.planet.atmoA } as React.CSSProperties}
+              />
+            </li>
+          );
+        })}
+      </ol>
 
       <Link className="planet-nav__side planet-nav__side--next" href={`/${next.slug}`}>
         <div>
@@ -154,7 +158,7 @@ function HackathonJourney({ project }: { project: Project }) {
   const winner = items.find((item) => item.highlight);
   // Oldest to newest, by the event year in the data (ties keep data order).
   const missions = byYear(items.filter((item) => item !== winner));
-  const trajectory: TrajectoryNode[] = [
+  const indexEntries: IndexEntry[] = [
     ...(winner ? [{ id: "arena-trophy", label: winner.name, meta: winner.year }] : []),
     ...missions.map((item) => ({ id: nodeId("mission", item.name), label: item.name, meta: item.year })),
   ];
@@ -186,13 +190,9 @@ function HackathonJourney({ project }: { project: Project }) {
     if (sweep) {
       gsap.to(sweep, {
         rotate: "+=540",
+        duration: 1.6,
         ease: "none",
-        scrollTrigger: {
-          trigger: q(".arena-hero")!,
-          start: "top top",
-          end: "bottom top",
-          scrub: 0.7,
-        },
+        scrollTrigger: scrollLinked({ trigger: q(".arena-hero")!, start: "top top", end: "bottom top", scrub: 0.7 }),
       });
     }
 
@@ -222,8 +222,9 @@ function HackathonJourney({ project }: { project: Project }) {
         { "--rail-progress": "0%" },
         {
           "--rail-progress": "100%",
+          duration: 1.2,
           ease: "none",
-          scrollTrigger: { trigger: rail, start: "top 72%", end: "bottom 65%", scrub: 0.6 },
+          scrollTrigger: scrollLinked({ trigger: rail, start: "top 72%", end: "bottom 65%", scrub: 0.6 }),
         }
       );
     }
@@ -367,7 +368,7 @@ function HackathonJourney({ project }: { project: Project }) {
       </footer>
 
       <PlanetNav slug="hackathons" />
-      <ScrollTrajectory nodes={trajectory} />
+      <EntryIndex entries={indexEntries} />
     </article>
   );
 }
@@ -391,7 +392,7 @@ function MentorshipJourney({ project }: { project: Project }) {
   const course = project.items?.find((item) => item.category?.es === "Curso destacado");
   const materials = byYear(project.items?.filter((item) => item.category?.es === "Materiales del curso") ?? []);
   const demos = byYear(project.items?.filter((item) => item.category?.es === "Demos técnicas") ?? []);
-  const trajectory: TrajectoryNode[] = [
+  const indexEntries: IndexEntry[] = [
     ...(course ? [{ id: "aula-course", label: course.name, meta: course.year }] : []),
     ...[...materials, ...demos].map((item) => ({ id: nodeId("aula", item.name), label: item.name, meta: item.year })),
   ];
@@ -419,7 +420,7 @@ function MentorshipJourney({ project }: { project: Project }) {
         duration: 0.35,
         stagger: 0.09,
         ease: "power2.out",
-        scrollTrigger: { trigger: dial, start: "top 78%", end: "bottom 55%", scrub: 0.8 },
+        scrollTrigger: scrollLinked({ trigger: dial, start: "top 78%", end: "bottom 55%", scrub: 0.8 }),
       });
       countUp(q(".aula-dial__core span"), 10, { trigger: dial, start: "top 80%" });
     }
@@ -579,7 +580,7 @@ function MentorshipJourney({ project }: { project: Project }) {
       )}
 
       <PlanetNav slug="teaching" />
-      <ScrollTrajectory nodes={trajectory} />
+      <EntryIndex entries={indexEntries} />
     </article>
   );
 }
@@ -598,7 +599,7 @@ function ProjectAtlas({ project }: { project: Project }) {
   const { tl } = useI18n();
   // One flat catalogue, oldest to newest: one line per project plus its tags.
   const items = byYear(project.items ?? []);
-  const trajectory: TrajectoryNode[] = items.map((item) => ({
+  const indexEntries: IndexEntry[] = items.map((item) => ({
     id: nodeId("atlas", item.name),
     label: item.name,
     meta: item.year,
@@ -626,7 +627,12 @@ function ProjectAtlas({ project }: { project: Project }) {
       gsap.fromTo(
         row,
         { "--row-wipe": "0%" },
-        { "--row-wipe": "100%", ease: "none", scrollTrigger: { trigger: row, start: "top 92%", end: "top 55%", scrub: 0.8 } }
+        {
+          "--row-wipe": "100%",
+          duration: 0.8,
+          ease: "none",
+          scrollTrigger: scrollLinked({ trigger: row, start: "top 92%", end: "top 55%", scrub: 0.8 }),
+        }
       );
     });
 
@@ -709,7 +715,7 @@ function ProjectAtlas({ project }: { project: Project }) {
       </section>
 
       <PlanetNav slug="projects" />
-      <ScrollTrajectory nodes={trajectory} />
+      <EntryIndex entries={indexEntries} />
     </article>
   );
 }
@@ -727,7 +733,7 @@ function UniversityJourney({ project }: { project: Project }) {
   const academicProjects = byYear(project.items?.filter((item) => item.category?.es === "Proyectos Académicos UTN-FRT") ?? []);
   // Follows the page: the degree, then each certification and each academic
   // project, each group oldest to newest as listed in the data.
-  const trajectory: TrajectoryNode[] = [
+  const indexEntries: IndexEntry[] = [
     { id: "education-degree", label: tl(degree.degree), meta: tl(degree.period) },
     ...CV.certifications.map((certification) => ({
       id: nodeId("cert", certification.name.es),
@@ -767,7 +773,7 @@ function UniversityJourney({ project }: { project: Project }) {
             opacity: 1,
             duration: 0.5,
             ease: "back.out(2.4)",
-            scrollTrigger: { trigger: orbit, start: "top 78%", end: "bottom 50%", scrub: 1 },
+            scrollTrigger: scrollLinked({ trigger: orbit, start: "top 78%", end: "bottom 50%", scrub: 1 }),
           }
         );
       });
@@ -916,7 +922,7 @@ function UniversityJourney({ project }: { project: Project }) {
       )}
 
       <PlanetNav slug="education" />
-      <ScrollTrajectory nodes={trajectory} />
+      <EntryIndex entries={indexEntries} />
     </article>
   );
 }

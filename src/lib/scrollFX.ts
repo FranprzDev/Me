@@ -4,8 +4,30 @@ import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
+import { isLiteMode } from "@/lib/lite";
 
 gsap.registerPlugin(ScrollTrigger, DrawSVGPlugin);
+// Mobile browsers resize the viewport when the address bar shows or hides
+// mid-scroll; refreshing every trigger then causes visible jumps.
+ScrollTrigger.config({ ignoreMobileResize: true });
+
+/** Scroll-linked trigger options for a scrubbed tween. */
+export interface ScrollLinkOptions {
+  trigger: Element;
+  start?: string;
+  end?: string;
+  scrub: number;
+}
+
+/**
+ * Scrubbed (scroll-linked) on desktop; on phones, touch-first or low-power
+ * devices the same tween plays once when it enters, so a fling never drives
+ * per-frame tween work and scrolling stays fully native.
+ */
+export function scrollLinked(options: ScrollLinkOptions): ScrollTrigger.Vars {
+  if (!isLiteMode()) return { ...options };
+  return { trigger: options.trigger, start: options.start ?? "top 85%", once: true };
+}
 
 /** Easing compartido: entradas rápidas con cola larga, nunca rebotones. */
 export const EASE = "power3.out";
@@ -186,10 +208,12 @@ export function scrubNumber(
     else element.textContent = String(Math.round(state.value));
   };
   render();
+  const link = scrollLinked({ trigger, end, scrub: 0.5 });
   gsap.to(state, {
     value: to,
-    ease: "none",
-    scrollTrigger: { trigger, end, scrub: 0.5, invalidateOnRefresh: true },
+    duration: 1.2,
+    ease: link.once ? EASE_SOFT : "none",
+    scrollTrigger: link.once ? link : { ...link, invalidateOnRefresh: true },
     onUpdate: render,
   });
 }
@@ -214,13 +238,9 @@ export function drawOnScroll(
       {
         drawSVG: "0% 100%",
         opacity: 1,
+        duration: 1,
         ease: "none",
-        scrollTrigger: {
-          trigger,
-          start: from,
-          end: to,
-          scrub: 0.6,
-        },
+        scrollTrigger: scrollLinked({ trigger, start: from, end: to, scrub: 0.6 }),
         delay: i * stagger,
       }
     );

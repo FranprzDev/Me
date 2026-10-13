@@ -41,15 +41,19 @@ html {
   scroll-padding-top: 5rem;
   background: var(--scene-bg, var(--bg));
 
-  /* Snap por secciones: cada gesto de rueda ancla a la sección y el viaje se
-     siente como ir "de una estación a otra" (no scroll continuo y tosco).
-     `proximity` (no `mandatory`) deja leer libremente las secciones más altas
-     que el viewport, p.ej. Educación, sin atrapar el contenido. */
-  scroll-snap-type: y proximity;
-
   /* Scrollbar integrado a la paleta estelar (Firefox). */
   scrollbar-width: thin;
   scrollbar-color: rgba(123, 150, 255, 0.4) transparent;
+}
+
+/* Section snap only for mouse/trackpad: each wheel gesture settles on a
+   section ("station to station"), and `proximity` keeps tall sections freely
+   readable. Touch screens keep plain native momentum scrolling; snapping
+   there fights the fling and feels forced. */
+@media (hover: hover) and (pointer: fine) {
+  html {
+    scroll-snap-type: y proximity;
+  }
 }
 
 body {
@@ -481,8 +485,65 @@ body:has([data-contact-heading="true"] canvas) .contact-copy h2 {
   transform: none;
 }
 
+/* --- Fixed header ---
+   Transparent over the hero; once the page scrolls, a solid band slides in
+   under it so content never shows through the logo and controls. The band is
+   a pseudo-element faded with opacity (compositor-only). Phones get a
+   solid band in the scene colour, no blur: a full-width backdrop-filter over the
+   animated canvas would be re-blurred on every scroll frame. */
 .site-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem max(1.25rem, env(safe-area-inset-right)) 0.75rem max(1.25rem, env(safe-area-inset-left));
   background: transparent;
+}
+.site-nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--scene-bg, #050817);
+  box-shadow: 0 10px 30px rgba(2, 4, 12, 0.35);
+  opacity: 0;
+  transition: opacity 220ms ease;
+  pointer-events: none;
+}
+.site-nav[data-scrolled]::before {
+  opacity: 1;
+}
+@media (min-width: 900px) and (hover: hover) {
+  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .site-nav::before {
+      background: linear-gradient(180deg, rgba(5, 8, 23, 0.78), rgba(5, 8, 23, 0.62));
+      -webkit-backdrop-filter: blur(12px) saturate(140%);
+      backdrop-filter: blur(12px) saturate(140%);
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-nav::before { transition: none; }
+}
+
+/* Reading progress along the very top edge, scaled from the scroll frame. */
+.site-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 60;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--space), var(--japan), var(--brain));
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  pointer-events: none;
+  will-change: transform;
 }
 
 a:focus-visible,
@@ -1443,11 +1504,37 @@ button:focus-visible {
   white-space: nowrap;
 }
 
-.planet-nav__orbit { display: flex; gap: 0.45rem; }
-.planet-nav__orbit i {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
+.planet-nav__orbit {
+  display: flex;
+  justify-content: center;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* 24px hit area around an 8px dot; the current world is a short pill. */
+.planet-nav__orbit a {
+  display: grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  border-radius: 999px;
+}
+.planet-nav__orbit a::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--dot);
+  opacity: 0.32;
+  transition: width 220ms ease, opacity 220ms ease;
+}
+.planet-nav__orbit a:hover::before,
+.planet-nav__orbit a:focus-visible::before { opacity: 0.75; }
+.planet-nav__orbit a[aria-current="page"]::before {
+  width: 20px;
+  opacity: 1;
+  box-shadow: 0 0 10px var(--dot);
 }
 
 @media (max-width: 860px) {
@@ -1480,10 +1567,24 @@ button:focus-visible {
   .aula-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
   .aula-book { grid-template-columns: minmax(0, 1fr); gap: 0.5rem; }
 
-  .planet-nav { grid-template-columns: minmax(0, 1fr); justify-items: stretch; gap: 0.5rem; }
-  .planet-nav__orbit { justify-content: center; order: -1; padding-bottom: 0.4rem; }
-  .planet-nav__side--next { justify-content: flex-start; text-align: left; flex-direction: row-reverse; }
-  .planet-nav__side--next div { text-align: left; }
+  /* Phones: dots on top, previous and next side by side as two equal tiles. */
+  .planet-nav {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: "orbit orbit" "prev next";
+    gap: 0.6rem;
+  }
+  .planet-nav__orbit { grid-area: orbit; }
+  .planet-nav__side--prev { grid-area: prev; }
+  .planet-nav__side--next { grid-area: next; }
+  .planet-nav__side {
+    gap: 0.5rem;
+    min-height: 64px;
+    padding: 0.65rem 0.75rem;
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(7, 10, 24, 0.55);
+  }
+  .planet-nav__side small { letter-spacing: 0.1em; }
+  .planet-nav__side b { font-size: 0.88rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1751,118 +1852,88 @@ button:focus-visible {
   white-space: nowrap;
 }
 
-/* --- Scroll-driven trajectory on world pages --- */
-.trajectory {
-  position: fixed;
-  top: 50%;
-  left: max(0.6rem, calc((100vw - 1080px) / 2 - 15.5rem));
-  z-index: 9; /* above the scene and aura, below the content layer (10) */
-  width: 13.5rem;
-  height: min(68vh, 620px);
-  transform: translateY(-50%);
-  pointer-events: none;
+/* --- "On this page" index on world pages ---
+   A column of short ticks in the left gutter. Only shown where the gutter can
+   hold it; on phones and narrow laptops the header progress bar is enough. */
+.entry-index {
+  display: none;
 }
-.trajectory__rail {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 3.4rem;
-}
-.trajectory__rail svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-.trajectory__base {
-  fill: none;
-  stroke: color-mix(in srgb, var(--planet, #8f7bff) 35%, transparent);
-  stroke-width: 1.5;
-  stroke-dasharray: 3 7;
-}
-.trajectory__glow {
-  fill: none;
-  stroke: url(#trajectory-glow);
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--planet, #8f7bff) 70%, transparent));
-}
-.trajectory__node {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  transform: translate(-0.4rem, -50%);
-}
-.trajectory__node i {
-  flex: none;
-  width: 0.8rem;
-  height: 0.8rem;
-  border: 2px solid color-mix(in srgb, var(--planet, #8f7bff) 55%, transparent);
-  border-radius: 999px;
-  background: #0b0d1f;
-  transition: background 260ms ease, border-color 260ms ease, box-shadow 260ms ease, transform 260ms ease;
-}
-.trajectory__node.is-lit i {
-  border-color: var(--planet-2, #f3c779);
-  background: var(--planet, #8f7bff);
-}
-.trajectory__node.is-active i {
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--planet, #8f7bff) 25%, transparent), 0 0 18px var(--planet, #8f7bff);
-  transform: scale(1.25);
-}
-.trajectory__label {
-  display: grid;
-  width: 10rem;
-  overflow: hidden;
-  color: rgba(232, 236, 255, 0.55);
-  font-size: 0.7rem;
-  line-height: 1.3;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
-  transition: color 260ms ease;
-}
-.trajectory__label small {
-  color: color-mix(in srgb, var(--planet-2, #f3c779) 70%, transparent);
-  font: 600 0.6rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
-  letter-spacing: 0.08em;
-}
-.trajectory__node.is-active .trajectory__label {
-  color: #fff;
-}
-.trajectory__marker {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 0.9rem;
-  height: 0.9rem;
-  margin: -0.45rem 0 0 -0.45rem;
-  border-radius: 999px;
-  background: radial-gradient(circle, #fff 0 30%, var(--planet-2, #f3c779) 45%, transparent 72%);
-  box-shadow: 0 0 16px var(--planet-2, #f3c779), 0 0 34px var(--planet, #8f7bff);
-  will-change: transform;
-}
-/* Not enough gutter for labels: a slim rail on the edge, dots only. */
-@media (max-width: 1599px) {
-  .trajectory {
-    left: 0.35rem;
-    width: 1.6rem;
-    height: min(56vh, 460px);
+@media (min-width: 1200px) {
+  .entry-index {
+    position: fixed;
+    top: 50%;
+    left: max(1.25rem, calc((100vw - 1080px) / 2 - 12.5rem));
+    z-index: 11;
+    display: block;
+    transform: translateY(-50%);
   }
-  .trajectory__rail { width: 1.6rem; }
-  .trajectory__label { display: none; }
-  .trajectory__node i { width: 0.6rem; height: 0.6rem; }
+  .entry-index ol {
+    display: grid;
+    gap: 0.1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .entry-index a {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    min-height: 24px;
+    color: inherit;
+    text-decoration: none;
+  }
+  .entry-index i {
+    flex: none;
+    width: 0.75rem;
+    height: 2px;
+    border-radius: 2px;
+    background: rgba(232, 236, 255, 0.28);
+    transition: width 240ms ease, background-color 240ms ease;
+  }
+  .entry-index span {
+    visibility: hidden;
+    max-width: 10.5rem;
+    overflow: hidden;
+    padding: 0.15rem 0.5rem;
+    border-radius: 0.4rem;
+    background: rgba(7, 10, 24, 0.82);
+    color: #e9ecff;
+    font-size: 0.72rem;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 200ms ease, visibility 0s linear 200ms;
+  }
+  .entry-index li.is-active i {
+    width: 1.75rem;
+    background: var(--planet, #8f7bff);
+  }
+  .entry-index a:hover i,
+  .entry-index a:focus-visible i {
+    background: var(--planet-2, #dfe8ff);
+  }
+  /* Hovering the column reveals every name: a jump list on demand. */
+  .entry-index:hover span,
+  .entry-index a:focus-visible span {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 200ms ease;
+  }
 }
-@media (max-width: 767px) {
-  .trajectory {
-    left: auto;
-    right: 0.2rem;
-    opacity: 0.85;
+/* Wide screens have room to keep the current entry named at all times. */
+@media (min-width: 1600px) {
+  .entry-index li.is-active span {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 200ms ease;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .trajectory__marker { display: none; }
+  .entry-index i,
+  .entry-index span { transition: none; }
+}
+@media (prefers-reduced-motion: reduce) {
   .story-back:hover,
   .story-back:focus-visible,
   .world-card:hover,

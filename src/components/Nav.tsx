@@ -3,14 +3,33 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
-import { useScrollProgress } from "@/lib/scroll";
+import { subscribeScroll } from "@/lib/scroll";
+
+/** Scroll offset (px) after which the header gets its solid band. */
+const BAND_AFTER = 8;
 
 export function Nav() {
   const { t, tl, lang, toggle } = useI18n();
-  const progress = useScrollProgress();
   const [menuOpen, setMenuOpen] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Progress bar and header band are written straight to the DOM from the
+  // shared scroll frame: no React render per scroll event, compositor-only
+  // transform for the bar, and the attribute only flips when it changes.
+  useEffect(() => {
+    let banded = false;
+    return subscribeScroll(({ progress, y }) => {
+      if (barRef.current) barRef.current.style.transform = `scaleX(${progress})`;
+      const next = y > BAND_AFTER;
+      if (next !== banded && navRef.current) {
+        banded = next;
+        navRef.current.toggleAttribute("data-scrolled", next);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -41,36 +60,13 @@ export function Nav() {
 
   return (
     <>
-      {/* barra de progreso del viaje */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          height: 3,
-          width: `${progress * 100}%`,
-          zIndex: 60,
-          background:
-            "linear-gradient(90deg, var(--space), var(--japan), var(--brain))",
-          transition: "width 0.1s linear",
-        }}
-        />
-        <nav
+      {/* Reading progress: one compositor-only transform, no layout. */}
+      <div ref={barRef} aria-hidden="true" className="site-progress" />
+      <nav
+        ref={navRef}
         aria-label={tl({ es: "Navegación principal", en: "Main navigation" })}
         className="content-layer site-nav"
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 50,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0.9rem 1.25rem",
-        }}
-        >
+      >
         <Link href="/" className="h-display" style={{ fontSize: "1.15rem", fontWeight: 600 }}>
           FP.
         </Link>
