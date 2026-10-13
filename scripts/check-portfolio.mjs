@@ -106,20 +106,34 @@ async function main() {
       }
       await page.waitForTimeout(1200);
       assert.equal(new URL(page.url()).hash, "#projects");
-      const selectors = page.locator("button[aria-controls='world-details']");
-      assert.equal(await selectors.count(), 4);
+      const pills = page.locator("#projects a.world-pill");
+      assert.equal(await pills.count(), 4);
       assert.equal(await page.locator("#world-details .chip").count(), 0, "No decorative project chips");
       const worldCard = page.locator("#world-details");
+      assert.equal(await worldCard.evaluate((el) => el.tagName), "A", "World card is a real link");
       for (let index = 0; index < 4; index++) {
-        await selectors.nth(index).click();
-        assert.equal(await selectors.nth(index).getAttribute("aria-pressed"), "true");
-        assert.equal(await worldCard.evaluate((el) => el.tagName), "A", "World card is a real link");
-        assert.equal(await worldCard.getAttribute("href"), routes[index + 1], "World card links to its world page");
+        assert.equal(await pills.nth(index).getAttribute("href"), routes[index + 1], "World pill links straight to its world page");
       }
-      assert.equal(await page.locator("#world-panel, .world-card__toggle, .world-card__close, [aria-expanded]#world-details").count(), 0, "No inline expansion");
-      assert.equal(await page.getByText("Explorar este mundo").count(), 0, "Old explore button is gone");
+      for (let index = 0; index < 4; index++) {
+        assert.equal(await worldCard.getAttribute("href"), routes[index + 1], "World card links to its world page");
+        await page.getByRole("button", { name: "Siguiente planeta" }).click();
+      }
+      assert.equal(await worldCard.getAttribute("href"), routes[1], "World slider wraps");
+      await page.getByRole("button", { name: "Planeta anterior" }).click();
+      assert.equal(await worldCard.getAttribute("href"), routes[4]);
+      assert.equal(await page.locator("#world-panel, .world-card__toggle, .world-card__close, #projects [aria-expanded]").count(), 0, "No inline expansion");
+      for (const gone of ["Abrir página completa", "Tocá la tarjeta para cerrar", "Tocá la tarjeta para ver este mundo", "más en la ruta completa", "Explorar este mundo"]) {
+        assert.equal(await page.locator("#projects").getByText(gone).count(), 0, `Worlds section never renders "${gone}"`);
+      }
+      assert.equal(await page.locator("#projects").getByText("Cerrar", { exact: true }).count(), 0, "Worlds section has no Close button");
+      // A pill goes straight to its world.
+      await pills.nth(1).click();
+      await page.waitForURL(`**${routes[2]}`);
+      await page.goBack();
+      await page.waitForURL((url) => new URL(url).pathname === "/");
       // Enter on the focused card goes straight to the world.
-      await selectors.first().click();
+      await page.locator("#projects").scrollIntoViewIfNeeded();
+      while ((await worldCard.getAttribute("href")) !== routes[1]) await page.getByRole("button", { name: "Siguiente planeta" }).click();
       await worldCard.focus();
       await page.keyboard.press("Enter");
       await page.waitForURL(`**${routes[1]}`);
@@ -130,10 +144,6 @@ async function main() {
       await page.reload();
       await page.waitForTimeout(400);
       assert.equal(await page.locator("[data-rocket-loader]").count(), 0, "Launch loader shows once per browser session");
-      await page.getByRole("button", { name: "Siguiente planeta" }).click();
-      assert.equal(await selectors.first().getAttribute("aria-pressed"), "true", "World selector wraps");
-      await page.getByRole("button", { name: "Planeta anterior" }).click();
-      assert.equal(await selectors.last().getAttribute("aria-pressed"), "true");
       const heading = page.locator("#contact h2");
       assert.equal(await heading.count(), 1, "Contact always has a semantic heading");
       if (fallback || options.isMobile) assert.equal(await heading.evaluate((el) => el.getBoundingClientRect().width > 100), true, "Contact has a visible DOM heading without the 3D title");

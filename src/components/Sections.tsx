@@ -255,18 +255,19 @@ export function Projects() {
           </Link>
         </Reveal>
 
-        {/* Selector interactivo de mundos directos */}
+        {/* Direct links to every world: one tap goes straight to its page. */}
         <Reveal delay={0.14}>
           <div style={{ display: "flex", gap: "0.45rem", flexWrap: "wrap", justifyContent: "center", maxWidth: 660, marginTop: "0.3rem" }}>
             {PROJECTS.map((proj, i) => (
-              <button
+              <Link
                 key={proj.slug}
-                onClick={() => go(i, i > idx ? 1 : -1)}
-                aria-pressed={i === idx}
-                aria-controls="world-details"
-                className="chip"
+                href={`/${proj.slug}`}
+                className="chip world-pill"
+                onMouseEnter={() => i !== idx && go(i, i > idx ? 1 : -1)}
+                onFocus={() => i !== idx && go(i, i > idx ? 1 : -1)}
                 style={{
                   cursor: "pointer",
+                  textDecoration: "none",
                   color: i === idx ? "#ffffff" : "var(--muted)",
                   borderColor: i === idx ? proj.planet.atmoA : "rgba(255,255,255,0.12)",
                   background: i === idx ? `color-mix(in srgb, ${proj.planet.atmoA} 25%, #0a0e1e)` : "#0a0e1e",
@@ -278,7 +279,7 @@ export function Projects() {
                 }}
               >
                 {proj.title ? tl(proj.title) : proj.name}
-              </button>
+              </Link>
             ))}
           </div>
         </Reveal>
