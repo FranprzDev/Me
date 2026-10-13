@@ -1759,3 +1759,7 @@ button:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+.mission__body .story-link + .story-link {
+  margin-left: 1.1rem;
+}

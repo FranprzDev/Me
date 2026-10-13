@@ -46,11 +46,14 @@ function StoryBack() {
 function ExternalLink({ href }: { href: string }) {
   const { tl } = useI18n();
   const isRepo = href.includes("github.com");
+  const isColosseum = href.includes("colosseum.com");
   return (
     <a className="story-link" href={href} target="_blank" rel="noreferrer">
       {isRepo
         ? tl({ es: "Abrir repositorio", en: "Open repository" })
-        : tl({ es: "Ver en vivo", en: "View live" })}{" "}↗
+        : isColosseum
+          ? tl({ es: "Ver en Colosseum", en: "View on Colosseum" })
+          : tl({ es: "Ver en vivo", en: "View live" })}{" "}↗
     </a>
   );
 }
@@ -326,7 +329,7 @@ function HackathonJourney({ project }: { project: Project }) {
         <header className="hud-title">
           <span>{tl({ es: "REGISTRO DE MISIONES", en: "MISSION LOG" })}</span>
           <h2 id="arena-missions-title">
-            {tl({ es: "Cada edición, un problema distinto", en: "Every edition, a different problem" })}
+            {tl({ es: "Voy a hackathones por amor al arte", en: "I go to hackathons for the love of it" })}
           </h2>
         </header>
         <ol className="mission-rail">
@@ -343,6 +346,7 @@ function HackathonJourney({ project }: { project: Project }) {
                 <h3>{item.name}</h3>
                 <p>{tl(item.description)}</p>
                 {item.link && <ExternalLink href={item.link} />}
+                {item.extraLinks?.map((href) => <ExternalLink key={href} href={href} />)}
               </div>
             </li>
           ))}
