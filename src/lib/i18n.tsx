@@ -19,7 +19,7 @@ const UI = {
   nav_projects: { es: "Proyectos", en: "Projects" },
   nav_contact: { es: "Contacto", en: "Contact" },
 
-  hero_cta_projects: { es: "Ver proyectos", en: "See projects" },
+  hero_cta_projects: { es: "Explorar mi trabajo", en: "Explore my work" },
   hero_cta_cv: { es: "Descargar CV", en: "Download Resume" },
 
   exp_title: { es: "Experiencia profesional", en: "Professional experience" },
@@ -29,10 +29,10 @@ const UI = {
   edu_certs: { es: "Certificaciones", en: "Certifications" },
   edu_highlights: { es: "Participaciones destacadas", en: "Highlights" },
 
-  proj_title: { es: "Proyectos que marcan mi experiencia", en: "Projects Experience" },
+  proj_title: { es: "Cuatro mundos. Trabajo real.", en: "Four worlds. Real work." },
   proj_instruction: {
-    es: "Cada tópico corresponde a un planeta, elegí el tópico que deseas visualizar.",
-    en: "Each topic corresponds to a planet; choose the world you wish to explore.",
+    es: "Hackathones, mentorías, productos y formación. Elegí un mundo y descubrí qué construí en él.",
+    en: "Hackathons, teaching, products and education. Choose a world and discover what I built there.",
   },
   proj_back: { es: "← Volver a la órbita", en: "← Back to orbit" },
   proj_explore: { es: "Explorar este mundo →", en: "Explore this world →" },
@@ -62,7 +62,12 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>("es");
 
   useEffect(() => {
-    const saved = window.localStorage.getItem("lang") as Lang | null;
+    let saved: string | null = null;
+    try {
+      saved = window.localStorage.getItem("lang");
+    } catch {
+      return;
+    }
     if (saved === "es" || saved === "en") {
       // Restaurar idioma guardado tras montar (no disponible en SSR).
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -76,7 +81,11 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const setLang = (l: Lang) => {
     setLangState(l);
-    window.localStorage.setItem("lang", l);
+    try {
+      window.localStorage.setItem("lang", l);
+    } catch {
+      // El idioma sigue funcionando cuando el navegador bloquea storage.
+    }
   };
 
   const value = useMemo<I18nCtx>(

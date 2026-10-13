@@ -66,7 +66,7 @@ export function ContactConstellations() {
     },
     {
       word: "LINKEDIN",
-      color: "#5b8cff",
+      color: "#a8c4ff",
       href: CV.linkedin,
       aria: "LinkedIn: in/franprzdev",
       external: true,
@@ -101,6 +101,9 @@ export function ContactConstellations() {
           {...(it.external ? { target: "_blank", rel: "noreferrer" } : {})}
         >
           <StarWord word={it.word} color={it.color} />
+          <span style={{ fontSize: "0.85rem", color: "var(--fg)", maxWidth: "100%", overflowWrap: "anywhere" }}>
+            {it.word === "EMAIL" ? CV.email : it.word === "LINKEDIN" ? "in/franprzdev" : lang === "es" ? "Mensaje directo ↗" : "Direct message ↗"}
+          </span>
         </a>
       ))}
 
@@ -111,13 +114,6 @@ export function ContactConstellations() {
           align-items: center;
           gap: 0.7rem;
           text-decoration: none;
-          opacity: 0.6;
-          transition: opacity 0.3s ease;
-        }
-        .cc-link:hover,
-        .cc-link:focus-visible {
-          opacity: 1;
-          outline: none;
         }
         .cc-link .cc-lines line {
           opacity: 0.35;

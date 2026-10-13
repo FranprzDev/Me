@@ -1,14 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import { useScrollProgress } from "@/lib/scroll";
 
 export function Nav() {
-  const { t, lang, toggle } = useI18n();
+  const { t, tl, lang, toggle } = useI18n();
   const progress = useScrollProgress();
   const [menuOpen, setMenuOpen] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    menuRef.current?.querySelector("a")?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setMenuOpen(false);
+      toggleRef.current?.focus();
+    };
+    const onPointer = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (!menuRef.current?.contains(target) && !toggleRef.current?.contains(target)) setMenuOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onPointer);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onPointer);
+    };
+  }, [menuOpen]);
 
   // Hrefs absolutos: el Nav vive en el layout (todas las rutas).
   const links: { href: string; key: Parameters<typeof t>[0] }[] = [
@@ -21,6 +43,7 @@ export function Nav() {
     <>
       {/* barra de progreso del viaje */}
       <div
+        aria-hidden="true"
         style={{
           position: "fixed",
           top: 0,
@@ -34,7 +57,8 @@ export function Nav() {
         }}
         />
         <nav
-        className="content-layer"
+        aria-label={tl({ es: "Navegación principal", en: "Main navigation" })}
+        className="content-layer site-nav"
         style={{
           position: "fixed",
           top: 0,
@@ -64,16 +88,18 @@ export function Nav() {
             onClick={toggle}
             className="chip"
             style={{ cursor: "pointer", color: "var(--fg)", background: "rgba(255,255,255,0.05)" }}
-            aria-label="Toggle language"
+            aria-label={tl({ es: "Cambiar a inglés", en: "Switch to Spanish" })}
           >
             {lang === "es" ? "ES · 🇦🇷" : "EN · 🇬🇧"}
           </button>
           <button
+            ref={toggleRef}
             onClick={() => setMenuOpen((v) => !v)}
             className="chip"
             style={{ cursor: "pointer", color: "var(--fg)" }}
-            aria-label="Menu"
+            aria-label={menuOpen ? tl({ es: "Cerrar menú", en: "Close menu" }) : tl({ es: "Abrir menú", en: "Open menu" })}
             aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
             data-mobile-toggle
           >
             {menuOpen ? "✕" : "☰"}
@@ -84,11 +110,13 @@ export function Nav() {
       {/* Menú móvil desplegable */}
       {menuOpen && (
         <div
+          id="mobile-menu"
+          ref={menuRef}
           className="glass content-layer"
           data-mobile-menu
           style={{
             position: "fixed",
-            top: "3.6rem",
+            top: "5rem",
             right: "1rem",
             left: "1rem",
             zIndex: 55,
