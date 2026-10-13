@@ -6,18 +6,8 @@ import { CV } from "@/data/cv";
 import { PROJECTS, type Project, type ProjectItem } from "@/data/projects";
 import { useI18n } from "@/lib/i18n";
 import gsap from "gsap";
+import { ScrollTrajectory, type TrajectoryNode } from "@/components/ScrollTrajectory";
 import { countUp, drawOnEnter, drawOnScroll, revealStagger, scrubNumber, useScrollScene } from "@/lib/scrollFX";
-
-/** Rango de años que cubren los sub-proyectos de un planeta. */
-function seasonOf(items: ProjectItem[]) {
-  const years = items
-    .map((item) => Number(item.year.slice(0, 4)))
-    .filter((year) => Number.isFinite(year));
-  if (!years.length) return "";
-  const from = Math.min(...years);
-  const to = Math.max(...years);
-  return from === to ? String(from) : `${from} — ${to}`;
-}
 
 function pad(value: number) {
   return String(value).padStart(2, "0");
@@ -32,15 +22,54 @@ export function ProjectPageContent({ slug }: { slug: string }) {
   const project = PROJECTS.find((x) => x.slug === slug);
   if (!project) notFound();
   if (slug === "hackathons") return <HackathonJourney project={project} />;
-  if (slug === "curso-n8n") return <MentorshipJourney project={project} />;
+  if (slug === "teaching") return <MentorshipJourney project={project} />;
   if (slug === "projects") return <ProjectAtlas project={project} />;
-  if (slug === "university") return <UniversityJourney project={project} />;
+  if (slug === "education") return <UniversityJourney project={project} />;
   return <DossierJourney project={project} />;
 }
 
+/** Event year of an item ("2025 – en curso" → 2025); undated items sort last. */
+function startYear(item: ProjectItem) {
+  const year = Number(item.year.slice(0, 4));
+  return Number.isFinite(year) ? year : Number.POSITIVE_INFINITY;
+}
+
+/** Oldest to newest by the year in the data; ties keep the data order. */
+function byYear(items: ProjectItem[]) {
+  return [...items].sort((a, b) => startYear(a) - startYear(b));
+}
+
+/** Stable DOM id for a trajectory node, derived from the entry name. */
+function nodeId(prefix: string, name: string) {
+  return `${prefix}-${name.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
+}
+
+function StackTags({ stack }: { stack?: string[] }) {
+  if (!stack?.length) return null;
+  return (
+    <ul className="stack-tags" aria-label="Stack">
+      {stack.map((tag) => (
+        <li key={tag}>{tag}</li>
+      ))}
+    </ul>
+  );
+}
+
+/** Way back to the home galaxy: a glass pill with a small rocket that nudges on hover. */
 function StoryBack() {
   const { t } = useI18n();
-  return <Link href="/#projects" className="story-back">{t("proj_back")}</Link>;
+  return (
+    <Link href="/#projects" className="story-back">
+      <span className="story-back__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+          <path d="M5 19c1.2-3.6 3.4-6.6 6.6-9.1L14 7.5c1.8-1.8 4.2-2.6 6-2.5.1 1.8-.7 4.2-2.5 6l-2.4 2.4C12.6 16.6 9.6 18.8 6 20Z" fill="currentColor" fillOpacity=".9" />
+          <circle cx="15.6" cy="8.4" r="1.6" fill="#0b1020" />
+          <path d="M4 20.5 7 17.5" stroke="#ffbf5c" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+      </span>
+      <span>{t("proj_back")}</span>
+    </Link>
+  );
 }
 
 function ExternalLink({ href }: { href: string }) {
@@ -123,12 +152,12 @@ function HackathonJourney({ project }: { project: Project }) {
   const { tl } = useI18n();
   const items = project.items ?? [];
   const winner = items.find((item) => item.highlight);
-  const missions = items.filter((item) => item !== winner);
-  const wins = items.filter((item) => item.highlight).length;
-  const season = seasonOf(items);
-  const [seasonFrom, seasonTo] = season.includes("—")
-    ? season.split("—").map((v) => Number(v.trim()))
-    : [Number(season), Number(season)];
+  // Oldest to newest, by the event year in the data (ties keep data order).
+  const missions = byYear(items.filter((item) => item !== winner));
+  const trajectory: TrajectoryNode[] = [
+    ...(winner ? [{ id: "arena-trophy", label: winner.name, meta: winner.year }] : []),
+    ...missions.map((item) => ({ id: nodeId("mission", item.name), label: item.name, meta: item.year })),
+  ];
 
   const ref = useScrollScene((root) => {
     const q = <T extends Element>(sel: string) => root.querySelector<T>(sel);
@@ -173,17 +202,6 @@ function HackathonJourney({ project }: { project: Project }) {
       end: "bottom 30%",
       format: clock,
     });
-
-    // Stats: contadores al entrar.
-    const stats = q(".hud-stats");
-    if (stats) {
-      countUp(q(".hud-stats dd:nth-child(1)"), items.length, { trigger: stats, pad: 2 });
-      countUp(q(".hud-stats dd:nth-child(2)"), seasonTo, {
-        trigger: stats,
-        format: (v) => `${seasonFrom} — ${Math.round(v)}`,
-      });
-      countUp(q(".hud-stats dd:nth-child(3)"), wins, { trigger: stats, pad: 2 });
-    }
 
     // Trofeo: entra de lado, como una placa que se descuenta.
     const trophy = q(".arena-trophy");
@@ -247,17 +265,7 @@ function HackathonJourney({ project }: { project: Project }) {
 
       <header className="arena-hero">
         <div className="arena-hero__copy">
-          <p className="hud-kicker">
-            {tl({ es: "HACKATHONS · TRABAJO EN EQUIPO · TUCUMÁN", en: "HACKATHONS · TEAMWORK · TUCUMÁN" })}
-          </p>
           <h1>{tl({ es: "Ideas contra el reloj.", en: "Ideas against the clock." })}</h1>
-          <p className="arena-hero__lede">{tl(project.tagline)}</p>
-          <p className="arena-hero__body">{tl(project.description)}</p>
-          <dl className="hud-stats">
-            <div><dd>{pad(items.length)}</dd><dt>{tl({ es: "Misiones", en: "Missions" })}</dt></div>
-            <div><dd>{seasonOf(items)}</dd><dt>{tl({ es: "Temporada", en: "Season" })}</dt></div>
-            <div><dd>{pad(wins)}</dd><dt>{tl({ es: "Victoria nacional", en: "National win" })}</dt></div>
-          </dl>
         </div>
 
         <div className="arena-radar">
@@ -296,7 +304,7 @@ function HackathonJourney({ project }: { project: Project }) {
       </header>
 
       {winner && (
-        <section className="arena-trophy" aria-labelledby="arena-trophy-title">
+        <section className="arena-trophy" id="arena-trophy" aria-labelledby="arena-trophy-title">
           <div className="arena-trophy__badge" aria-hidden="true">
             <svg viewBox="0 0 132 132" fill="none">
               <circle cx="66" cy="66" r="62" stroke="currentColor" strokeOpacity=".3" strokeDasharray="2 6" />
@@ -334,7 +342,7 @@ function HackathonJourney({ project }: { project: Project }) {
         </header>
         <ol className="mission-rail">
           {missions.map((item, i) => (
-            <li className="mission" key={item.name}>
+            <li className="mission" id={nodeId("mission", item.name)} key={item.name}>
               <span className="mission__node" aria-hidden="true">
                 <i />
                 {pad(i + 1)}
@@ -355,15 +363,16 @@ function HackathonJourney({ project }: { project: Project }) {
 
       <footer className="arena-outro">
         <span aria-hidden="true">▲</span>
-        {tl({ es: "Sin ideas cerradas: siempre hay una misión en curso.", en: "No finished ideas: a mission is always running." })}
+        {tl({ es: "Si hay comida gratis, llámame.", en: "If there's free food, call me." })}
       </footer>
 
       <PlanetNav slug="hackathons" />
+      <ScrollTrajectory nodes={trajectory} />
     </article>
   );
 }
 
-/* ─────────────────────────────  /curso-n8n  ───────────────────────────── */
+/* ─────────────────────────────  /teaching  ───────────────────────────── */
 
 const COURSE_TOPICS = ["n8n", "APIs & Webhooks", "RAG", "Human-in-the-Loop"];
 const DIAL_RADIUS = 54;
@@ -380,7 +389,12 @@ const DIAL_CIRCUMFERENCE = 2 * Math.PI * DIAL_RADIUS;
 function MentorshipJourney({ project }: { project: Project }) {
   const { tl } = useI18n();
   const course = project.items?.find((item) => item.category?.es === "Curso destacado");
-  const materials = project.items?.filter((item) => item.category?.es === "Materiales del curso") ?? [];
+  const materials = byYear(project.items?.filter((item) => item.category?.es === "Materiales del curso") ?? []);
+  const demos = byYear(project.items?.filter((item) => item.category?.es === "Demos técnicas") ?? []);
+  const trajectory: TrajectoryNode[] = [
+    ...(course ? [{ id: "aula-course", label: course.name, meta: course.year }] : []),
+    ...[...materials, ...demos].map((item) => ({ id: nodeId("aula", item.name), label: item.name, meta: item.year })),
+  ];
 
   const ref = useScrollScene((root) => {
     const q = <T extends Element>(sel: string) => root.querySelector<T>(sel);
@@ -435,9 +449,11 @@ function MentorshipJourney({ project }: { project: Project }) {
     }
 
     // Biblioteca: los libros se deslizan como se sacan del estante.
-    revealStagger(".aula-book", { trigger: q(".aula-shelf")!, x: 24, y: 0, stagger: 0.12 });
+    root.querySelectorAll(".aula-shelf").forEach((shelf) => {
+      revealStagger(shelf.querySelectorAll(".aula-book"), { trigger: shelf, x: 24, y: 0, stagger: 0.12 });
+    });
 
-    revealStagger(".aula-outro, .planet-nav__side, .planet-nav__orbit", {
+    revealStagger(".planet-nav__side, .planet-nav__orbit", {
       trigger: q(".planet-nav")!,
       y: 18,
       stagger: 0.08,
@@ -457,12 +473,7 @@ function MentorshipJourney({ project }: { project: Project }) {
 
       <header className="aula-hero">
         <div className="aula-hero__copy">
-          <p className="aula-kicker">
-            {tl({ es: "ENSEÑAR · ACOMPAÑAR · COMPARTIR", en: "TEACH · GUIDE · SHARE" })}
-          </p>
-          <h1>{tl({ es: "Mentorías", en: "Teaching & Mentorship" })}</h1>
-          <p className="aula-hero__lede">{tl(project.tagline)}</p>
-          <p className="aula-hero__body">{tl(project.description)}</p>
+          <h1>{tl({ es: "Cursos dictados", en: "Courses taught" })}</h1>
           <dl className="aula-facts">
             <div><dt>{tl({ es: "Encuentros", en: "Sessions" })}</dt><dd>10</dd></div>
             <div><dt>{tl({ es: "Horas de clase", en: "Class hours" })}</dt><dd>20</dd></div>
@@ -500,7 +511,7 @@ function MentorshipJourney({ project }: { project: Project }) {
       </header>
 
       {course && (
-        <section className="aula-course" aria-labelledby="aula-course-title">
+        <section className="aula-course" id="aula-course" aria-labelledby="aula-course-title">
           <header className="aula-course__label">
             <span>{tl({ es: "PROGRAMA · CURSO DESTACADO", en: "SYLLABUS · FEATURED COURSE" })}</span>
             <span>{course.year}</span>
@@ -533,7 +544,7 @@ function MentorshipJourney({ project }: { project: Project }) {
         </header>
         <ul className="aula-shelf">
           {materials.map((item, i) => (
-            <li className="aula-book" key={item.name}>
+            <li className="aula-book" id={nodeId("aula", item.name)} key={item.name}>
               <span className="aula-book__index">{pad(i + 1)}</span>
               <div className="aula-book__copy">
                 <h3>{item.name}</h3>
@@ -545,12 +556,30 @@ function MentorshipJourney({ project }: { project: Project }) {
         </ul>
       </section>
 
-      <footer className="aula-outro">
-        <span aria-hidden="true">✦</span>
-        {tl({ es: "El aula sigue abierta para quien quiera aprender.", en: "The classroom stays open for anyone who wants to learn." })}
-      </footer>
+      {demos.length > 0 && (
+        <section className="aula-library" aria-labelledby="aula-demos-title">
+          <header className="aula-heading">
+            <span>{tl({ es: "DEMOS", en: "DEMOS" })}</span>
+            <h2 id="aula-demos-title">{tl({ es: "Demos técnicas", en: "Technical demos" })}</h2>
+          </header>
+          <ul className="aula-shelf">
+            {demos.map((item, i) => (
+              <li className="aula-book" id={nodeId("aula", item.name)} key={item.name}>
+                <span className="aula-book__index">{pad(i + 1)}</span>
+                <div className="aula-book__copy">
+                  <h3>{item.name}</h3>
+                  <p>{tl(item.description)}</p>
+                  <StackTags stack={item.stack} />
+                </div>
+                {item.link && <ExternalLink href={item.link} />}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
-      <PlanetNav slug="curso-n8n" />
+      <PlanetNav slug="teaching" />
+      <ScrollTrajectory nodes={trajectory} />
     </article>
   );
 }
@@ -567,9 +596,13 @@ function MentorshipJourney({ project }: { project: Project }) {
  */
 function ProjectAtlas({ project }: { project: Project }) {
   const { tl } = useI18n();
-  const items = project.items ?? [];
-  const categories = [...new Set(items.map((item) => item.category?.es ?? "Otros"))];
-  const highlights = items.filter((item) => item.highlight).length;
+  // One flat catalogue, oldest to newest: one line per project plus its tags.
+  const items = byYear(project.items ?? []);
+  const trajectory: TrajectoryNode[] = items.map((item) => ({
+    id: nodeId("atlas", item.name),
+    label: item.name,
+    meta: item.year,
+  }));
 
   const ref = useScrollScene((root) => {
     const q = <T extends Element>(sel: string) => root.querySelector<T>(sel);
@@ -587,43 +620,17 @@ function ProjectAtlas({ project }: { project: Project }) {
       duration: 1,
       stagger: 0.14,
     });
-    const blueprint = q(".atlas-blueprint");
-    if (blueprint) {
-      gsap.from(blueprint.querySelectorAll("g[fill] circle"), {
-        opacity: 0,
-        scale: 0,
-        transformOrigin: "center",
-        duration: 0.55,
-        stagger: 0.13,
-        ease: "back.out(2.2)",
-        scrollTrigger: { trigger: blueprint, start: "top 78%", once: true },
-      });
-    }
 
-    // Ficha técnica: cada celda cuenta su valor.
-    const specs = q(".atlas-specs");
-    if (specs) {
-      countUp(q(".atlas-specs div:nth-child(1) dd"), items.length, { trigger: specs, pad: 2 });
-      countUp(q(".atlas-specs div:nth-child(2) dd"), categories.length, { trigger: specs, pad: 2 });
-      countUp(q(".atlas-specs div:nth-child(4) dd"), highlights, { trigger: specs, pad: 2 });
-      revealStagger(".atlas-specs div", { trigger: specs, y: 14, stagger: 0.06, start: "top 92%" });
-    }
-
-    // Catálogo: cada categoría entra como un bloque y sus filas en cascada.
-    root.querySelectorAll(".atlas-category").forEach((category) => {
-      revealStagger(".atlas-category__head > *", { trigger: category, y: 14, stagger: 0.07 });
-      revealStagger(".atlas-row", { trigger: category, x: 22, y: 0, stagger: 0.08 });
-      // La fila se ilumina de izquierda a derecha al enfocar/hover.
-      category.querySelectorAll(".atlas-row").forEach((row) => {
-        gsap.fromTo(
-          row,
-          { "--row-wipe": "0%" },
-          { "--row-wipe": "100%", ease: "none", scrollTrigger: { trigger: row, start: "top 92%", end: "top 55%", scrub: 0.8 } }
-        );
-      });
+    revealStagger(".atlas-row", { trigger: q(".atlas-rows")!, x: 22, y: 0, stagger: 0.08 });
+    root.querySelectorAll(".atlas-row").forEach((row) => {
+      gsap.fromTo(
+        row,
+        { "--row-wipe": "0%" },
+        { "--row-wipe": "100%", ease: "none", scrollTrigger: { trigger: row, start: "top 92%", end: "top 55%", scrub: 0.8 } }
+      );
     });
 
-    revealStagger(".atlas-outro > *, .planet-nav__side, .planet-nav__orbit", {
+    revealStagger(".planet-nav__side, .planet-nav__orbit", {
       trigger: q(".planet-nav")!,
       y: 16,
       stagger: 0.06,
@@ -647,8 +654,6 @@ function ProjectAtlas({ project }: { project: Project }) {
             {tl({ es: "LABORATORIO PERSONAL · HERRAMIENTAS SELECCIONADAS", en: "PERSONAL LAB · SELECTED TOOLS" })}
           </p>
           <h1>{tl({ es: "Construyo para resolver cosas reales.", en: "I build to solve real things." })}</h1>
-          <p className="atlas-hero__lede">{tl(project.tagline)}</p>
-          <p className="atlas-hero__body">{tl(project.description)}</p>
           {project.link && <ExternalLink href={project.link} />}
         </div>
 
@@ -678,56 +683,38 @@ function ProjectAtlas({ project }: { project: Project }) {
         </figure>
       </header>
 
-      <dl className="atlas-specs">
-        <div><dt>{tl({ es: "Herramientas", en: "Tools" })}</dt><dd>{pad(items.length)}</dd></div>
-        <div><dt>{tl({ es: "Categorías", en: "Categories" })}</dt><dd>{pad(categories.length)}</dd></div>
-        <div><dt>{tl({ es: "Periodo", en: "Period" })}</dt><dd>{project.year}</dd></div>
-        <div><dt>{tl({ es: "Destacados", en: "Highlights" })}</dt><dd>{pad(highlights)}</dd></div>
-      </dl>
-
-      <div className="atlas-catalog">
-        {categories.map((category, index) => {
-          const group = items.filter((item) => (item.category?.es ?? "Otros") === category);
-          const label = group[0].category ?? { es: category, en: category };
-          return (
-            <section className="atlas-category" key={category} aria-labelledby={`atlas-category-${index}`}>
-              <header className="atlas-category__head">
-                <span>{pad(index + 1)}</span>
-                <h2 id={`atlas-category-${index}`}>{tl(label)}</h2>
-                <i>{tl({ es: `${group.length} ${group.length === 1 ? "proyecto" : "proyectos"}`, en: `${group.length} ${group.length === 1 ? "project" : "projects"}` })}</i>
-              </header>
-              <ul className="atlas-rows">
-                {group.map((item) => (
-                  <li className="atlas-row" key={item.name}>
-                    <div className="atlas-row__main">
-                      <h3>{item.name}</h3>
-                      <p>{tl(item.description)}</p>
-                    </div>
-                    <div className="atlas-row__aside">
-                      <span className="atlas-row__year">{item.year}</span>
-                      {item.highlight && <span className="atlas-row__flag">★ {tl(item.highlight)}</span>}
-                      {item.link && <ExternalLink href={item.link} />}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          );
-        })}
-      </div>
-
-      <footer className="atlas-outro">
-        <span>{tl({ es: "STACK", en: "STACK" })}</span>
-        <p className="stack-note">{project.stack.join(" · ")}</p>
-        {project.link && <ExternalLink href={project.link} />}
-      </footer>
+      <section className="atlas-catalog" aria-labelledby="atlas-catalog-title">
+        <h2 id="atlas-catalog-title" className="sr-only">
+          {tl({ es: "Proyectos", en: "Projects" })}
+        </h2>
+        <ul className="atlas-rows">
+          {items.map((item) => (
+            <li className="atlas-row" id={nodeId("atlas", item.name)} key={item.name}>
+              <div className="atlas-row__main">
+                <h3>{item.name}</h3>
+                <p>{tl(item.pitch ?? item.description)}</p>
+                <StackTags stack={item.stack} />
+              </div>
+              <div className="atlas-row__aside">
+                <span className="atlas-row__year">
+                  {item.year}
+                  {item.category ? ` · ${tl(item.category)}` : ""}
+                </span>
+                {item.highlight && <span className="atlas-row__flag">★ {tl(item.highlight)}</span>}
+                {item.link && <ExternalLink href={item.link} />}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <PlanetNav slug="projects" />
+      <ScrollTrajectory nodes={trajectory} />
     </article>
   );
 }
 
-/* ─────────────────────────────  /university  ───────────────────────────── */
+/* ─────────────────────────────  /education  ───────────────────────────── */
 
 /** Bitácora de exploración: la carrera, las certificaciones y los proyectos.
  *
@@ -735,9 +722,20 @@ function ProjectAtlas({ project }: { project: Project }) {
  * encienden en orden cronológico y los certificados caen en cascada.
  */
 function UniversityJourney({ project }: { project: Project }) {
-  const { t, tl } = useI18n();
+  const { tl } = useI18n();
   const degree = CV.education[0];
-  const academicProjects = project.items?.filter((item) => item.category?.es === "Proyectos Académicos UTN-FRT") ?? [];
+  const academicProjects = byYear(project.items?.filter((item) => item.category?.es === "Proyectos Académicos UTN-FRT") ?? []);
+  // Follows the page: the degree, then each certification and each academic
+  // project, each group oldest to newest as listed in the data.
+  const trajectory: TrajectoryNode[] = [
+    { id: "education-degree", label: tl(degree.degree), meta: tl(degree.period) },
+    ...CV.certifications.map((certification) => ({
+      id: nodeId("cert", certification.name.es),
+      label: tl(certification.name),
+      meta: tl(certification.period),
+    })),
+    ...academicProjects.map((item) => ({ id: nodeId("edu", item.name), label: item.name, meta: item.year })),
+  ];
 
   const ref = useScrollScene((root) => {
     const q = <T extends Element>(sel: string) => root.querySelector<T>(sel);
@@ -801,7 +799,7 @@ function UniversityJourney({ project }: { project: Project }) {
     revealStagger(".edu-certificate", { trigger: q(".edu-certificates")!, y: 22, stagger: 0.07 });
     revealStagger(".edu-project", { trigger: q(".edu-projects")!, y: 20, stagger: 0.07 });
 
-    revealStagger(".edu-outro, .planet-nav__side, .planet-nav__orbit", {
+    revealStagger(".planet-nav__side, .planet-nav__orbit", {
       trigger: q(".planet-nav")!,
       y: 16,
       stagger: 0.08,
@@ -811,17 +809,15 @@ function UniversityJourney({ project }: { project: Project }) {
 
   return (
     <article ref={ref} className="edu-page" style={{ "--planet": project.planet.atmoA } as React.CSSProperties}>
-      <Link href="/#projects" className="edu-back">{t("proj_back")}</Link>
+      <StoryBack />
 
       <header className="edu-hero">
         <div className="edu-hero__copy">
-          <p className="edu-kicker">{tl({ es: "BITÁCORA DE EXPLORACIÓN · TUCUMÁN", en: "EXPLORER'S LOG · TUCUMÁN" })}</p>
-          <h1>{tl({ es: "El camino hacia un nuevo mundo", en: "The path to a new world" })}</h1>
+          <h1>Always Exploring</h1>
           <p className="edu-hero__intro">{tl({
             es: "Estudio Ingeniería en Sistemas en la UTN-FRT. Cada materia, curso y desafío me acerca a una forma nueva de resolver problemas.",
             en: "I study Information Systems Engineering at UTN-FRT. Every class, course and challenge brings a new way to solve problems.",
           })}</p>
-          <span className="edu-hero__coordinates">26°49′S&nbsp; 65°12′W <i /> {tl({ es: "RUTA ACTIVA", en: "ACTIVE ROUTE" })}</span>
         </div>
 
         <div className="edu-orbit" aria-hidden="true">
@@ -886,7 +882,7 @@ function UniversityJourney({ project }: { project: Project }) {
         </div>
         <div className="edu-certificates">
           {CV.certifications.map((certification, index) => (
-            <article className="edu-certificate" key={certification.name.es}>
+            <article className="edu-certificate" id={nodeId("cert", certification.name.es)} key={certification.name.es}>
               <span className="edu-certificate__index">0{index + 1}</span>
               <div>
                 <span className="edu-certificate__period">{tl(certification.period)}</span>
@@ -908,7 +904,7 @@ function UniversityJourney({ project }: { project: Project }) {
           </div>
           <div className="edu-projects">
             {academicProjects.map((item) => (
-              <article className="edu-project" key={item.name}>
+              <article className="edu-project" id={nodeId("edu", item.name)} key={item.name}>
                 <span>{item.year} · UTN-FRT</span>
                 <h3>{item.name}</h3>
                 <p>{tl(item.description)}</p>
@@ -919,9 +915,8 @@ function UniversityJourney({ project }: { project: Project }) {
         </section>
       )}
 
-      <footer className="edu-outro"><span>✦</span>{tl({ es: "La exploración sigue.", en: "The exploration continues." })}</footer>
-
-      <PlanetNav slug="university" />
+      <PlanetNav slug="education" />
+      <ScrollTrajectory nodes={trajectory} />
     </article>
   );
 }
