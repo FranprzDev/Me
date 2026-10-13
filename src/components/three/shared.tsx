@@ -9,6 +9,27 @@ import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { getScrollProgress } from "@/lib/scroll";
 
+/**
+ * Shared orbital clock for every planet, moon and camera orbit. It advances by
+ * frame delta (frame-rate independent) from one <OrbitClock /> inside the
+ * persistent canvas and lives at module level, so orbits carry on where they
+ * were across route changes instead of restarting. Reduced motion slows it
+ * way down rather than freezing it.
+ */
+let orbitSeconds = 0;
+export const REDUCED_ORBIT_RATE = 0.15;
+
+export function orbitTime(): number {
+  return orbitSeconds;
+}
+
+export function OrbitClock({ reduced }: { reduced: boolean }) {
+  useFrame((_, dt) => {
+    orbitSeconds += Math.min(dt, 0.1) * (reduced ? REDUCED_ORBIT_RATE : 1);
+  });
+  return null;
+}
+
 /** Suavizado exponencial independiente del framerate: `speed` mayor = más pegado. */
 export function dampingFactor(dt: number, speed: number) {
   return 1 - Math.exp(-dt * speed);

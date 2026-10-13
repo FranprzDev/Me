@@ -9,62 +9,84 @@ import { PROJECTS } from "@/data/projects";
 import { CursorTrail } from "@/components/CursorTrail";
 import { WarpTransition } from "@/components/WarpTransition";
 import { RocketLoader } from "@/components/RocketLoader";
+import { expireLaunchLoader } from "@/lib/launchLoader";
+import type { BackdropView } from "@/components/three/Backdrop";
 
-// Las escenas 3D son client-only (WebGPU); se cargan sin SSR. El cosmos vive en
-// el layout para que la navegación sea consistente en todas las rutas.
-const Scene = dynamic(() => import("@/components/three/Scene"), { ssr: false });
-const PlanetScene = dynamic(() => import("@/components/three/PlanetScene"), { ssr: false });
+// One client-only chunk holds the whole 3D layer (home cosmos + every world),
+// so after the first load no route change fetches or initialises it again.
+const loadBackdrop = () => import("@/components/three/Backdrop");
+const Backdrop = dynamic(loadBackdrop, { ssr: false });
+
+function viewFor(pathname: string | null): BackdropView {
+  if (pathname === "/") return { kind: "home" };
+  // Each world has its own scene, only for real projects: a 404 or /me gets none.
+  const slug = pathname?.replace(/^\/|\/$/g, "") ?? "";
+  return PROJECTS.some((p) => p.slug === slug) ? { kind: "world", slug } : { kind: "none" };
+}
 
 export function SiteChrome() {
   const pathname = usePathname();
   const { tl } = useI18n();
   const [sceneReady, setSceneReady] = useState(false);
-  const onHome = pathname === "/";
-  // Cada planeta tiene su propia escena, así que la ruta decide cuál se monta.
-  // Sólo para proyectos reales: un 404 no merece un canvas.
-  const slug = onHome ? null : pathname.replace(/^\/|\/$/g, "");
-  const worldSlug = slug && PROJECTS.some((p) => p.slug === slug) ? slug : null;
+  const view = viewFor(pathname);
+  const onSceneRoute = view.kind !== "none";
+  const onMe = pathname?.startsWith("/me") ?? false;
+  // The backdrop is created the first time a scene route is shown (never for a
+  // visit that stays on /me) and then kept for the rest of the visit.
+  const [visitedScene, setVisitedScene] = useState(onSceneRoute);
+  if (onSceneRoute && !visitedScene) setVisitedScene(true);
 
-  // La escena 3D es lo más costoso del sitio. La diferimos para dejar que la
-  // UI textual pinte primero. Arranca una sola vez: navegar entre mundos después
-  // no vuelve a esperar, sólo cambia la escena montada.
+  // The launch loader belongs to the very first load only. When the visit
+  // starts on a route without a scene, it is spent right away so it never
+  // shows up later on a client-side navigation.
+  useEffect(() => {
+    if (!onSceneRoute) expireLaunchLoader();
+    // Only the route the visit started on matters.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // The 3D layer is the heaviest thing on the site: let the text UI paint
+  // first, start the chunk download on idle, then mount it once. It is never
+  // unmounted afterwards, so navigating home <-> worlds reuses the same
+  // renderer and canvas.
   useEffect(() => {
     let timer: number | undefined;
     let idleId: number | undefined;
     const start = () => {
+      if (onSceneRoute) void loadBackdrop();
       timer = window.setTimeout(() => setSceneReady(true), 450);
     };
-
-    // Dejamos que la UI textual y el primer frame tengan prioridad. En
-    // navegadores compatibles usamos idle callback para no competir con el
-    // render inicial; el timeout garantiza que nunca quede esperando.
     if ("requestIdleCallback" in window) {
       idleId = window.requestIdleCallback(start, { timeout: 900 });
     } else {
       start();
     }
-
     return () => {
       if (idleId !== undefined) window.cancelIdleCallback(idleId);
       if (timer !== undefined) window.clearTimeout(timer);
     };
+    // Scheduled once for the visit; later routes reuse the mounted backdrop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // /me is a standalone editorial page with its own header.
-  if (pathname?.startsWith("/me")) return null;
 
   return (
     <>
-      <a href="#main-content" className="skip-link">
-        {tl({ es: "Saltar al contenido", en: "Skip to content" })}
-      </a>
-      {sceneReady && onHome ? <Scene /> : null}
-      {sceneReady && worldSlug ? <PlanetScene slug={worldSlug} /> : null}
-      {/* Launch loader: covers the canvas until its first real frame, then bursts. */}
-      {onHome || worldSlug ? <RocketLoader /> : null}
-      <Nav />
-      <CursorTrail />
-      <WarpTransition />
+      {/* Mounted for every route (paused and hidden where there is no scene),
+          so the WebGPU renderer survives a detour through /me or a 404. */}
+      {sceneReady && visitedScene ? <Backdrop view={view} /> : null}
+      {/* /me is a standalone editorial page with its own header. */}
+      {onMe ? null : (
+        <>
+          <a href="#main-content" className="skip-link">
+            {tl({ es: "Saltar al contenido", en: "Skip to content" })}
+          </a>
+          {/* Launch loader: first load only, covers the canvas until its first real frame. */}
+          {onSceneRoute ? <RocketLoader /> : null}
+          <Nav />
+          <CursorTrail />
+          <WarpTransition />
+        </>
+      )}
     </>
   );
 }

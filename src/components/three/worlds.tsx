@@ -193,7 +193,7 @@ export function ArenaWorld({ inside, velocity, reduced, performanceMode }: World
 }
 
 /**
- * AULA / curso-n8n — el programa como anillo.
+ * AULA / teaching — el programa como anillo.
  *
  * Diez segmentos (uno por módulo) en un anillo inclinado. Cada segmento se
  * enciende cuando el scroll alcanza su módulo, así el objeto 3D y el temario
@@ -383,7 +383,7 @@ export function AtlasWorld({ inside, reduced }: WorldProps) {
 }
 
 /**
- * EXPEDICIÓN / university — bitácora orbital.
+ * EXPEDICIÓN / education — bitácora orbital.
  *
  * Un planeta con su ruta y cuatro waypoints, y un VIAJANTE que recorre el anillo
  * conforme bajás. Acá la escena no acompaña: sos el punto que avanza por la

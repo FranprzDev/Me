@@ -9,28 +9,14 @@
 // Debe ir ANTES de @react-three/fiber: parchea console.warn para silenciar el
 // warning de THREE.Clock deprecado que R3F dispara al crear su clock interno.
 import "@/lib/silenceR3FClockWarning";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { WebGPURenderer } from "three/webgpu";
-import { Component, useMemo, useRef, useState, useEffect, type ReactNode, type RefObject } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
+import { useMemo, useRef, useEffect, type RefObject } from "react";
 import * as THREE from "three";
-import { SceneStatus, setSceneStatus } from "@/lib/sceneStatus";
-import { FirstFrameSignal } from "./FirstFrameSignal";
 import { getScrollProgress, measuredSectionCenter, bumpWeight } from "@/lib/scroll";
 import { getConstellations, type Constellation } from "@/data/constellations";
 import { useI18n } from "@/lib/i18n";
 import { Nebula, Planet, ProjectPlanets } from "./Cosmos";
-import {
-  StarShell,
-  WarpField,
-  dampingFactor,
-  isConstrainedDevice,
-  smoother,
-  useReducedMotion,
-} from "./shared";
-
-// Fondo de respaldo: clear-color del WebGL y fallback CSS. Siempre oscuro para
-// que NUNCA aparezca un flash blanco (p.ej. al redimensionar).
-const FALLBACK_BG = "#050817";
+import { StarShell, WarpField, dampingFactor, smoother } from "./shared";
 
 // Familia de color del nebulón: todo dentro del "espacio" (índigos/violetas
 // oscuros). No son mundos distintos, sólo un leve cambio de humor por profundidad.
@@ -38,22 +24,6 @@ const C_BG_A = new THREE.Color("#050817"); // despegue
 const C_BG_B = new THREE.Color("#0a0a22"); // medio (matiz violeta)
 const C_BG_C = new THREE.Color("#070b1d"); // fondo profundo
 const tmpColor = new THREE.Color();
-
-class RendererFallback extends Component<{ children: ReactNode; fallback: ReactNode }, { failed: boolean }> {
-  state = { failed: false };
-
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-
-  componentDidCatch() {
-    setSceneStatus(SceneStatus.Failed);
-  }
-
-  render() {
-    return this.state.failed ? this.props.fallback : this.props.children;
-  }
-}
 
 /**
  * Constelación que se ENSAMBLA con partículas: miles de chispas dispersas vuelan
@@ -346,8 +316,8 @@ function Rig({
       <ambientLight intensity={0.5} />
 
       <Nebula pRef={pRef} reduced={reduced} performanceMode={performanceMode} />
-      {!performanceMode && <Planet reduced={reduced} pRef={pRef} />}
-      <ProjectPlanets reduced={reduced} pRef={pRef} />
+      {!performanceMode && <Planet pRef={pRef} />}
+      <ProjectPlanets pRef={pRef} />
 
       <StarShell count={starCount} reduced={reduced} spin={0.006} opacity={0.85} />
 
@@ -369,105 +339,32 @@ function Rig({
   );
 }
 
-export default function Scene({ minimal = false }: { minimal?: boolean }) {
-  const reduced = useReducedMotion();
-  const [performanceMode, setPerformanceMode] = useState(() => isConstrainedDevice(reduced));
-  const [dpr, setDpr] = useState<[number, number]>(() => (isConstrainedDevice(reduced) ? [1, 1] : [1, 1.5]));
-  // Pausamos el loop cuando la pestaña queda oculta: no tiene sentido animar
-  // estrellas que nadie ve (ahorra GPU/CPU y batería en segundo plano).
-  const [frameloop, setFrameloop] = useState<"always" | "never">("always");
-  const [webgpuReady, setWebgpuReady] = useState(false);
-
+/**
+ * Home cosmos contents, rendered inside the persistent backdrop canvas. On
+ * mount it re-frames the shared camera (a world page may have moved it), so
+ * returning home never sweeps across the scene.
+ */
+export function CosmosContents({
+  reduced,
+  minimal,
+  performanceMode,
+}: {
+  reduced: boolean;
+  minimal: boolean;
+  performanceMode: boolean;
+}) {
+  const camera = useThree((state) => state.camera) as THREE.PerspectiveCamera;
+  const gl = useThree((state) => state.gl);
   useEffect(() => {
-    const onVis = () =>
-      setFrameloop(document.visibilityState === "hidden" ? "never" : "always");
-    document.addEventListener("visibilitychange", onVis);
-    return () => document.removeEventListener("visibilitychange", onVis);
-  }, []);
-
-  useEffect(() => {
-    // Los móviles, conexiones con ahorro de datos y equipos con pocos núcleos
-    // conservan el fondo 3D, pero usan un perfil más barato de renderizado.
-    const connection = (navigator as Navigator & {
-      connection?: { saveData?: boolean };
-    }).connection;
-    const lowPowerDevice =
-      (navigator.hardwareConcurrency > 0 && navigator.hardwareConcurrency <= 4) ||
-      connection?.saveData === true;
-
-    const apply = () => {
-      const small = window.innerWidth < 768;
-      const constrained = small || lowPowerDevice || reduced;
-      setPerformanceMode(constrained);
-      setDpr(constrained ? [1, 1] : [1, 1.5]);
-    };
-    apply();
-    window.addEventListener("resize", apply, { passive: true });
-    return () => window.removeEventListener("resize", apply);
-  }, [reduced]);
-
-  useEffect(() => {
-    let active = true;
-    const gpu = (navigator as Navigator & { gpu?: { requestAdapter(): Promise<unknown> } }).gpu;
-    if (!gpu) {
-      setSceneStatus(SceneStatus.Failed);
-      return;
-    }
-    void gpu.requestAdapter().then((adapter) => {
-      if (!adapter) setSceneStatus(SceneStatus.Failed);
-      if (active) setWebgpuReady(Boolean(adapter));
-    }).catch(() => {
-      setSceneStatus(SceneStatus.Failed);
-      if (active) setWebgpuReady(false);
-    });
+    camera.position.set(0, 0.3, 6);
+    camera.fov = 60;
+    camera.updateProjectionMatrix();
+    // The rig opens pointer events in the Projects zone; hand the shared
+    // wrapper back closed when the cosmos is swapped out.
     return () => {
-      active = false;
+      const root = gl.domElement.closest<HTMLElement>("[data-scene-root]");
+      if (root) root.style.pointerEvents = "none";
     };
-  }, []);
-
-  return (
-    <div
-      aria-hidden
-      data-scene-root=""
-      data-contact-heading={!minimal && !performanceMode}
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 0,
-        pointerEvents: "none",
-        // Fondo sólido oscuro: respaldo si el canvas aún no pintó (nunca blanco).
-        background: `var(--scene-bg, ${FALLBACK_BG})`,
-      }}
-    >
-      {webgpuReady && <RendererFallback fallback={null}><Canvas
-        camera={{ position: [0, 0.3, 6], fov: 60 }}
-        dpr={dpr}
-        frameloop={frameloop}
-        // Debounce del resize: re-mide tras 50ms en lugar de en cada píxel.
-        resize={{ scroll: false, debounce: { scroll: 0, resize: 50 } }}
-        // alpha:false -> canvas OPACO. Sin transparencia no hay flash blanco.
-        gl={async (props) => {
-          const renderer = new WebGPURenderer({
-            ...props,
-            antialias: !performanceMode,
-            powerPreference: performanceMode ? "low-power" : "high-performance",
-            alpha: false,
-          } as ConstructorParameters<typeof WebGPURenderer>[0]);
-          await renderer.init();
-          return renderer;
-        }}
-        style={{ background: FALLBACK_BG }}
-        onCreated={({ gl }) => {
-          gl.setClearColor(FALLBACK_BG, 1);
-        }}
-      >
-        <FirstFrameSignal />
-        <Rig
-          reduced={reduced}
-          minimal={minimal || performanceMode}
-          performanceMode={performanceMode}
-        />
-      </Canvas></RendererFallback>}
-    </div>
-  );
+  }, [camera, gl]);
+  return <Rig reduced={reduced} minimal={minimal} performanceMode={performanceMode} />;
 }

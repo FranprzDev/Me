@@ -18,6 +18,7 @@ import cosmosShader from "./shaders/nebula.wgsl";
 import { PROJECTS, type PlanetSpec } from "@/data/projects";
 import { bumpWeight, measuredSectionCenter } from "@/lib/scroll";
 import { getActiveProject, getSlideDirection } from "@/lib/projectFocus";
+import { orbitTime } from "./shared";
 import { useRouter } from "next/navigation";
 
 type CosmosShaderInputs = {
@@ -83,16 +84,15 @@ function createAtmosphereMaterial(colorA: THREE.Color, colorB: THREE.Color, opac
  * Planeta lejano con atmósfera fresnel y anillo tenue: ancla visual que da
  * escala al cosmos. Rota lentísimo; la cámara pasa cerca durante el viaje.
  */
-export function Planet({
-  reduced,
-  pRef,
-}: {
-  reduced: boolean;
-  pRef: RefObject<number>;
-}) {
-  const group = useRef<THREE.Group>(null);
+/** Centre of the anchor planet's orbit and its ellipse (semi-axes, tilt). */
+const ANCHOR_ORBIT = { x: -4.6, y: 1.9, z: -11, a: 0.9, b: 0.55, speed: 0.07, tilt: 0.35 };
 
-  const { bodyMat, atmoMat, atmoOpacity, ringMat, geo, atmoGeo, ringGeo } = useMemo(() => {
+export function Planet({ pRef }: { pRef: RefObject<number> }) {
+  const group = useRef<THREE.Group>(null);
+  const body = useRef<THREE.Group>(null);
+  const moon = useRef<THREE.Mesh>(null);
+
+  const { bodyMat, atmoMat, atmoOpacity, ringMat, geo, atmoGeo, ringGeo, moonGeo, moonMat } = useMemo(() => {
     const bodyMat = new THREE.MeshStandardMaterial({
       color: new THREE.Color("#131f3d"),
       roughness: 0.95,
@@ -120,6 +120,14 @@ export function Planet({
       geo: new THREE.SphereGeometry(1, 48, 32),
       atmoGeo: new THREE.SphereGeometry(1.18, 48, 32),
       ringGeo: new THREE.RingGeometry(1.45, 2.15, 96),
+      moonGeo: new THREE.SphereGeometry(0.16, 20, 14),
+      moonMat: new THREE.MeshStandardMaterial({
+        color: new THREE.Color("#8e9cc4"),
+        emissive: new THREE.Color("#5b6fa8"),
+        emissiveIntensity: 0.3,
+        roughness: 0.9,
+        transparent: true,
+      }),
     };
   }, []);
 
@@ -131,17 +139,34 @@ export function Planet({
       geo.dispose();
       atmoGeo.dispose();
       ringGeo.dispose();
+      moonGeo.dispose();
+      moonMat.dispose();
     },
-    [bodyMat, atmoMat, ringMat, geo, atmoGeo, ringGeo]
+    [bodyMat, atmoMat, ringMat, geo, atmoGeo, ringGeo, moonGeo, moonMat]
   );
 
-  useFrame((_, dt) => {
+  useFrame(() => {
     if (!group.current) return;
-    if (!reduced) group.current.rotation.y += dt * 0.02;
+    const t = orbitTime();
+    // Inclined elliptical orbit around a point just off-frame (the planet never
+    // leaves the upper-left of the view), plus its own axial spin.
+    const o = ANCHOR_ORBIT;
+    const a = t * o.speed;
+    group.current.position.set(
+      o.x + Math.cos(a) * o.a,
+      o.y + Math.sin(a) * o.b * Math.cos(o.tilt),
+      o.z + Math.sin(a) * o.b * Math.sin(o.tilt) * 2
+    );
+    if (body.current) body.current.rotation.y = t * 0.12;
+    if (moon.current) {
+      const m = t * 0.45;
+      moon.current.position.set(Math.cos(m) * 2.6, Math.sin(m) * 0.55, Math.sin(m) * 2.1);
+      moonMat.opacity = bodyMat.opacity;
+    }
     // El ancla no entra en Sobre Mi: se desvanece antes de la sección
     // (antes era 0.68→0.90 y se pisaba con el slider).
-    const t = Math.min(1, Math.max(0, (pRef.current - 0.42) / 0.16));
-    const f = 1 - t * t * (3 - 2 * t);
+    const fade = Math.min(1, Math.max(0, (pRef.current - 0.42) / 0.16));
+    const f = 1 - fade * fade * (3 - 2 * fade);
     bodyMat.opacity = f;
     atmoOpacity.value = f;
     ringMat.opacity = 0.16 * f;
@@ -149,8 +174,11 @@ export function Planet({
   });
 
   return (
-    <group ref={group} position={[-4.6, 1.9, -11]} rotation={[0.28, 0, -0.14]}>
-      <mesh geometry={geo} material={bodyMat} />
+    <group ref={group} position={[ANCHOR_ORBIT.x, ANCHOR_ORBIT.y, ANCHOR_ORBIT.z]} rotation={[0.28, 0, -0.14]}>
+      <group ref={body}>
+        <mesh geometry={geo} material={bodyMat} />
+      </group>
+      <mesh ref={moon} geometry={moonGeo} material={moonMat} />
       {/* Luz clave desde arriba-derecha: coherente con el bloom del hero */}
       <pointLight position={[4, 5, 3]} intensity={12} color="#bcd0ff" />
       <mesh geometry={atmoGeo} material={atmoMat} scale={1} />
@@ -168,13 +196,7 @@ export function Planet({
  */
 const PLANET_FRONT = { x: 0, y: 0.15, z: -5.4 };
 
-export function ProjectPlanets({
-  reduced,
-  pRef,
-}: {
-  reduced: boolean;
-  pRef: RefObject<number>;
-}) {
+export function ProjectPlanets({ pRef }: { pRef: RefObject<number> }) {
   return (
     <>
       {PROJECTS.map((p, i) => (
@@ -183,7 +205,6 @@ export function ProjectPlanets({
           spec={p.planet}
           index={i}
           seed={i}
-          reduced={reduced}
           pRef={pRef}
         />
       ))}
@@ -195,13 +216,11 @@ function ProjectPlanet({
   spec,
   index,
   seed,
-  reduced,
   pRef,
 }: {
   spec: PlanetSpec;
   index: number;
   seed: number;
-  reduced: boolean;
   pRef: RefObject<number>;
 }) {
   const group = useRef<THREE.Group>(null);
@@ -271,7 +290,10 @@ function ProjectPlanet({
 
   useFrame((_, dt) => {
     if (!group.current) return;
-    if (!reduced) group.current.rotation.y += 0.006 + seed * 0.002;
+    // Axial spin on the shared orbit clock (frame-rate independent, slowed
+    // rather than frozen under reduced motion).
+    const t = orbitTime();
+    group.current.rotation.y = t * (0.36 + seed * 0.12);
 
     // Ventana CORTA medida del DOM real: los planetas viven sólo en plena
     // sección Proyectos y se apagan antes de que empiece a armarse CHARLEMOS.
@@ -287,7 +309,13 @@ function ProjectPlanet({
     // lado del que viene/va la transición.
     const camZ = camera.position.z;
     const off = (1 - s) * getSlideDirection() * 8;
-    group.current.position.set(PLANET_FRONT.x + off, PLANET_FRONT.y, camZ + PLANET_FRONT.z);
+    // A small inclined orbit around its stage spot, so it never sits still.
+    const orbit = t * 0.35 + seed;
+    group.current.position.set(
+      PLANET_FRONT.x + off + Math.cos(orbit) * 0.22,
+      PLANET_FRONT.y + Math.sin(orbit) * 0.08,
+      camZ + PLANET_FRONT.z + Math.sin(orbit) * 0.18
+    );
     const viewportScale = Math.min(1, Math.max(0.48, size.width / 1200));
     group.current.scale.setScalar(spec.radius * 1.82 * viewportScale * (1 + 0.06 * hoverRef.current));
 
