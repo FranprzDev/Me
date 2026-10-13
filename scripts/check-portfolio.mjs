@@ -54,6 +54,24 @@ async function checkPage(page, route, name) {
 /** Scenario + page being checked, reported with any failure. */
 const progress = { scenario: "", page: null };
 
+/** Adds the scenario and the page state to a failure, while the page is still open. */
+async function describeFailure(error) {
+  if (!progress.page || progress.page.isClosed()) return;
+  const where = await progress.page
+    .evaluate(() => {
+      const el = document.querySelector(".story-back");
+      const style = el ? getComputedStyle(el) : null;
+      const box = el?.getBoundingClientRect();
+      return {
+        url: location.href,
+        h1: document.querySelector("h1")?.textContent,
+        back: el ? `opacity=${style.opacity} visibility=${style.visibility} display=${style.display} box=${Math.round(box.width)}x${Math.round(box.height)}@${Math.round(box.top)}` : "missing",
+      };
+    })
+    .catch((e) => ({ evalError: String(e) }));
+  error.message = `[${progress.scenario}] ${JSON.stringify(where)}\n${error.message}`;
+}
+
 async function main() {
   await mkdir(output, { recursive: true });
   const browser = await chromium.launch({ headless: process.env.HEADFUL !== "1" });
@@ -231,27 +249,16 @@ async function main() {
       }
       await context.close();
     }
+  } catch (error) {
+    await describeFailure(error);
+    throw error;
   } finally {
     await browser.close();
   }
 }
 
-main().catch(async (error) => {
+main().catch((error) => {
   console.error(error);
-  if (progress.page && !progress.page.isClosed()) {
-    const where = await progress.page.evaluate(() => ({
-      url: location.href,
-      h1: document.querySelector("h1")?.textContent,
-      back: (() => {
-        const el = document.querySelector(".story-back");
-        if (!el) return "missing";
-        const style = getComputedStyle(el);
-        const box = el.getBoundingClientRect();
-        return `opacity=${style.opacity} visibility=${style.visibility} display=${style.display} box=${Math.round(box.width)}x${Math.round(box.height)}@${Math.round(box.top)}`;
-      })(),
-    })).catch((e) => ({ evalError: String(e) }));
-    error.message = `[${progress.scenario}] ${JSON.stringify(where)}\n${error.message}`;
-  }
   // Surface the failing assertion as a GitHub annotation (visible without log access).
   if (process.env.GITHUB_ACTIONS) console.log(`::error title=check-portfolio::${String(error?.message ?? error).replace(/\r?\n/g, "%0A").slice(0, 3000)}`);
   process.exitCode = 1;
