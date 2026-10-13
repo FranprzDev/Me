@@ -52,7 +52,7 @@ async function checkPage(page, route, name) {
 }
 
 /** Scenario + page being checked, reported with any failure. */
-const progress = { scenario: "", page: null };
+const progress = { scenario: "", page: null, logs: [] };
 
 /** Adds the scenario and the page state to a failure, while the page is still open. */
 async function describeFailure(error) {
@@ -69,7 +69,7 @@ async function describeFailure(error) {
       };
     })
     .catch((e) => ({ evalError: String(e) }));
-  error.message = `[${progress.scenario}] ${JSON.stringify(where)}\n${error.message}`;
+  error.message = `[${progress.scenario}] ${JSON.stringify(where)}\nlogs: ${progress.logs.slice(-6).join(" | ")}\n${error.message}`;
 }
 
 async function main() {
@@ -88,6 +88,11 @@ async function main() {
       const page = await context.newPage();
       progress.scenario = name;
       progress.page = page;
+      progress.logs = [];
+      page.on("console", (msg) => {
+        if (msg.type() === "error") progress.logs.push(msg.text().slice(0, 400));
+      });
+      page.on("pageerror", (err) => progress.logs.push(`pageerror: ${String(err.stack ?? err).slice(0, 600)}`));
       page.setDefaultTimeout(15000);
       page.setDefaultNavigationTimeout(15000);
       for (const route of routes) {
