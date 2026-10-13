@@ -36,10 +36,32 @@ export function useScrollScene(build: Scene) {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) return;
 
-    const ctx = gsap.context(() => buildRef.current(root), root);
+    // Scroll animations are decoration: if GSAP throws while building them
+    // (seen on mobile when ScrollTrigger refreshes during a client-side route
+    // change), revert what was created so the content stays visible instead of
+    // the error taking the whole page down.
+    let failed = false;
+    const ctx = gsap.context(() => {
+      try {
+        buildRef.current(root);
+      } catch (error) {
+        failed = true;
+        console.warn("Scroll animations skipped:", error);
+      }
+    }, root);
+    if (failed) {
+      ctx.revert();
+      return;
+    }
 
     // El contenido bilingüe puede cambiar de alto tras montar; recalculamos.
-    const refresh = () => ScrollTrigger.refresh();
+    const refresh = () => {
+      try {
+        ScrollTrigger.refresh();
+      } catch (error) {
+        console.warn("ScrollTrigger refresh skipped:", error);
+      }
+    };
     const id = window.setTimeout(refresh, 120);
 
     return () => {
