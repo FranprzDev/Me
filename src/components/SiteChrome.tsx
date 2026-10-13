@@ -50,6 +50,9 @@ export function SiteChrome() {
     };
   }, []);
 
+  // /me is a standalone editorial page with its own header.
+  if (pathname?.startsWith("/me")) return null;
+
   return (
     <>
       <a href="#main-content" className="skip-link">
