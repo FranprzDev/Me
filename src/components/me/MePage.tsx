@@ -373,7 +373,7 @@ export function MePage({ fontClassName }: { fontClassName: string }) {
   return (
     <div className={`me-root ${fontClassName}`}>
       <Header />
-      <main>
+      <main id="main-content">
         <Hero />
         <Statement />
         <MeLayers />
