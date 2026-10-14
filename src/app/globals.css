@@ -344,9 +344,14 @@ body {
   font: 0.72rem/1.5 ui-monospace, monospace;
 }
 
-button.chip {
+button.chip,
+.chip--control {
   min-height: 44px;
   min-width: 44px;
+}
+.chip--control {
+  justify-content: center;
+  text-decoration: none;
 }
 
 .experience-period {

@@ -1,6 +1,8 @@
 import { CvSection, type ResolvedCv } from "@/content/cv";
 import { CvBar } from "./CvBar";
+import { CvCosmos } from "./CvCosmos";
 import { cvFontClassName } from "./fonts";
+import { riseStyle } from "./motion";
 import "./cv.css";
 
 function sectionId(section: CvSection): string {
@@ -91,14 +93,19 @@ function SectionBody({ cv, section }: { cv: ResolvedCv; section: CvSection }) {
   }
 }
 
-/** The résumé itself: real text, semantic headings, one A4 sheet on screen and on paper. */
+/**
+ * The résumé itself: real text and semantic headings. On screen it wears the
+ * portfolio's night-sky look (cv.css, `@media screen`); on paper it is a clean
+ * light A4 document (`@media print`).
+ */
 export function CvDocument({ cv }: { cv: ResolvedCv }) {
   return (
     <div className={`cv-root ${cvFontClassName}`} lang={cv.locale} data-cv-variant={cv.variant}>
-      <CvBar locale={cv.locale} variant={cv.variant} />
+      <CvCosmos />
       <main id="main-content" className="cv-sheet" tabIndex={-1}>
+        <CvBar locale={cv.locale} variant={cv.variant} />
         <article className="cv-doc">
-          <header className="cv-head">
+          <header className="cv-head cv-rise" style={riseStyle(1)}>
             <h1>{cv.name}</h1>
             <p className="cv-head__headline">{cv.headline}</p>
             <p className="cv-head__location">{cv.location}</p>
@@ -110,8 +117,13 @@ export function CvDocument({ cv }: { cv: ResolvedCv }) {
               ))}
             </ul>
           </header>
-          {cv.sections.map((section) => (
-            <section key={section} className={`cv-section cv-section--${section}`} aria-labelledby={sectionId(section)}>
+          {cv.sections.map((section, index) => (
+            <section
+              key={section}
+              className={`cv-section cv-section--${section} cv-rise`}
+              style={riseStyle(index + 2)}
+              aria-labelledby={sectionId(section)}
+            >
               <h2 id={sectionId(section)}>{cv.sectionTitles[section]}</h2>
               <SectionBody cv={cv} section={section} />
             </section>

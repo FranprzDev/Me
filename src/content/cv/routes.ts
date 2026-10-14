@@ -43,3 +43,10 @@ export function cvLocaleForPath(pathname: string | null): CvLocale | null {
 export function otherLocale(locale: CvLocale): CvLocale {
   return locale === CvLocale.En ? CvLocale.Es : CvLocale.En;
 }
+
+/** The same CV page in the other language, or null when the path is not a CV route. */
+export function cvCounterpartPath(pathname: string | null): string | null {
+  const locale = cvLocaleForPath(pathname);
+  if (locale === null || pathname === null) return null;
+  return locale === CvLocale.Es ? pathname.replace(/^\/es/, "") : `/es${pathname}`;
+}

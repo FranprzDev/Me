@@ -3,16 +3,20 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useI18n } from "@/lib/i18n";
 import { subscribeScroll } from "@/lib/scroll";
 import { CvLocale } from "@/content/cv/types";
-import { cvIndexPath } from "@/content/cv/routes";
+import { cvCounterpartPath, cvIndexPath } from "@/content/cv/routes";
 
 /** Scroll offset (px) after which the header gets its solid band. */
 const BAND_AFTER = 8;
 
 export function Nav() {
   const { t, tl, lang, toggle } = useI18n();
+  // A CV page is written in one language: its switch is a link to the same
+  // page in the other language instead of the stored-preference toggle.
+  const cvSwitchHref = cvCounterpartPath(usePathname());
   const [menuOpen, setMenuOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
@@ -89,14 +93,27 @@ export function Nav() {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
-          <button
-            onClick={toggle}
-            className="chip"
-            style={{ cursor: "pointer", color: "var(--fg)", background: "rgba(255,255,255,0.05)" }}
-            aria-label={tl({ es: "Cambiar a inglés", en: "Switch to Spanish" })}
-          >
-            {lang === "es" ? "ES · 🇦🇷" : "EN · 🇬🇧"}
-          </button>
+          {cvSwitchHref ? (
+            <Link
+              href={cvSwitchHref}
+              hrefLang={lang === "es" ? "en" : "es"}
+              className="chip chip--control"
+              style={{ color: "var(--fg)", background: "rgba(255,255,255,0.05)" }}
+              aria-label={tl({ es: "Cambiar a inglés", en: "Switch to Spanish" })}
+              data-lang-switch
+            >
+              {lang === "es" ? "ES · 🇦🇷" : "EN · 🇬🇧"}
+            </Link>
+          ) : (
+            <button
+              onClick={toggle}
+              className="chip"
+              style={{ cursor: "pointer", color: "var(--fg)", background: "rgba(255,255,255,0.05)" }}
+              aria-label={tl({ es: "Cambiar a inglés", en: "Switch to Spanish" })}
+            >
+              {lang === "es" ? "ES · 🇦🇷" : "EN · 🇬🇧"}
+            </button>
+          )}
           <button
             ref={toggleRef}
             onClick={() => setMenuOpen((v) => !v)}

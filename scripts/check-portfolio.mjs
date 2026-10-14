@@ -79,7 +79,13 @@ async function checkCvPages(browser) {
       assert.equal(await page.locator(".cv-root").getAttribute("lang"), locale, `${route}: content language`);
       assert.equal(await page.locator("h1").count(), 1, `${route}: one h1`);
       assert.equal(await page.locator("main#main-content").count(), 1, `${route}: main landmark`);
-      assert.equal(await page.locator(".site-nav, [data-scene-root]").count(), 0, `${route}: no portfolio chrome or 3D layer`);
+      // CV pages wear the portfolio chrome (nav, CSS night sky) but never the WebGPU layer.
+      assert.equal(await page.locator(".site-nav").count(), 1, `${route}: portfolio nav`);
+      assert.equal(await page.locator(".cv-cosmos").count(), 1, `${route}: night-sky backdrop`);
+      assert.equal(await page.locator("[data-scene-root]").count(), 0, `${route}: no 3D layer`);
+      if (options.reducedMotion === "reduce") {
+        assert.equal(await page.evaluate(() => document.getAnimations().filter((a) => a.animationName === "cv-rise").length), 0, `${route}: no entrance motion with reduced motion`);
+      }
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${name}: horizontal overflow ${route}`);
       const html = await page.content();
       assert.equal(/planet/i.test(await page.locator(".cv-root").evaluate((el) => el.outerHTML)), false, `${route}: no 'planet' wording`);
@@ -90,7 +96,7 @@ async function checkCvPages(browser) {
       );
       const enRoute = route.replace(/^\/es/, "");
       assert.deepEqual(alternates, { en: enRoute, es: `/es${enRoute}`, "x-default": enRoute }, `${route}: hreflang alternates`);
-      const toggle = page.locator(".cv-bar__lang");
+      const toggle = page.locator(".site-nav [data-lang-switch]");
       assert.equal(await toggle.getAttribute("href"), locale === "es" ? enRoute : `/es${enRoute}`, `${route}: EN/ES toggle`);
       if (variant) {
         const pdf = await page.locator("a[data-cv-pdf]").getAttribute("href");
@@ -102,12 +108,17 @@ async function checkCvPages(browser) {
         assert.equal(await page.locator(".cv-section h2").count() >= 6, true, `${route}: résumé sections`);
         assert.equal(await page.locator(`.cv-bar__versions a[aria-current='page']`).getAttribute("href"), route);
         await page.emulateMedia({ media: "print" });
-        assert.equal(await page.locator(".cv-bar").isVisible(), false, `${route}: toolbar hidden in print`);
+        for (const screenOnly of [".cv-bar", ".site-nav", ".cv-cosmos"]) {
+          assert.equal(await page.locator(screenOnly).isVisible(), false, `${route}: ${screenOnly} hidden in print`);
+        }
+        assert.equal(await page.locator(".cv-doc").isVisible(), true, `${route}: résumé printed`);
         await page.emulateMedia({ media: "screen" });
       } else {
         assert.equal(await page.locator(".cv-card").count(), CV_VARIANTS.length, `${route}: index lists every version`);
       }
       if (name === "cv-mobile") {
+        // Let the entrance motion settle so contrast is measured on the final frame.
+        await page.waitForFunction(() => document.getAnimations().every((a) => a.animationName !== "cv-rise" || a.playState === "finished"));
         const audit = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
         assert.deepEqual(audit.violations.map(({ id, nodes }) => ({ id, targets: nodes.map(({ target }) => target) })), [], `${name}: accessibility ${route}`);
       }
@@ -117,7 +128,7 @@ async function checkCvPages(browser) {
     }
     // The toggle keeps the variant and switches the language.
     await page.goto(`${baseURL}/cv/backend`);
-    await Promise.all([page.waitForURL("**/es/cv/backend"), page.locator(".cv-bar__lang").click()]);
+    await Promise.all([page.waitForURL("**/es/cv/backend"), page.locator(".site-nav [data-lang-switch]").click()]);
     await page.waitForFunction(() => document.documentElement.lang === "es");
     assert.equal(await page.locator("h2#cv-experience").textContent(), "Experiencia");
     // Leaving the CV gives the portfolio back its own language choice.
