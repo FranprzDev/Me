@@ -7,10 +7,7 @@ export const CV_UI = {
   versions: { [CvLocale.En]: "Résumé versions", [CvLocale.Es]: "Versiones del CV" },
   allVersions: { [CvLocale.En]: "All versions", [CvLocale.Es]: "Todas las versiones" },
   download: { [CvLocale.En]: "Download PDF", [CvLocale.Es]: "Descargar PDF" },
-  /** Shown on the toggle, in the language it switches to. */
-  switchLabel: { [CvLocale.En]: "Leer en español", [CvLocale.Es]: "Read in English" },
-  switchShort: { [CvLocale.En]: "ES", [CvLocale.Es]: "EN" },
-  current: { [CvLocale.En]: "EN", [CvLocale.Es]: "ES" },
+  pdfBadge: { [CvLocale.En]: "PDF · A4", [CvLocale.Es]: "PDF · A4" },
   indexTitle: { [CvLocale.En]: "Résumés", [CvLocale.Es]: "Currículums" },
   indexIntro: {
     [CvLocale.En]:

@@ -17,7 +17,8 @@ import { CV_LOCALES, CV_VARIANTS, MANIFEST, PDF_DIR, cvPdfFile, cvRoute, cvSourc
  * source hash no longer matches, so a stale PDF cannot ship unnoticed.
  */
 const baseURL = (process.env.PORTFOLIO_URL || "http://localhost:3000").replace(/\/$/, "");
-const MAX_PAGES = 2;
+/** Every résumé is one A4 page (Francisco's rule): a longer render fails the run. */
+const MAX_PAGES = 1;
 
 async function main() {
   await mkdir(PDF_DIR, { recursive: true });
@@ -32,7 +33,11 @@ async function main() {
         const response = await page.goto(`${baseURL}${route}`, { waitUntil: "networkidle" });
         assert.equal(response?.status(), 200, route);
         await page.emulateMedia({ media: "print" });
+        // The print families are not preloaded (screen never uses them): load
+        // every declared face before rendering so the PDF never falls back.
         await page.evaluate(async () => {
+          // allSettled: the local() fallback faces next/font declares may not exist here.
+          await Promise.allSettled(Array.from(document.fonts, (face) => face.load()));
           await document.fonts.ready;
         });
         const file = cvPdfFile(variant, locale);

@@ -7,6 +7,10 @@ import { CvSection, CvVariant, type CvDefinition, type ExperienceEntry, type Loc
  * applied-ai follows his AI Engineer CV; fde puts client-facing delivery,
  * integrations and AI agents first. No variant adds a role, date, metric or
  * skill that is not in his source CVs.
+ *
+ * One page per variant (A4, checked by `pnpm cv:pdf`): each variant keeps the
+ * roles, bullets and projects most relevant to its role type and drops the
+ * rest. Shortened text only trims words, never changes a fact.
  */
 
 const lvc: ExperienceEntry = {
@@ -14,8 +18,11 @@ const lvc: ExperienceEntry = {
   org: F.LA_VISTA_CASAL.org,
   place: F.LA_VISTA_CASAL.place,
   period: F.LA_VISTA_CASAL.period,
-  bullets: [F.B_LVC_PLATFORM, F.B_LVC_HANDOVER],
+  bullets: [F.B_LVC_PLATFORM],
 };
+
+/** FDE keeps the handover: client delivery is the point of that variant. */
+const lvcWithHandover: ExperienceEntry = { ...lvc, bullets: [F.B_LVC_PLATFORM, F.B_LVC_HANDOVER] };
 
 const fla: ExperienceEntry = { role: F.ROLE_FLA, org: F.FLA.org, period: F.FLA.period, bullets: [F.B_FLA] };
 
@@ -26,19 +33,12 @@ const judiciary: ExperienceEntry = {
   bullets: [F.B_JUDICIARY],
 };
 
-const teaching: ExperienceEntry = {
-  role: F.ROLE_TA,
-  org: F.ROLLINGCODE_SCHOOL.org,
-  period: F.ROLLINGCODE_SCHOOL.period,
-  bullets: [F.B_TA],
-};
-
 const repuestoGeneral: ExperienceEntry = {
   role: F.ROLE_SOFTWARE_AI,
   org: F.REPUESTOSHOP.org,
   place: F.REPUESTOSHOP.place,
   period: F.REPUESTOSHOP.period,
-  bullets: [F.B_REPUESTO_TOOLS, F.B_REPUESTO_AGENT, F.B_REPUESTO_LLM],
+  bullets: [F.B_REPUESTO_TOOLS, F.B_REPUESTO_AGENT],
 };
 
 function studio(first: Localized): ExperienceEntry {
@@ -46,7 +46,7 @@ function studio(first: Localized): ExperienceEntry {
     role: F.ROLE_PRODUCT,
     org: F.ROLLINGCODE_STUDIO.org,
     period: F.ROLLINGCODE_STUDIO.period,
-    bullets: [first, F.B_STUDIO_N8N],
+    bullets: [first],
   };
 }
 
@@ -62,6 +62,18 @@ const generalSections = [
 
 const webCertifications = [F.CERT_MERN, F.CERT_REACT, F.CERT_NEXT];
 
+/** Web variants: one compact AI + integrations row instead of two. */
+const SKILL_AI_INTEGRATIONS = {
+  label: { en: "AI & Integrations", es: "IA e integraciones" },
+  value: {
+    en: "LLM APIs (OpenAI, Anthropic, Gemini), LangChain, LangGraph, RAG, n8n, Google Workspace APIs, Meta APIs",
+    es: "APIs de LLM (OpenAI, Anthropic, Gemini), LangChain, LangGraph, RAG, n8n, APIs de Google Workspace, APIs de Meta",
+  },
+};
+
+/** The two highlight projects (the n8n hackathon is dropped for space). */
+const highlightProjects = [F.PROJECT_NASA, F.PROJECT_PROOFY];
+
 const fullstack: CvDefinition = {
   variant: CvVariant.Fullstack,
   label: { en: "Full-Stack", es: "Full-Stack" },
@@ -70,8 +82,8 @@ const fullstack: CvDefinition = {
     es: "Desarrollador de Software Full-Stack | TypeScript, React, Next.js, Node.js, Python | Integraciones con IA",
   },
   summary: {
-    en: "Software developer with 3 years building production web applications end to end: frontends in React and Next.js, APIs in Node.js and Python, databases, deployments and integrations with third-party systems. I also add AI and automation where they solve a real problem (LLM agents, RAG, n8n). Comfortable working directly with clients and non-technical users, from gathering requirements to handover and training. NASA Space Apps 2024 national winner. Final-year Information Systems Engineering student at UTN (expected Dec 2027).",
-    es: "Desarrollador de software con 3 años construyendo aplicaciones web en producción de punta a punta: frontend en React y Next.js, APIs en Node.js y Python, bases de datos, despliegues e integraciones con sistemas de terceros. También sumo IA y automatización donde resuelven un problema real (agentes con LLMs, RAG, n8n). Acostumbrado a trabajar directo con clientes y usuarios no técnicos, desde el relevamiento hasta la entrega y la capacitación. Ganador nacional de NASA Space Apps 2024. Estudiante de último tramo de Ingeniería en Sistemas de Información en la UTN (egreso estimado dic 2027).",
+    en: "Software developer with 3 years building production web applications end to end: frontends in React and Next.js, APIs in Node.js and Python, databases, deployments and third-party integrations. I add AI and automation where they solve a real problem (LLM agents, RAG, n8n) and work directly with clients, from requirements to handover. NASA Space Apps 2024 national winner.",
+    es: "Desarrollador de software con 3 años construyendo aplicaciones web en producción de punta a punta: frontend en React y Next.js, APIs en Node.js y Python, bases de datos, despliegues e integraciones con terceros. Sumo IA y automatización donde resuelven un problema real (agentes con LLMs, RAG, n8n) y trabajo directo con clientes, del relevamiento a la entrega. Ganador nacional de NASA Space Apps 2024.",
   },
   sections: generalSections,
   skills: [
@@ -79,8 +91,7 @@ const fullstack: CvDefinition = {
     { label: { en: "Frontend", es: "Frontend" }, value: { en: "React, Next.js, HTML/CSS, Tailwind", es: "React, Next.js, HTML/CSS, Tailwind" } },
     { label: { en: "Backend", es: "Backend" }, value: { en: "Node.js, Express, REST APIs, webhooks", es: "Node.js, Express, APIs REST, webhooks" } },
     F.SKILL_DATA_CLOUD,
-    F.SKILL_INTEGRATIONS,
-    F.SKILL_AI,
+    SKILL_AI_INTEGRATIONS,
     F.SKILL_PRACTICES,
   ],
   experience: [
@@ -92,9 +103,8 @@ const fullstack: CvDefinition = {
     }),
     fla,
     judiciary,
-    teaching,
   ],
-  projects: [F.PROJECT_NASA, F.PROJECT_PROOFY, F.PROJECT_VORTEX],
+  projects: highlightProjects,
   certifications: webCertifications,
 };
 
@@ -106,8 +116,8 @@ const backend: CvDefinition = {
     es: "Desarrollador Backend | Node.js, TypeScript, Python | APIs REST, PostgreSQL, MongoDB, AWS",
   },
   summary: {
-    en: "Backend-focused software developer with 3 years building production systems: REST APIs and services in Node.js and Python, data modeling in PostgreSQL and MongoDB, integrations with third-party APIs and webhooks, and deployments on AWS and Vercel. I also work on the frontend (React, Next.js) when the product needs it, and add AI and automation where they solve a real problem (LLM agents, RAG, n8n). Comfortable working directly with clients and non-technical users, from gathering requirements to handover and training. NASA Space Apps 2024 national winner. Final-year Information Systems Engineering student at UTN (expected Dec 2027).",
-    es: "Desarrollador de software orientado a backend, con 3 años construyendo sistemas en producción: APIs REST y servicios en Node.js y Python, modelado de datos en PostgreSQL y MongoDB, integraciones con APIs de terceros y webhooks, y despliegues en AWS y Vercel. También trabajo en frontend (React, Next.js) cuando el producto lo necesita, y sumo IA y automatización donde resuelven un problema real (agentes con LLMs, RAG, n8n). Acostumbrado a trabajar directo con clientes y usuarios no técnicos, desde el relevamiento hasta la entrega y la capacitación. Ganador nacional de NASA Space Apps 2024. Estudiante de último tramo de Ingeniería en Sistemas de Información en la UTN (egreso estimado dic 2027).",
+    en: "Backend-focused software developer with 3 years building production systems: REST APIs and services in Node.js and Python, data modeling in PostgreSQL and MongoDB, third-party APIs and webhooks, and deployments on AWS and Vercel. I also work on the frontend (React, Next.js) when the product needs it, and add AI and automation where they solve a real problem (LLM agents, RAG, n8n). NASA Space Apps 2024 national winner.",
+    es: "Desarrollador de software orientado a backend, con 3 años construyendo sistemas en producción: APIs REST y servicios en Node.js y Python, modelado de datos en PostgreSQL y MongoDB, APIs de terceros y webhooks, y despliegues en AWS y Vercel. También trabajo en frontend (React, Next.js) cuando el producto lo necesita, y sumo IA y automatización donde resuelven un problema real (agentes con LLMs, RAG, n8n). Ganador nacional de NASA Space Apps 2024.",
   },
   sections: generalSections,
   skills: [
@@ -121,8 +131,7 @@ const backend: CvDefinition = {
     },
     { label: { en: "Frontend", es: "Frontend" }, value: { en: "React, Next.js", es: "React, Next.js" } },
     F.SKILL_DATA_CLOUD,
-    F.SKILL_INTEGRATIONS,
-    F.SKILL_AI,
+    SKILL_AI_INTEGRATIONS,
     F.SKILL_PRACTICES,
   ],
   experience: [
@@ -134,9 +143,8 @@ const backend: CvDefinition = {
     }),
     fla,
     judiciary,
-    teaching,
   ],
-  projects: [F.PROJECT_NASA, F.PROJECT_PROOFY, F.PROJECT_VORTEX],
+  projects: highlightProjects,
   certifications: webCertifications,
 };
 
@@ -148,8 +156,8 @@ const frontend: CvDefinition = {
     es: "Desarrollador Frontend | React, Next.js, TypeScript | HTML/CSS, Tailwind, Vercel",
   },
   summary: {
-    en: "Frontend-focused software developer with 3 years building production web applications: user interfaces in React and Next.js with TypeScript, HTML/CSS and Tailwind, shipped on Vercel and Netlify. I also work across the stack (Node.js APIs, PostgreSQL, Supabase) when the product needs it, and add AI and automation where they solve a real problem (LLM agents, RAG, n8n). Comfortable working directly with clients and non-technical users, from gathering requirements to handover and training. NASA Space Apps 2024 national winner. Final-year Information Systems Engineering student at UTN (expected Dec 2027).",
-    es: "Desarrollador de software orientado a frontend, con 3 años construyendo aplicaciones web en producción: interfaces en React y Next.js con TypeScript, HTML/CSS y Tailwind, desplegadas en Vercel y Netlify. También trabajo en todo el stack (APIs en Node.js, PostgreSQL, Supabase) cuando el producto lo necesita, y sumo IA y automatización donde resuelven un problema real (agentes con LLMs, RAG, n8n). Acostumbrado a trabajar directo con clientes y usuarios no técnicos, desde el relevamiento hasta la entrega y la capacitación. Ganador nacional de NASA Space Apps 2024. Estudiante de último tramo de Ingeniería en Sistemas de Información en la UTN (egreso estimado dic 2027).",
+    en: "Frontend-focused software developer with 3 years building production web applications: user interfaces in React and Next.js with TypeScript, HTML/CSS and Tailwind, shipped on Vercel and Netlify. I also work across the stack (Node.js APIs, PostgreSQL, Supabase) when the product needs it, and add AI and automation where they solve a real problem (LLM agents, RAG, n8n). NASA Space Apps 2024 national winner.",
+    es: "Desarrollador de software orientado a frontend, con 3 años construyendo aplicaciones web en producción: interfaces en React y Next.js con TypeScript, HTML/CSS y Tailwind, desplegadas en Vercel y Netlify. También trabajo en todo el stack (APIs en Node.js, PostgreSQL, Supabase) cuando el producto lo necesita, y sumo IA y automatización donde resuelven un problema real (agentes con LLMs, RAG, n8n). Ganador nacional de NASA Space Apps 2024.",
   },
   sections: generalSections,
   skills: [
@@ -169,8 +177,7 @@ const frontend: CvDefinition = {
         es: "Node.js, Express, APIs REST, webhooks, PostgreSQL, MongoDB",
       },
     },
-    F.SKILL_INTEGRATIONS,
-    F.SKILL_AI,
+    SKILL_AI_INTEGRATIONS,
     F.SKILL_PRACTICES,
   ],
   // UI work first: the React/Next.js roles lead, the rest follows by date.
@@ -183,9 +190,8 @@ const frontend: CvDefinition = {
     repuestoGeneral,
     lvc,
     judiciary,
-    teaching,
   ],
-  projects: [F.PROJECT_PROOFY, F.PROJECT_NASA, F.PROJECT_VORTEX],
+  projects: [F.PROJECT_PROOFY, F.PROJECT_NASA],
   certifications: [F.CERT_REACT, F.CERT_NEXT, F.CERT_MERN],
 };
 
@@ -197,8 +203,8 @@ const appliedAi: CvDefinition = {
     es: "AI Engineer (IA aplicada) | Sistemas multiagente, pipelines RAG, LangChain/LangGraph | Automatización",
   },
   summary: {
-    en: "Final-year Information Systems Engineering student (UTN, expected Dec 2027) with nearly three years of industry experience building clean and scalable systems. I evolved from full-stack engineering into designing applied AI solutions and workflow automations: multi-agent systems, RAG pipelines, tool calling and context control. Beyond writing code, I bring product sense and strategic thinking to build systems that drive business value, plus proven experience leading technical courses and workshops. NASA Space Apps 2024 national winner.",
-    es: "Estudiante de último tramo de Ingeniería en Sistemas de Información (UTN, egreso estimado dic 2027) con casi tres años de experiencia en la industria construyendo sistemas limpios y escalables. Evolucioné del desarrollo full-stack al diseño de soluciones de IA aplicada y automatizaciones: sistemas multiagente, pipelines RAG, tool calling y control de contexto. Más allá del código, aporto criterio de producto y pensamiento estratégico para construir sistemas que generan valor, además de experiencia dictando cursos y talleres técnicos. Ganador nacional de NASA Space Apps 2024.",
+    en: "Nearly three years of industry experience building clean and scalable systems. I evolved from full-stack engineering into designing applied AI solutions and workflow automations: multi-agent systems, RAG pipelines, tool calling and context control. I bring product sense to build systems that drive business value, plus experience leading technical courses and workshops. NASA Space Apps 2024 national winner.",
+    es: "Casi tres años de experiencia en la industria construyendo sistemas limpios y escalables. Evolucioné del desarrollo full-stack al diseño de soluciones de IA aplicada y automatizaciones: sistemas multiagente, pipelines RAG, tool calling y control de contexto. Aporto criterio de producto para construir sistemas que generan valor, además de experiencia dictando cursos y talleres técnicos. Ganador nacional de NASA Space Apps 2024.",
   },
   sections: [
     CvSection.Summary,
@@ -218,15 +224,11 @@ const appliedAi: CvDefinition = {
       },
     },
     {
-      label: { en: "Automation", es: "Automatización" },
+      label: { en: "Automation & data", es: "Automatización y datos" },
       value: {
-        en: "n8n, APIs and webhooks, Human-in-the-Loop workflows",
-        es: "n8n, APIs y webhooks, flujos Human-in-the-Loop",
+        en: "n8n, APIs and webhooks, Human-in-the-Loop workflows, web scraping pipelines, Meta APIs, Google Workspace APIs",
+        es: "n8n, APIs y webhooks, flujos Human-in-the-Loop, pipelines de web scraping, APIs de Meta, APIs de Google Workspace",
       },
-    },
-    {
-      label: { en: "Data grounding", es: "Datos para grounding" },
-      value: { en: "Web scraping pipelines, Meta APIs, Google Workspace APIs", es: "Pipelines de web scraping, APIs de Meta, APIs de Google Workspace" },
     },
     F.SKILL_LANGUAGES,
     {
@@ -257,39 +259,19 @@ const appliedAi: CvDefinition = {
         },
         F.B_REPUESTO_AGENT,
         {
-          en: "Build internal tools with Meta APIs and web scraping pipelines for data grounding.",
-          es: "Construyo herramientas internas con APIs de Meta y pipelines de scraping para el grounding de datos.",
-        },
-        {
-          en: "Benchmark LLM providers for the best cost/quality trade-off in production, and use Codex and Claude Code to research unfamiliar tech and deliver production-ready POCs fast.",
-          es: "Comparo proveedores de LLM para elegir la mejor relación costo/calidad en producción, y uso Codex y Claude Code para investigar tecnología nueva y entregar POCs listos para producción.",
+          en: "Benchmark LLM providers for the best cost/quality trade-off in production; use Codex and Claude Code to deliver production-ready POCs fast.",
+          es: "Comparo proveedores de LLM por relación costo/calidad en producción; uso Codex y Claude Code para entregar POCs listos para producción.",
         },
       ],
     },
     lvc,
-    {
-      role: F.ROLE_INSTRUCTOR,
-      org: F.JUDICIARY.org,
-      period: F.JUDICIARY.period,
-      bullets: [
-        {
-          en: "Designed and delivered a 20-hour practical course on workflow automation with n8n for court staff, with original materials and live build sessions on API/webhook integrations, RAG pipelines and Human-in-the-Loop workflows.",
-          es: "Diseñé y dicté un curso práctico de 20 horas sobre automatización con n8n para personal judicial, con materiales propios y sesiones en vivo sobre integraciones con APIs y webhooks, pipelines RAG y flujos Human-in-the-Loop.",
-        },
-        {
-          en: "Presented the automation strategy to the Judiciary's leadership.",
-          es: "Presenté la estrategia de automatización a las autoridades del Poder Judicial.",
-        },
-      ],
-    },
+    judiciary,
     studio({
       en: "Built frontend and backend features for client web projects; introduced n8n automations and explored practical AI tools through working POCs.",
       es: "Desarrollé funcionalidades de frontend y backend para proyectos web de clientes; impulsé automatizaciones con n8n y exploré herramientas de IA mediante POCs funcionales.",
     }),
-    fla,
-    teaching,
   ],
-  projects: [F.PROJECT_NASA, F.PROJECT_PROOFY, F.PROJECT_VORTEX],
+  projects: highlightProjects,
   certifications: [F.CERT_MERN, F.CERT_REACT, F.CERT_NEXT, F.CERT_DATA],
 };
 
@@ -301,8 +283,8 @@ const fde: CvDefinition = {
     es: "Forward Deployed Software Engineer | Entrega a clientes, integraciones, agentes de IA | Full-stack",
   },
   summary: {
-    en: "Software engineer who ships end to end, working directly with clients and non-technical users: from gathering requirements to production, handover and training. 3 years building web applications (React, Next.js, Node.js, Python), integrating third-party systems (Google Workspace, Meta APIs, webhooks) and adding AI agents and automation where they solve a real problem (LangGraph, RAG, n8n). Co-built a tax-deadline platform running in production at an accounting firm, and taught a 20-hour n8n automation course to Tucumán Judiciary staff. NASA Space Apps 2024 national winner. Final-year Information Systems Engineering student at UTN (expected Dec 2027).",
-    es: "Ingeniero de software que entrega de punta a punta, trabajando directo con clientes y usuarios no técnicos: desde el relevamiento hasta producción, la entrega y la capacitación. 3 años construyendo aplicaciones web (React, Next.js, Node.js, Python), integrando sistemas de terceros (Google Workspace, APIs de Meta, webhooks) y sumando agentes de IA y automatización donde resuelven un problema real (LangGraph, RAG, n8n). Co-desarrollé una plataforma de vencimientos impositivos en producción en un estudio contable y dicté un curso de 20 horas de automatización con n8n para personal del Poder Judicial de Tucumán. Ganador nacional de NASA Space Apps 2024. Estudiante de último tramo de Ingeniería en Sistemas de Información en la UTN (egreso estimado dic 2027).",
+    en: "Software engineer who ships end to end, working directly with clients and non-technical users: from gathering requirements to production, handover and training. 3 years building web applications (React, Next.js, Node.js, Python), integrating third-party systems (Google Workspace, Meta APIs, webhooks) and adding AI agents and automation where they solve a real problem (LangGraph, RAG, n8n). NASA Space Apps 2024 national winner.",
+    es: "Ingeniero de software que entrega de punta a punta, trabajando directo con clientes y usuarios no técnicos: desde el relevamiento hasta producción, la entrega y la capacitación. 3 años construyendo aplicaciones web (React, Next.js, Node.js, Python), integrando sistemas de terceros (Google Workspace, APIs de Meta, webhooks) y sumando agentes de IA y automatización donde resuelven un problema real (LangGraph, RAG, n8n). Ganador nacional de NASA Space Apps 2024.",
   },
   sections: [
     CvSection.Summary,
@@ -347,13 +329,13 @@ const fde: CvDefinition = {
   ],
   // Client-facing delivery first, then the rest by date.
   experience: [
-    lvc,
+    lvcWithHandover,
     {
       role: F.ROLE_AI,
       org: F.REPUESTOSHOP.org,
       place: F.REPUESTOSHOP.place,
       period: F.REPUESTOSHOP.period,
-      bullets: [F.B_REPUESTO_TOOLS, F.B_REPUESTO_AGENT, F.B_REPUESTO_LLM],
+      bullets: [F.B_REPUESTO_TOOLS, F.B_REPUESTO_AGENT],
     },
     judiciary,
     studio({
@@ -361,9 +343,8 @@ const fde: CvDefinition = {
       es: "Desarrollé funcionalidades de frontend y backend para proyectos web de clientes en React, Next.js y Node.js.",
     }),
     fla,
-    teaching,
   ],
-  projects: [F.PROJECT_PROOFY, F.PROJECT_NASA, F.PROJECT_VORTEX],
+  projects: [F.PROJECT_PROOFY, F.PROJECT_NASA],
   certifications: webCertifications,
 };
 
