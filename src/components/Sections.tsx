@@ -109,31 +109,25 @@ export function Experience() {
         <div className="timeline-container">
           {CV.experience.map((e, i) => (
             <Reveal key={e.org + i} delay={i * 0.05}>
-              <div className="timeline-row">
-                <div className="timeline-dot" aria-hidden="true" style={{ borderColor: e.current ? "var(--japan)" : "var(--space)" }}>
-                  {i === 0 ? "🤖" : i === 1 ? "🏛️" : i === 2 ? "🌐" : i === 3 ? "💻" : "👨‍🏫"}
+              <article
+                className="glass tilt-card"
+                style={{
+                  padding: "1.4rem 1.6rem",
+                  borderLeft: e.current ? "3px solid var(--japan)" : "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "0.4rem", alignItems: "baseline" }}>
+                  <h3 style={{ margin: 0, fontSize: "1.2rem", color: "var(--fg)" }}>{tl(e.role)}</h3>
+                  <span className="experience-period" data-current={e.current}>
+                    {tl(e.period)}
+                  </span>
                 </div>
-                <article
-                  className="glass tilt-card"
-                  style={{
-                    padding: "1.4rem 1.6rem",
-                    flex: 1,
-                    borderLeft: e.current ? "3px solid var(--japan)" : "1px solid rgba(255,255,255,0.08)",
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "0.4rem", alignItems: "baseline" }}>
-                    <h3 style={{ margin: 0, fontSize: "1.2rem", color: "var(--fg)" }}>{tl(e.role)}</h3>
-                    <span className="experience-period" data-current={e.current}>
-                      {tl(e.period)}
-                    </span>
-                  </div>
-                  <p className="accent-japan" style={{ margin: "0.3rem 0 0.7rem", fontWeight: 600 }}>{e.org}</p>
-                  <p style={{ margin: 0, color: "var(--muted)", lineHeight: 1.7 }}>{tl(e.description)}</p>
-                  {e.stack && e.stack.length > 0 && (
-                    <p className="stack-note">{e.stack.join(" · ")}</p>
-                  )}
-                </article>
-              </div>
+                <p className="accent-japan" style={{ margin: "0.3rem 0 0.7rem", fontWeight: 600 }}>{e.org}</p>
+                <p style={{ margin: 0, color: "var(--muted)", lineHeight: 1.7 }}>{tl(e.description)}</p>
+                {e.stack && e.stack.length > 0 && (
+                  <p className="stack-note">{e.stack.join(" · ")}</p>
+                )}
+              </article>
             </Reveal>
           ))}
         </div>

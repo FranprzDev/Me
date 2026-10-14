@@ -410,28 +410,6 @@ button.chip {
   gap: 1.4rem;
 }
 
-.timeline-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 1.3rem;
-}
-
-.timeline-row article {
-  min-width: 0;
-}
-
-.timeline-dot {
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  width: 2.7rem;
-  height: 2.7rem;
-  margin-top: 0.6rem;
-  border: 1px solid var(--space);
-  border-radius: 50%;
-  background: #10182c;
-}
-
 .contact-copy {
   max-width: 580px;
 }
@@ -575,9 +553,6 @@ button:focus-visible {
   }
   .btn-text-row {
     font-size: 0.82rem;
-  }
-  .timeline-dot {
-    display: none;
   }
   .hero-proof a {
     display: flex;
