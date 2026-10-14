@@ -34,7 +34,8 @@ export interface Project {
   slug: string;
   name: string;
   title?: Localized<string>;
-  tagline: Localized<string>;
+  /** Optional one-liner shown under the title on the home selector. */
+  tagline?: Localized<string>;
   description: Localized<string>;
   stack: string[];
   year: string;
@@ -55,10 +56,6 @@ export const PROJECTS: Project[] = [
     slug: "hackathons",
     name: "Hackathones",
     title: { es: "Hackathones", en: "Hackathons" },
-    tagline: {
-      es: "Hackathones bajo presión: NASA, n8n y UNESCO.",
-      en: "Hackathons under pressure: NASA, n8n and UNESCO.",
-    },
     description: {
       es: "Espacios donde el tiempo, el equipo y el problema real mandan: desde NASA Space Apps (BeeAgro y ExoGames, ganador nacional 2024) hasta el hackathon n8n de Vortex IT y el Youth Hackathon 2025 de UNESCO.",
       en: "Spaces where time, team and a real problem matter: from NASA Space Apps (BeeAgro and national winner ExoGames 2024) to Vortex IT's n8n hackathon and UNESCO's Youth Hackathon 2025.",

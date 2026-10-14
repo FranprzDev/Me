@@ -1,13 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { CV } from "@/data/cv";
-import { PROJECTS } from "@/data/projects";
 import { useI18n } from "@/lib/i18n";
-import { setActiveProject } from "@/lib/projectFocus";
 import { Reveal } from "@/components/Reveal";
 import { ContactConstellations } from "@/components/ContactConstellations";
+import { OrbitSelector } from "@/components/OrbitSelector";
 import { GsapHeroName } from "@/components/GsapHeroName";
 import { Magnetic } from "@/components/Magnetic";
 
@@ -34,7 +32,7 @@ export function Hero() {
               textShadow: "0 0 25px rgba(122,162,255,0.4)",
             }}
           >
-            AI Engineer {tl({ es: "en Tucumán", en: "in Tucumán" })} <span style={{ color: "var(--muted)" }}>· {tl({ es: "Desarrollo de producto", en: "Product development" })}</span>
+            AI Applied Engineer {tl({ es: "en Tucumán", en: "in Tucumán" })}
           </p>
         </Reveal>
 
@@ -182,20 +180,7 @@ export function Education() {
 }
 
 export function Projects() {
-  const { t, tl } = useI18n();
-  const [idx, setIdx] = useState(0);
-  const total = PROJECTS.length;
-
-  const go = (next: number, dir: number) => {
-    setActiveProject((next + total) % total, dir);
-    setIdx((next + total) % total);
-  };
-  useEffect(() => {
-    setActiveProject(idx, 1);
-  }, [idx]);
-
-  const p = PROJECTS[idx];
-  const title = p.title ? tl(p.title) : p.name;
+  const { t } = useI18n();
   return (
     <section id="projects" className="section" style={{ position: "relative", textAlign: "center" }}>
       <div className="wrap" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.9rem" }}>
@@ -204,100 +189,7 @@ export function Projects() {
             {t("proj_title")}
           </h2>
         </Reveal>
-        <Reveal delay={0.06}>
-          <p style={{ color: "var(--muted)", margin: "0 auto", maxWidth: 640, textAlign: "center", lineHeight: 1.6 }}>
-            {t("proj_instruction")}
-          </p>
-        </Reveal>
-
-        {/* Planeta actual centrado: HUD protagonista del slider. The whole card
-            is a real link to the world's page: no inline expansion. */}
-        <Reveal delay={0.1}>
-          <Link
-            id="world-details"
-            href={`/${p.slug}`}
-            className="planet-hud world-card glass-panel"
-            style={{
-              "--hud-glow": p.planet.atmoA,
-              marginTop: "0.4rem",
-            } as React.CSSProperties}
-          >
-            <span style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexWrap: "wrap", justifyContent: "center" }}>
-              <span className="eyebrow" style={{ color: p.planet.atmoA, fontSize: "0.72rem" }}>
-                {t("world")} 0{idx + 1} / 0{total}
-              </span>
-              <span style={{ color: "var(--muted)", fontSize: "0.8rem" }}>
-                {p.year}
-              </span>
-            </span>
-
-            <h3
-              aria-live="polite"
-              aria-atomic="true"
-              className="world-card__title"
-              style={{ color: p.planet.atmoA, textShadow: `0 0 30px ${p.planet.atmoA}66` }}
-            >
-              {title}
-            </h3>
-
-            <span className="world-card__tagline">{tl(p.tagline)}</span>
-
-            <span className="world-card__cta">
-              {tl({ es: "Entrar a este mundo", en: "Enter this world" })}
-              <span aria-hidden="true">→</span>
-            </span>
-          </Link>
-        </Reveal>
-
-        {/* Direct links to every world: one tap goes straight to its page. */}
-        <Reveal delay={0.14}>
-          <div style={{ display: "flex", gap: "0.45rem", flexWrap: "wrap", justifyContent: "center", maxWidth: 660, marginTop: "0.3rem" }}>
-            {PROJECTS.map((proj, i) => (
-              <Link
-                key={proj.slug}
-                href={`/${proj.slug}`}
-                className="chip world-pill"
-                style={{
-                  cursor: "pointer",
-                  textDecoration: "none",
-                  color: i === idx ? "#ffffff" : "var(--muted)",
-                  borderColor: i === idx ? proj.planet.atmoA : "rgba(255,255,255,0.12)",
-                  background: i === idx ? `color-mix(in srgb, ${proj.planet.atmoA} 25%, #0a0e1e)` : "#0a0e1e",
-                  boxShadow: i === idx ? `0 0 15px ${proj.planet.atmoA}44` : "none",
-                  transition: "all 0.25s ease",
-                  padding: "0.65rem 0.85rem",
-                  fontSize: "0.75rem",
-                  fontWeight: i === idx ? 600 : 400,
-                }}
-              >
-                {proj.title ? tl(proj.title) : proj.name}
-              </Link>
-            ))}
-          </div>
-        </Reveal>
-      </div>
-
-      <div className="world-controls">
-        <Magnetic strength={0.22}>
-          <button
-            onClick={() => go(idx - 1, -1)}
-            aria-label={tl({ es: "Planeta anterior", en: "Previous planet" })}
-            className="glass"
-            style={{ borderRadius: "999px", width: 52, height: 52, color: "var(--fg)", fontSize: "1.3rem", cursor: "pointer", pointerEvents: "auto" }}
-          >
-            ←
-          </button>
-        </Magnetic>
-        <Magnetic strength={0.22}>
-          <button
-            onClick={() => go(idx + 1, 1)}
-            aria-label={tl({ es: "Siguiente planeta", en: "Next planet" })}
-            className="glass"
-            style={{ borderRadius: "999px", width: 52, height: 52, color: "var(--fg)", fontSize: "1.3rem", cursor: "pointer", pointerEvents: "auto" }}
-          >
-            →
-          </button>
-        </Magnetic>
+        <OrbitSelector />
       </div>
     </section>
   );
