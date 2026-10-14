@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent, type PointerEvent } from "react";
 import { PROJECTS, type Project } from "@/data/projects";
 import { useI18n } from "@/lib/i18n";
+import { isWorldSlug, launchWorldEntry } from "@/lib/worldFlight";
 
 /** Idle time between automatic steps of the orbit. */
 const AUTO_STEP_MS = 6500;
@@ -67,8 +68,8 @@ function wrap(i: number, count: number): number {
  * - ← → keys and a horizontal swipe rotate every item one slot along the
  *   ellipse; clicking an outer item brings it to the centre. Keyboard steps
  *   keep focus on the new centred item.
- * - The centred item is a real link: activating it zooms into it while the
- *   world route loads (modified clicks keep the browser's default behaviour).
+ * - The centred item is a real link: activating it zooms into it, with the
+ *   world's own vehicle flying in (lib/worldFlight), while the world route loads (modified clicks keep the browser's default behaviour).
  * - Slow auto-rotation pauses on hover, focus, interaction, when the section
  *   is off screen or the tab is hidden, and is off with prefers-reduced-motion.
  *
@@ -173,6 +174,12 @@ export function OrbitSelector() {
       return;
     }
     setEntering(slug);
+    // The world's vehicle flies in over the zoom (overlay in SiteChrome); it
+    // only decorates the jump and never delays it.
+    const orb = event.currentTarget.parentElement?.querySelector(".orbit-select__orb")?.getBoundingClientRect();
+    if (orb && isWorldSlug(slug)) {
+      launchWorldEntry({ slug, target: { x: orb.left + orb.width / 2, y: orb.top + orb.height / 2 } });
+    }
     // Navigate right away instead of after the zoom: the zoom is a compositor
     // transition, so it keeps playing while the (prefetched) world mounts. The
     // zoom state commits first (urgent update); the route change is a
