@@ -279,6 +279,31 @@ async function main() {
     }
 
     if (process.env.HEADFUL === "1") return;
+    // /for-agents: lunar landing page with one-click assistant launchers.
+    for (const [name, options] of [
+      ["agents-desktop", { viewport: { width: 1440, height: 900 } }],
+      ["agents-mobile", devices["iPhone 13"]],
+    ]) {
+      const context = await browser.newContext(options);
+      const page = await context.newPage();
+      progress.scenario = name;
+      progress.page = page;
+      page.setDefaultTimeout(15000);
+      await checkPage(page, "/for-agents", name);
+      for (const [label, prefix] of [["Open in ChatGPT", "https://chatgpt.com/?q="], ["Open in Claude", "https://claude.ai/new?q="]]) {
+        const link = page.getByRole("link", { name: new RegExp(`^${label}`) });
+        assert.equal(await link.count(), 1, `${name}: ${label} button`);
+        const href = await link.getAttribute("href");
+        assert.ok(href.startsWith(prefix), `${label} uses ${prefix}`);
+        assert.match(decodeURIComponent(href.slice(prefix.length)), /https:\/\/me-pink-ten\.vercel\.app\/api\/mcp/, `${label} prompt points at the MCP server`);
+        assert.equal(await link.getAttribute("target"), "_blank");
+        assert.match(await link.getAttribute("rel"), /noopener/);
+      }
+      assert.equal(await page.getByRole("button", { name: "Copy prompt" }).count(), 1, "Copy-prompt fallback");
+      assert.equal(await page.locator("main pre").count() >= 4, true, "Prompt and connector snippets are rendered");
+      assert.equal(await page.locator("main").evaluate((el) => /planet/i.test(el.outerHTML)), false, "No 'planet' wording on /for-agents");
+      await context.close();
+    }
     for (const [name, options] of [
       ["small-mobile", { viewport: { width: 320, height: 740 }, isMobile: true, hasTouch: true }],
       ["no-javascript", { javaScriptEnabled: false }],
