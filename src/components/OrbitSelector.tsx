@@ -30,6 +30,28 @@ enum OrbitSlot {
 /** Slot for each offset from the centred item (offset 1 is "next"). */
 const SLOT_BY_OFFSET: readonly OrbitSlot[] = [OrbitSlot.Center, OrbitSlot.Right, OrbitSlot.Back, OrbitSlot.Left];
 
+/** Surface texture family each world is painted with (pure CSS layers). */
+enum OrbSurface {
+  Banded = "banded",
+  Cratered = "cratered",
+  Oceanic = "oceanic",
+  Storm = "storm",
+}
+
+/** Texture per world; unknown slugs fall back to the banded giant. */
+const SURFACE_BY_SLUG: Readonly<Record<string, OrbSurface>> = {
+  hackathons: OrbSurface.Banded,
+  teaching: OrbSurface.Cratered,
+  projects: OrbSurface.Oceanic,
+  education: OrbSurface.Storm,
+};
+
+/** Worlds escorted by a small moon on a tilted orbit. */
+const MOON_SLUGS: ReadonlySet<string> = new Set(["education", "teaching"]);
+
+/** Inline style carrying a world's colour tokens as CSS custom properties. */
+type ToneStyle = CSSProperties & Record<`--${string}`, string>;
+
 enum StepSpeed {
   Auto = "auto",
   User = "user",
@@ -44,8 +66,9 @@ function wrap(i: number, count: number): number {
  * is large in the centre, the other three ride a faint tilted ellipse around
  * it (left, right and a smaller, dimmer one at the back).
  *
- * - Prev / next buttons, ← → keys and a horizontal swipe rotate every item one
- *   slot along the ellipse; clicking an outer item brings it to the centre.
+ * - ← → keys and a horizontal swipe rotate every item one slot along the
+ *   ellipse; clicking an outer item brings it to the centre. Keyboard steps
+ *   keep focus on the new centred item.
  * - The centred item is a real link: activating it zooms into it and then
  *   navigates (modified clicks keep the browser's default behaviour).
  * - Slow auto-rotation pauses on hover, focus, interaction, when the section
@@ -53,7 +76,9 @@ function wrap(i: number, count: number): number {
  *
  * Motion is CSS transitions on transforms only: the horizontal and vertical
  * moves use different easings, so a step travels along a curve instead of a
- * straight line. No per-frame JS and no 3D.
+ * straight line. Each world is layered CSS (texture, clouds, shading,
+ * atmosphere, optional ring and moon); its slow spin is a transform
+ * animation that pauses off screen. No per-frame JS, no canvas and no 3D.
  */
 export function OrbitSelector() {
   const { t, tl } = useI18n();
@@ -68,15 +93,27 @@ export function OrbitSelector() {
   /** When the section last came on screen (0 while off screen). */
   const visibleSince = useRef(0);
   const swipeX = useRef<number | null>(null);
+  /** Set by keyboard steps so focus follows the item that reaches the centre. */
+  const focusCenter = useRef(false);
+  const centerRef = useRef<HTMLAnchorElement>(null);
 
   const current = PROJECTS[active];
   const nameOf = (p: Project) => (p.title ? tl(p.title) : p.name);
 
-  const step = (delta: number, by: StepSpeed = StepSpeed.User) => {
+  const step = (delta: number, by: StepSpeed = StepSpeed.User, keepFocus = false) => {
+    focusCenter.current = keepFocus;
     if (by === StepSpeed.User) skipTicks.current = USER_PAUSE_TICKS;
     setSpeed(by);
     setActive((a) => wrap(a + delta, count));
   };
+
+  // The focused element unmounts when its item changes slot (link <-> button),
+  // so keyboard steps hand focus to the new centred link.
+  useEffect(() => {
+    if (!focusCenter.current) return;
+    focusCenter.current = false;
+    centerRef.current?.focus();
+  }, [active]);
 
   // Slow auto-rotation, only while the section is on screen and idle.
   useEffect(() => {
@@ -85,6 +122,8 @@ export function OrbitSelector() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const observer = new IntersectionObserver(([entry]) => {
       visibleSince.current = entry.isIntersecting ? Date.now() : 0;
+      // Surface spin, clouds and moons pause while the selector is off screen.
+      root.toggleAttribute("data-offscreen", !entry.isIntersecting);
     });
     observer.observe(root);
     const timer = window.setInterval(() => {
@@ -108,10 +147,10 @@ export function OrbitSelector() {
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "ArrowRight") {
       event.preventDefault();
-      step(1);
+      step(1, StepSpeed.User, true);
     } else if (event.key === "ArrowLeft") {
       event.preventDefault();
-      step(-1);
+      step(-1, StepSpeed.User, true);
     }
   };
 
@@ -138,9 +177,6 @@ export function OrbitSelector() {
     setEntering(slug);
     window.setTimeout(() => router.push(`/${slug}`), ENTER_MS);
   };
-
-  const prev = PROJECTS[wrap(active - 1, count)];
-  const next = PROJECTS[wrap(active + 1, count)];
 
   return (
     <div
@@ -171,39 +207,57 @@ export function OrbitSelector() {
           const offset = wrap(i - active, count);
           const slot = SLOT_BY_OFFSET[offset];
           const isCenter = slot === OrbitSlot.Center;
-          const tone = { "--tone": p.planet.atmoA, "--tone-2": p.planet.atmoB, "--tone-deep": p.planet.body } as CSSProperties;
+          const ring = p.planet.ring;
+          const tone: ToneStyle = {
+            "--tone": p.planet.atmoA,
+            "--tone-2": p.planet.atmoB,
+            "--tone-deep": p.planet.body,
+            ...(ring ? { "--ring": ring } : {}),
+          };
           const name = nameOf(p);
-          const body = (
-            <>
-              <span className="orbit-select__orb" aria-hidden="true" />
-              <span className="orbit-select__name">{name}</span>
-            </>
-          );
           return (
             <div key={p.slug} className="orbit-select__slot" data-slot={slot} style={tone}>
-              <div className="orbit-select__lift">
+              <div className={`orbit-select__lift${entering === p.slug ? " is-zooming" : ""}`}>
+                {/* The control is an overlay over the world, so the world and
+                    its label stay mounted (spin and label size keep going)
+                    when the item swaps between link and button. */}
                 {isCenter ? (
                   <Link
+                    ref={centerRef}
                     id="world-details"
                     href={`/${p.slug}`}
-                    className={`orbit-select__body is-center${entering === p.slug ? " is-zooming" : ""}`}
+                    className="orbit-select__body is-center"
                     aria-label={tl({ es: `Entrar: ${name}`, en: `Enter: ${name}` })}
                     data-no-warp=""
                     onClick={(event) => enter(event, p.slug)}
-                  >
-                    {body}
-                  </Link>
+                  />
                 ) : (
                   <button
                     type="button"
                     className="orbit-select__body"
                     aria-label={tl({ es: `Traer al centro: ${name}`, en: `Bring to centre: ${name}` })}
                     // Offset 3 is one step back; offset 2 (the back slot) goes either way.
-                    onClick={() => step(offset > count / 2 ? offset - count : offset)}
-                  >
-                    {body}
-                  </button>
+                    // A keyboard activation (detail 0) keeps focus on the new centre.
+                    onClick={(event) => step(offset > count / 2 ? offset - count : offset, StepSpeed.User, event.detail === 0)}
+                  />
                 )}
+                <span className="orbit-select__orb" data-surface={SURFACE_BY_SLUG[p.slug] ?? OrbSurface.Banded} aria-hidden="true">
+                  <span className="orbit-select__halo" />
+                  {ring ? <span className="orbit-select__ring is-back" /> : null}
+                  <span className="orbit-select__globe">
+                    <span className="orbit-select__map" />
+                    <span className="orbit-select__clouds" />
+                  </span>
+                  {ring ? <span className="orbit-select__ring is-front" /> : null}
+                  {MOON_SLUGS.has(p.slug) ? (
+                    <span className="orbit-select__moon-path">
+                      <span className="orbit-select__moon" />
+                    </span>
+                  ) : null}
+                </span>
+                <span className="orbit-select__name" aria-hidden="true">
+                  {name}
+                </span>
               </div>
             </div>
           );
@@ -216,23 +270,7 @@ export function OrbitSelector() {
         <p className="sr-only" aria-live="polite" aria-atomic="true">
           {nameOf(current)}
         </p>
-        <span className="orbit-select__count" style={{ color: current.planet.atmoA }}>
-          {String(active + 1).padStart(2, "0")} / {String(count).padStart(2, "0")} · {current.year}
-        </span>
         {current.tagline ? <p className="orbit-select__tagline">{tl(current.tagline)}</p> : null}
-      </div>
-
-      <div className="orbit-select__controls">
-        <button type="button" className="orbit-select__step" onClick={() => step(-1)} aria-label={tl({ es: `Anterior: ${nameOf(prev)}`, en: `Previous: ${nameOf(prev)}` })}>
-          <span aria-hidden="true">←</span>
-        </button>
-        <Link href={`/${current.slug}`} className="orbit-select__enter" data-no-warp="" onClick={(event) => enter(event, current.slug)}>
-          {tl({ es: "Entrar", en: "Enter" })}
-          <span aria-hidden="true">→</span>
-        </Link>
-        <button type="button" className="orbit-select__step" onClick={() => step(1)} aria-label={tl({ es: `Siguiente: ${nameOf(next)}`, en: `Next: ${nameOf(next)}` })}>
-          <span aria-hidden="true">→</span>
-        </button>
       </div>
     </div>
   );
