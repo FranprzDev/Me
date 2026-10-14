@@ -20,6 +20,8 @@ assert.equal(agentsPage.status, 200);
 const agentsHtml = await agentsPage.text();
 assert.match(agentsHtml, /\/api\/mcp/, "/for-agents shows the MCP endpoint");
 assert.match(agentsHtml, /claude mcp add --transport http/);
+assert.match(agentsHtml, /href="https:\/\/chatgpt\.com\/\?q=[^"]+"/, "/for-agents opens ChatGPT with a prompt");
+assert.match(agentsHtml, /href="https:\/\/claude\.ai\/new\?q=[^"]+"/, "/for-agents opens Claude with a prompt");
 assert.doesNotMatch(agentsHtml, /EmbeddingGemma|Qwen/);
 
 const card = await (await fetch(`${baseUrl}/.well-known/agent-card.json`)).json();

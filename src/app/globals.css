@@ -1934,32 +1934,6 @@ button:focus-visible {
   }
 }
 
-/* --- /for-agents: how to connect to the MCP server --- */
-.agents-wrap { display: grid; gap: 1.4rem; max-width: 820px; padding-top: 6rem; }
-.agents-heading h1 { margin: 0.6rem 0 0.8rem; font-size: clamp(2.4rem, 6vw, 4rem); }
-.agents-heading p { max-width: 68ch; color: var(--muted); line-height: 1.7; }
-.agents-card { padding: clamp(1.2rem, 3vw, 2rem); }
-.agents-card h2 { margin: 0 0 0.8rem; font-size: 1.3rem; }
-.agents-card h3 { margin: 1.4rem 0 0.4rem; font-size: 1rem; }
-.agents-card p { margin: 0.3rem 0; color: var(--muted); line-height: 1.6; }
-.agents-card pre {
-  margin: 0.6rem 0 0;
-  padding: 0.8rem 1rem;
-  overflow-x: auto;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0.7rem;
-  background: rgba(4, 6, 16, 0.85);
-  color: #e6ecff;
-  font: 0.82rem/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
-}
-.agents-tools { display: grid; gap: 0.6rem; margin: 0; padding: 0; list-style: none; }
-.agents-tools li { display: grid; grid-template-columns: minmax(9rem, auto) 1fr; gap: 0.8rem; align-items: baseline; }
-.agents-tools code { color: var(--space); font-size: 0.85rem; }
-.agents-tools span { color: var(--fg); font-size: 0.9rem; }
-.agents-note { margin-top: 1rem !important; font-size: 0.85rem; }
-@media (max-width: 600px) {
-  .agents-tools li { grid-template-columns: 1fr; gap: 0.2rem; }
-}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Phones and touch-first screens: no backdrop blur anywhere.
