@@ -174,9 +174,11 @@ export function OrbitSelector() {
     }
     setEntering(slug);
     // Navigate right away instead of after the zoom: the zoom is a compositor
-    // transition, so it keeps playing while the (prefetched) world mounts. One
-    // frame first, so the zoom has started before the route work begins.
-    window.requestAnimationFrame(() => router.push(`/${slug}`));
+    // transition, so it keeps playing while the (prefetched) world mounts. The
+    // zoom state commits first (urgent update); the route change is a
+    // transition, rendered after it. Not gated on requestAnimationFrame: with
+    // a busy WebGPU canvas a frame can be late, and the jump must not wait.
+    router.push(`/${slug}`);
   };
 
   return (
