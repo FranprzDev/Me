@@ -2515,3 +2515,139 @@ button:focus-visible {
     transform: translateY(calc(var(--orb-d) * 0.14));
   }
 }
+
+/* ─── World-entry flights ─────────────────────────────────────────────────
+   Overlay flying the entered world's vehicle along its tangent curve
+   (components/WorldEntryFlight, lib/worldFlight). Fixed, clipped and
+   pointer-transparent; the path itself is a WAAPI transform animation and
+   the vehicles' idle motion below animates transform/opacity only. */
+.world-flight {
+  position: fixed;
+  inset: 0;
+  z-index: 86;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+  --vehicle-size: clamp(84px, 8.5vw, 124px);
+}
+.world-flight__vehicle,
+.world-flight__echo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.world-flight__vehicle {
+  width: var(--vehicle-size);
+  height: var(--vehicle-size);
+  margin: calc(var(--vehicle-size) / -2) 0 0 calc(var(--vehicle-size) / -2);
+}
+.world-flight__vehicle .vehicle-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.world-flight .vehicle-art * {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+/* UFO afterglow: soft tone orbs trailing the saucer. */
+.world-flight__echo {
+  width: calc(var(--vehicle-size) * 0.55);
+  height: calc(var(--vehicle-size) * 0.3);
+  margin: calc(var(--vehicle-size) * -0.15) 0 0 calc(var(--vehicle-size) * -0.275);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--tone) calc(var(--echo) * 70%), transparent), transparent);
+}
+/* UFO arrival: a tone shockwave where it dives into the world. */
+.world-flight__burst {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  margin: -90px 0 0 -90px;
+  border-radius: 50%;
+  opacity: 0;
+  border: 3px solid var(--tone-2);
+  box-shadow: 0 0 24px 6px color-mix(in srgb, var(--tone) 60%, transparent), inset 0 0 24px 4px color-mix(in srgb, var(--tone) 45%, transparent);
+}
+.vehicle-art--ufo .ufo__body {
+  animation: ufo-wobble 300ms ease-in-out infinite alternate;
+}
+.vehicle-art--ufo .ufo__glow {
+  animation: ufo-pulse 220ms ease-in-out infinite alternate;
+}
+.vehicle-art--ufo .ufo__beam {
+  transform-origin: top center;
+  animation: ufo-beam 140ms ease-in-out infinite alternate;
+}
+.vehicle-art--ufo .ufo__beam-rings ellipse {
+  animation: ufo-rings 360ms linear infinite;
+}
+.vehicle-art--ufo .ufo__beam-rings ellipse:last-child {
+  animation-delay: -180ms;
+}
+.vehicle-art--ufo .ufo__light {
+  animation: ufo-light 280ms steps(2, jump-none) infinite alternate;
+}
+@keyframes ufo-wobble {
+  from { transform: rotate(-8deg) translateY(-1.5px); }
+  to { transform: rotate(8deg) translateY(1.5px); }
+}
+@keyframes ufo-pulse {
+  from { transform: scale(0.88); opacity: 0.7; }
+  to { transform: scale(1.12); opacity: 1; }
+}
+@keyframes ufo-beam {
+  from { transform: scaleX(0.82); opacity: 0.65; }
+  to { transform: scaleX(1.08); opacity: 1; }
+}
+@keyframes ufo-rings {
+  from { transform: translateY(-14px) scale(0.6); opacity: 0; }
+  40% { opacity: 1; }
+  to { transform: translateY(16px) scale(1.25); opacity: 0; }
+}
+@keyframes ufo-light {
+  from { opacity: 0.25; }
+  to { opacity: 1; }
+}
+.vehicle-art--book .book__wing--up {
+  transform-origin: bottom center;
+  animation: book-flap 150ms ease-in-out infinite alternate;
+}
+.vehicle-art--book .book__wing--down {
+  transform-origin: top center;
+  animation: book-flap 150ms ease-in-out infinite alternate;
+}
+.vehicle-art--book .book__spark {
+  animation: ufo-light 200ms ease-in-out infinite alternate;
+}
+@keyframes book-flap {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(0.22); }
+}
+.vehicle-art--hammer .hammer__spin {
+  animation: hammer-spin 260ms linear infinite;
+}
+.vehicle-art--hammer .hammer__swirl {
+  animation: hammer-spin 520ms linear infinite reverse;
+}
+@keyframes hammer-spin {
+  to { transform: rotate(360deg); }
+}
+.vehicle-art--plane .plane__body {
+  animation: plane-roll 240ms ease-in-out infinite alternate;
+}
+.vehicle-art--plane .plane__trail {
+  animation: ufo-light 160ms ease-in-out infinite alternate;
+}
+@keyframes plane-roll {
+  from { transform: scaleY(1) rotate(-3deg); }
+  to { transform: scaleY(0.78) rotate(3deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .world-flight {
+    display: none;
+  }
+}
