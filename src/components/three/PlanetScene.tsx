@@ -149,28 +149,24 @@ function WorldAtmosphere({
 }
 
 /**
- * ESCENA DE PLANETA, rendered inside the persistent backdrop canvas: the set
- * piece and atmosphere come from worlds.ts. On mount it snaps the shared camera
- * to this world's approach (where the home cosmos left it is meaningless here).
+ * The visible parts of a world: lights, set piece, membrane, moon and sky. The
+ * live route scene and the idle warm-up (warmup.tsx) render the same body, so
+ * the warm-up compiles exactly the materials a visit will draw.
  */
-export function WorldContents({
+export function WorldBody({
   world,
+  progress,
+  velocity,
   reduced,
   performanceMode,
 }: {
   world: WorldSpec;
+  progress: RefObject<number>;
+  velocity: RefObject<number>;
   reduced: boolean;
   performanceMode: boolean;
 }) {
-  const { progress, velocity } = useRouteMotion();
   const SetPiece = WORLD_SET_PIECES[world.kind];
-  const camera = useThree((state) => state.camera) as THREE.PerspectiveCamera;
-  useEffect(() => {
-    camera.position.copy(worldCameraPosition(world, 0, reduced));
-    camera.fov = world.camera.fov;
-    camera.updateProjectionMatrix();
-    camera.lookAt(0, 0, 0);
-  }, [camera, world, reduced]);
 
   // El set piece se revela con el progreso INTERIOR: lo que leés está adentro,
   // y lo que se enciende tiene que coincidir con el texto que estás leyendo.
@@ -183,9 +179,6 @@ export function WorldContents({
     <>
       <ambientLight intensity={0.5} />
       <pointLight color={world.key.color} intensity={world.key.intensity * 6} position={[0, 4, 5]} />
-
-      <WorldRig world={world} progress={progress} reduced={reduced} />
-      <WorldAtmosphere world={world} progress={progress} />
 
       <PlanetSpin>
         <SetPiece
@@ -215,6 +208,44 @@ export function WorldContents({
         reduced={reduced}
         performanceMode={performanceMode}
         color={world.tint}
+      />
+    </>
+  );
+}
+
+/**
+ * ESCENA DE PLANETA, rendered inside the persistent backdrop canvas: the set
+ * piece and atmosphere come from worlds.ts. On mount it snaps the shared camera
+ * to this world's approach (where the home cosmos left it is meaningless here).
+ */
+export function WorldContents({
+  world,
+  reduced,
+  performanceMode,
+}: {
+  world: WorldSpec;
+  reduced: boolean;
+  performanceMode: boolean;
+}) {
+  const { progress, velocity } = useRouteMotion();
+  const camera = useThree((state) => state.camera) as THREE.PerspectiveCamera;
+  useEffect(() => {
+    camera.position.copy(worldCameraPosition(world, 0, reduced));
+    camera.fov = world.camera.fov;
+    camera.updateProjectionMatrix();
+    camera.lookAt(0, 0, 0);
+  }, [camera, world, reduced]);
+
+  return (
+    <>
+      <WorldRig world={world} progress={progress} reduced={reduced} />
+      <WorldAtmosphere world={world} progress={progress} />
+      <WorldBody
+        world={world}
+        progress={progress}
+        velocity={velocity}
+        reduced={reduced}
+        performanceMode={performanceMode}
       />
     </>
   );
