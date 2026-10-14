@@ -302,6 +302,7 @@ async function main() {
       assert.equal(await page.getByRole("button", { name: "Copy prompt" }).count(), 1, "Copy-prompt fallback");
       assert.equal(await page.locator("main pre").count() >= 4, true, "Prompt and connector snippets are rendered");
       assert.equal(await page.locator("main").evaluate((el) => /planet/i.test(el.outerHTML)), false, "No 'planet' wording on /for-agents");
+      assert.equal(await page.locator("main").evaluate((el) => /CH-0\d \/\//.test(el.outerHTML)), false, "No channel labels (CH-0x //) on /for-agents panels");
       await context.close();
     }
     for (const [name, options] of [

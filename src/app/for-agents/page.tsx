@@ -51,7 +51,6 @@ export default async function ForAgentsPage() {
       <div className="wrap moon-deck">
         <section className="moon-panel" aria-labelledby="agents-ask">
           <header className="moon-panel__bar" aria-hidden="true">
-            <span>CH-00 // QUICK LAUNCH</span>
             <span className="moon-panel__led">GO</span>
           </header>
           <h2 id="agents-ask">Ask an assistant</h2>
@@ -61,7 +60,6 @@ export default async function ForAgentsPage() {
 
         <section className="moon-panel" aria-labelledby="agents-endpoint">
           <header className="moon-panel__bar" aria-hidden="true">
-            <span>CH-01 // UPLINK</span>
             <span className="moon-panel__led">NOMINAL</span>
           </header>
           <h2 id="agents-endpoint">Endpoint</h2>
@@ -86,7 +84,6 @@ export default async function ForAgentsPage() {
 
         <section className="moon-panel" aria-labelledby="agents-tools">
           <header className="moon-panel__bar" aria-hidden="true">
-            <span>CH-02 // PAYLOAD MANIFEST</span>
             <span className="moon-panel__led">{String(TOOLS.length).padStart(2, "0")} TOOLS</span>
           </header>
           <h2 id="agents-tools">Tools</h2>
