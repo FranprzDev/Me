@@ -508,3 +508,10 @@
     animation: none;
   }
 }
+
+/* Code blocks scroll horizontally, so they take keyboard focus (axe:
+   scrollable-region-focusable); show it clearly. */
+.moon-panel pre:focus-visible {
+  outline: 2px solid #bed0ff;
+  outline-offset: 2px;
+}

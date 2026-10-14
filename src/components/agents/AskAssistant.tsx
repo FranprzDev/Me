@@ -69,7 +69,7 @@ export function AskAssistant() {
       </p>
       <details ref={promptRef} className="moon-launch__prompt">
         <summary>See the prompt</summary>
-        <pre>
+        <pre tabIndex={0}>
           <code>{ASSISTANT_PROMPT}</code>
         </pre>
       </details>

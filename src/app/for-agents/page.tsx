@@ -65,13 +65,13 @@ export default async function ForAgentsPage() {
             <span className="moon-panel__led">NOMINAL</span>
           </header>
           <h2 id="agents-endpoint">Endpoint</h2>
-          <pre>
+          <pre tabIndex={0}>
             <code>{endpoint}</code>
           </pre>
 
           <h3>Claude</h3>
           <p>Claude.ai or Claude Desktop: Settings → Connectors → Add custom connector, and paste the endpoint. Claude Code:</p>
-          <pre>
+          <pre tabIndex={0}>
             <code>{`claude mcp add --transport http francisco-perez ${endpoint}`}</code>
           </pre>
 
@@ -79,7 +79,7 @@ export default async function ForAgentsPage() {
           <p>Settings → Connectors (developer mode) → Create, choose MCP server URL, paste the endpoint, no authentication.</p>
 
           <h3>Any MCP client (JSON config)</h3>
-          <pre>
+          <pre tabIndex={0}>
             <code>{JSON.stringify({ mcpServers: { "francisco-perez": { type: "http", url: endpoint } } }, null, 2)}</code>
           </pre>
         </section>
