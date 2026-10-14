@@ -102,7 +102,7 @@ export function Nav() {
               aria-label={tl({ es: "Cambiar a inglés", en: "Switch to Spanish" })}
               data-lang-switch
             >
-              {lang === "es" ? "ES · 🇦🇷" : "EN · 🇬🇧"}
+              {lang === "es" ? "ES" : "EN"}
             </Link>
           ) : (
             <button
@@ -111,7 +111,7 @@ export function Nav() {
               style={{ cursor: "pointer", color: "var(--fg)", background: "rgba(255,255,255,0.05)" }}
               aria-label={tl({ es: "Cambiar a inglés", en: "Switch to Spanish" })}
             >
-              {lang === "es" ? "ES · 🇦🇷" : "EN · 🇬🇧"}
+              {lang === "es" ? "ES" : "EN"}
             </button>
           )}
           <button

@@ -926,7 +926,7 @@ html:has(.cv-root) {
     min-height: 0;
     /* Body never below 9.5pt: one page comes from content choices, not tiny type. */
     font-size: 9.6pt;
-    line-height: 1.36;
+    line-height: 1.32;
     color: #1d2a3f;
   }
   .cv-bar {
@@ -965,7 +965,7 @@ html:has(.cv-root) {
     color: var(--cv-accent);
   }
   .cv-section {
-    margin-top: 7pt;
+    margin-top: 6pt;
   }
   .cv-section h2 {
     font-size: 8.5pt;
@@ -977,7 +977,7 @@ html:has(.cv-root) {
     font-size: 9.8pt;
   }
   .cv-list {
-    gap: 6pt;
+    gap: 5pt;
   }
   .cv-skills__row {
     grid-template-columns: 33mm 1fr;
@@ -999,7 +999,7 @@ html:has(.cv-root) {
      side, certifications after them across the full width. */
   .cv-doc {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
     column-gap: 8mm;
   }
   .cv-doc > * {

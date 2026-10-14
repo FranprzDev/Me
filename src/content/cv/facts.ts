@@ -167,7 +167,7 @@ export const SKILL_LANGUAGES = {
   value: { en: "TypeScript, JavaScript, Python, SQL", es: "TypeScript, JavaScript, Python, SQL" },
 };
 export const SKILL_DATA_CLOUD = {
-  label: { en: "Databases & Cloud", es: "Bases de datos y cloud" },
+  label: { en: "Databases & Cloud", es: "BBDD y cloud" },
   value: { en: "PostgreSQL, MongoDB, Supabase, AWS, Vercel, Netlify", es: "PostgreSQL, MongoDB, Supabase, AWS, Vercel, Netlify" },
 };
 export const SKILL_PRACTICES = {
