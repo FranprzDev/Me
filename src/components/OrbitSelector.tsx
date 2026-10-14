@@ -10,8 +10,6 @@ import { useI18n } from "@/lib/i18n";
 const AUTO_STEP_MS = 6500;
 /** After the user moves the orbit, auto-rotation skips this many ticks. */
 const USER_PAUSE_TICKS = 2;
-/** Duration of the zoom into the centred item before navigating. */
-const ENTER_MS = 420;
 /** Horizontal swipe distance (px) that counts as a step. */
 const SWIPE_PX = 40;
 
@@ -69,8 +67,8 @@ function wrap(i: number, count: number): number {
  * - ← → keys and a horizontal swipe rotate every item one slot along the
  *   ellipse; clicking an outer item brings it to the centre. Keyboard steps
  *   keep focus on the new centred item.
- * - The centred item is a real link: activating it zooms into it and then
- *   navigates (modified clicks keep the browser's default behaviour).
+ * - The centred item is a real link: activating it zooms into it while the
+ *   world route loads (modified clicks keep the browser's default behaviour).
  * - Slow auto-rotation pauses on hover, focus, interaction, when the section
  *   is off screen or the tab is hidden, and is off with prefers-reduced-motion.
  *
@@ -175,7 +173,10 @@ export function OrbitSelector() {
       return;
     }
     setEntering(slug);
-    window.setTimeout(() => router.push(`/${slug}`), ENTER_MS);
+    // Navigate right away instead of after the zoom: the zoom is a compositor
+    // transition, so it keeps playing while the (prefetched) world mounts. One
+    // frame first, so the zoom has started before the route work begins.
+    window.requestAnimationFrame(() => router.push(`/${slug}`));
   };
 
   return (
