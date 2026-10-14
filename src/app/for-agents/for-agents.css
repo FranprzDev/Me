@@ -267,7 +267,7 @@
 .moon-panel__bar {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 0.4rem 1rem;
   margin: 0 calc(clamp(1.1rem, 3vw, 2rem) * -1) 1.1rem;
   padding: 0.65rem clamp(1.1rem, 3vw, 2rem);
