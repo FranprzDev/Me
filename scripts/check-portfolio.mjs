@@ -166,35 +166,43 @@ async function main() {
       assert.equal(await page.locator("#projects").evaluate((el) => /planet/i.test(el.outerHTML)), false, "No 'planet' wording in the selector markup");
       const worldCard = page.locator("#world-details");
       assert.equal(await worldCard.evaluate((el) => el.tagName), "A", "Front item is a real link");
-      const nextButton = page.getByRole("button", { name: /^Siguiente: / });
+      assert.equal(await page.locator("#projects .orbit-select__controls, #projects .orbit-select__count").count(), 0, "No controls row or counter under the selector");
+      assert.equal(await page.locator("#projects").getByRole("button", { name: /^(Siguiente|Anterior): / }).count(), 0, "No prev / next buttons");
+      assert.equal(await page.locator("#projects").getByRole("link", { name: "Entrar", exact: true }).count(), 0, "No separate Enter pill");
+      // Arrow keys rotate the orbit and keep focus on the new centred item.
+      await worldCard.focus();
       for (let index = 0; index < 4; index++) {
         assert.equal(await worldCard.getAttribute("href"), routes[index + 1], "Front item links to its world page");
-        await nextButton.click();
+        await page.keyboard.press("ArrowRight");
+        await page.waitForFunction(() => document.activeElement?.id === "world-details", null, { timeout: 2000 });
       }
       assert.equal(await worldCard.getAttribute("href"), routes[1], "Orbit wraps");
-      await page.getByRole("button", { name: /^Anterior: / }).click();
-      assert.equal(await worldCard.getAttribute("href"), routes[4]);
-      // Arrow keys rotate the orbit while focus is inside it.
-      await page.keyboard.press("ArrowRight");
-      assert.equal(await worldCard.getAttribute("href"), routes[1], "ArrowRight brings the next item forward");
       await page.keyboard.press("ArrowLeft");
       assert.equal(await worldCard.getAttribute("href"), routes[4], "ArrowLeft brings the previous item forward");
-      // An outer item is a button that brings it to the centre.
-      await page.getByRole("button", { name: /^Traer al centro: / }).first().click();
-      assert.notEqual(await worldCard.getAttribute("href"), routes[4], "Clicking an outer item brings it to the centre");
+      await page.keyboard.press("ArrowRight");
+      assert.equal(await worldCard.getAttribute("href"), routes[1], "ArrowRight brings the next item forward");
+      // An outer item is a button that brings that exact item to the centre.
+      const sideButton = page.locator('#projects .orbit-select__slot[data-slot="right"] button');
+      const sideName = (await sideButton.getAttribute("aria-label")).replace(/^Traer al centro: /, "");
+      await sideButton.click();
+      assert.equal(await worldCard.getAttribute("href"), routes[2], "Clicking the right item brings it to the centre");
+      assert.equal(await worldCard.getAttribute("aria-label"), `Entrar: ${sideName}`, "The clicked item is the one centred");
+      await page.locator('#projects .orbit-select__slot[data-slot="left"] button').click();
+      assert.equal(await worldCard.getAttribute("href"), routes[1], "Clicking the left item brings it to the centre");
       assert.equal(await page.locator("#world-panel, .world-card__toggle, .world-card__close, #projects [aria-expanded]").count(), 0, "No inline expansion");
       for (const gone of ["Abrir página completa", "Tocá la tarjeta para cerrar", "Tocá la tarjeta para ver este mundo", "más en la ruta completa", "Explorar este mundo"]) {
         assert.equal(await page.locator("#projects").getByText(gone).count(), 0, `Worlds section never renders "${gone}"`);
       }
       assert.equal(await page.locator("#projects").getByText("Cerrar", { exact: true }).count(), 0, "Worlds section has no Close button");
-      // The Enter pill goes to the focused item's world.
+      // Clicking the centred world goes to its page.
       const focusedHref = await worldCard.getAttribute("href");
-      await Promise.all([page.waitForURL(`**${focusedHref}`), page.locator("#projects .orbit-select__enter").click()]);
+      await Promise.all([page.waitForURL(`**${focusedHref}`), worldCard.click()]);
       await page.goto(`${baseURL}/#projects`);
       await page.locator("#world-details").waitFor();
       // Enter on the focused item zooms in and goes straight to the world.
       await page.locator("#projects").scrollIntoViewIfNeeded();
-      while ((await worldCard.getAttribute("href")) !== routes[1]) await nextButton.click();
+      await worldCard.focus();
+      while ((await worldCard.getAttribute("href")) !== routes[1]) await page.keyboard.press("ArrowRight");
       await worldCard.focus();
       await Promise.all([page.waitForURL(`**${routes[1]}`), page.keyboard.press("Enter")]);
       await page.locator(".story-back").waitFor();

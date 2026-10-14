@@ -1963,8 +1963,9 @@ button:focus-visible {
   overflow-x: clip;
 }
 .orbit-select {
-  /* Diameter of the centred sphere; outer items are scaled-down copies. */
-  --orb-d: clamp(190px, 21vw, 290px);
+  /* Diameter of the centred sphere; outer items are scaled-down copies.
+     Capped by the viewport height so short screens still fit it whole. */
+  --orb-d: clamp(240px, min(28vw, 46vh), 390px);
   /* Ellipse radii: wide enough to reach the empty sides of the hero. */
   --rx: min(39vw, 600px);
   --ry: calc(var(--orb-d) * 0.62);
@@ -1985,13 +1986,13 @@ button:focus-visible {
   position: relative;
   width: 100%;
   /* Back item peeking above the centre sphere + centre sphere + its name. */
-  height: calc(var(--orb-d) * 1.32 + 3.4rem);
+  height: calc(var(--orb-d) * 1.38 + 3.4rem);
   touch-action: pan-y;
 }
 /* Faint orbit line through the outer items. */
 .orbit-select__track {
   position: absolute;
-  top: calc(var(--orb-d) * 0.8);
+  top: calc(var(--orb-d) * 0.86);
   left: 50%;
   width: calc(var(--rx) * 2);
   height: calc(var(--ry) * 2);
@@ -2009,7 +2010,7 @@ button:focus-visible {
   --s: 1;
   --o: 1;
   position: absolute;
-  top: calc(var(--orb-d) * 0.8);
+  top: calc(var(--orb-d) * 0.86);
   left: 50%;
   z-index: 3;
   width: 0;
@@ -2046,92 +2047,393 @@ button:focus-visible {
     transform var(--orbit-dur) var(--orbit-y-ease),
     opacity var(--orbit-dur) ease;
 }
+/* Click / focus target: a transparent overlay over the world and its label.
+   The world and label are its siblings, so they stay mounted when the item
+   swaps between link (centre) and button (outer). */
 .orbit-select__body {
   position: absolute;
-  /* Centre the sphere (first child) on the slot point. */
+  z-index: 1;
   top: calc(var(--orb-d) / -2);
   left: calc(var(--orb-d) / -2);
-  display: grid;
-  justify-items: center;
-  gap: 0.7rem;
   width: var(--orb-d);
+  height: calc(var(--orb-d) + 2.6rem);
   padding: 0;
   border: 0;
   border-radius: 0;
   background: none;
-  color: var(--fg);
-  font: inherit;
-  text-decoration: none;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.orbit-select__lift.is-zooming {
+  scale: 1.8;
+  opacity: 0;
   transition:
     scale 420ms cubic-bezier(0.5, 0, 0.75, 0),
     opacity 300ms ease;
 }
+
+/* ─── The world itself ────────────────────────────────────────────────────
+   Layers, back to front: starlight halo (centre only), back half of the
+   ring, the globe (scrolling texture + faster cloud deck, then terminator
+   shading and specular light painted on top), front half of the ring, the
+   moon, and the atmosphere rim. Colours come from --tone (bright), --tone-2
+   (pale) and --tone-deep (dark). Only transforms and opacity animate. */
 .orbit-select__orb {
-  position: relative;
+  position: absolute;
+  /* Centred on the slot point. */
+  top: calc(var(--orb-d) / -2);
+  left: calc(var(--orb-d) / -2);
+  isolation: isolate;
   width: var(--orb-d);
   height: var(--orb-d);
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 32% 28%, color-mix(in srgb, var(--tone-2) 80%, #fff) 0 4%, transparent 26%),
-    radial-gradient(circle at 70% 76%, rgba(2, 4, 14, 0.78) 0 18%, transparent 62%),
-    radial-gradient(circle at 38% 34%, var(--tone) 0%, color-mix(in srgb, var(--tone) 55%, var(--tone-deep)) 40%, color-mix(in srgb, var(--tone-deep) 70%, #02040c) 78%);
-  box-shadow:
-    inset -14px -18px 40px rgba(0, 0, 0, 0.45),
-    inset 6px 8px 24px color-mix(in srgb, var(--tone-2) 30%, transparent),
-    0 0 0 2px color-mix(in srgb, var(--tone) 30%, transparent),
-    0 0 60px color-mix(in srgb, var(--tone) 40%, transparent),
-    0 0 140px color-mix(in srgb, var(--tone) 18%, transparent);
-  transition: box-shadow 220ms ease;
 }
-/* Thin atmosphere halo. */
+/* Atmosphere: a thin luminous shell hugging the limb. */
 .orbit-select__orb::after {
   content: "";
   position: absolute;
-  inset: -7%;
+  z-index: 3;
+  inset: -8%;
   border-radius: 50%;
-  border: 2px solid color-mix(in srgb, var(--tone) 22%, transparent);
+  background:
+    radial-gradient(circle closest-side, transparent 0 82%, color-mix(in srgb, var(--tone) 50%, transparent) 86%, color-mix(in srgb, var(--tone) 16%, transparent) 91%, transparent 100%);
   pointer-events: none;
 }
+.orbit-select__globe {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--tone-deep);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--tone) 28%, transparent),
+    0 0 calc(var(--orb-d) * 0.16) color-mix(in srgb, var(--tone) 24%, transparent),
+    0 0 calc(var(--orb-d) * 0.42) color-mix(in srgb, var(--tone) 10%, transparent);
+  transition: box-shadow 220ms ease;
+}
+/* Texture strip: two identical tiles side by side, scrolled by one tile so
+   the loop is seamless. Each tile is one globe wide (background-size 50%). */
+.orbit-select__map,
+.orbit-select__clouds {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 200%;
+  background-repeat: repeat-x;
+  background-size: 50% 100%;
+  animation: orb-spin 96s linear infinite;
+  will-change: transform;
+}
+.orbit-select__clouds {
+  animation-duration: 64s;
+}
+/* Night side, terminator and limb darkening, lit from the upper left. */
+.orbit-select__globe::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0 58%, rgba(1, 2, 10, 0.32) 70%, rgba(1, 2, 10, 0.6) 100%),
+    radial-gradient(92% 92% at 30% 26%, transparent 0 30%, rgba(2, 3, 14, 0.45) 50%, rgba(1, 2, 10, 0.85) 70%, rgba(0, 1, 6, 0.96) 88%);
+}
+/* Specular glint and a soft sheen on the lit side. */
+.orbit-select__globe::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse 20% 14% at 31% 25%, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.12) 55%, transparent 100%),
+    radial-gradient(ellipse 46% 40% at 34% 30%, color-mix(in srgb, var(--tone-2) 22%, transparent), transparent 100%);
+}
+
+/* Banded giant: latitude belts, a storm oval and a few eddies. */
+.orbit-select__orb[data-surface="banded"] .orbit-select__map {
+  background-image:
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0 0.35%, transparent 0.35% 3.7%),
+    repeating-linear-gradient(180deg, transparent 0 2.1%, rgba(0, 0, 0, 0.08) 2.1% 2.5%, transparent 2.5% 5.3%),
+    radial-gradient(ellipse 15% 8% at 30% 63%, color-mix(in srgb, var(--tone-2) 85%, #fff) 0 22%, color-mix(in srgb, var(--tone) 55%, var(--tone-deep)) 48%, color-mix(in srgb, var(--tone-deep) 80%, #000) 68%, transparent 80%),
+    radial-gradient(ellipse 9% 3.5% at 74% 35%, color-mix(in srgb, var(--tone-2) 60%, transparent), transparent 100%),
+    radial-gradient(ellipse 12% 3% at 58% 47%, color-mix(in srgb, var(--tone-deep) 80%, transparent), transparent 100%),
+    radial-gradient(ellipse 8% 3% at 12% 27%, color-mix(in srgb, var(--tone-2) 45%, transparent), transparent 100%),
+    radial-gradient(ellipse 10% 2.6% at 88% 74%, color-mix(in srgb, var(--tone-2) 40%, transparent), transparent 100%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--tone-deep) 60%, #000) 0%,
+      var(--tone-deep) 7%,
+      color-mix(in srgb, var(--tone) 32%, var(--tone-deep)) 12%,
+      color-mix(in srgb, var(--tone-2) 34%, var(--tone-deep)) 16%,
+      var(--tone-deep) 21%,
+      color-mix(in srgb, var(--tone) 48%, var(--tone-deep)) 27%,
+      color-mix(in srgb, var(--tone-2) 55%, var(--tone-deep)) 32%,
+      color-mix(in srgb, var(--tone) 62%, var(--tone-deep)) 37%,
+      color-mix(in srgb, var(--tone) 28%, var(--tone-deep)) 43%,
+      color-mix(in srgb, var(--tone-2) 62%, var(--tone)) 48%,
+      color-mix(in srgb, var(--tone) 46%, var(--tone-deep)) 54%,
+      var(--tone-deep) 59%,
+      color-mix(in srgb, var(--tone) 38%, var(--tone-deep)) 66%,
+      color-mix(in srgb, var(--tone-2) 30%, var(--tone-deep)) 72%,
+      var(--tone-deep) 78%,
+      color-mix(in srgb, var(--tone) 26%, var(--tone-deep)) 86%,
+      color-mix(in srgb, var(--tone-deep) 60%, #000) 100%
+    );
+}
+.orbit-select__orb[data-surface="banded"] .orbit-select__clouds {
+  background-image:
+    radial-gradient(ellipse 22% 2% at 40% 30%, rgba(255, 255, 255, 0.16), transparent 100%),
+    radial-gradient(ellipse 18% 1.6% at 80% 56%, rgba(255, 255, 255, 0.12), transparent 100%),
+    radial-gradient(ellipse 16% 1.8% at 18% 80%, rgba(255, 255, 255, 0.1), transparent 100%);
+}
+
+/* Cratered desert: mottled dunes, dark maria and rimmed craters. */
+.orbit-select__orb[data-surface="cratered"] .orbit-select__map {
+  background-image:
+    radial-gradient(ellipse 5% 5% at 22% 30%, color-mix(in srgb, var(--tone-deep) 85%, #000) 0 50%, color-mix(in srgb, var(--tone-2) 55%, transparent) 72%, transparent 100%),
+    radial-gradient(ellipse 3% 3% at 64% 22%, color-mix(in srgb, var(--tone-deep) 85%, #000) 0 50%, color-mix(in srgb, var(--tone-2) 55%, transparent) 72%, transparent 100%),
+    radial-gradient(ellipse 7% 7% at 72% 62%, color-mix(in srgb, var(--tone-deep) 80%, #000) 0 48%, color-mix(in srgb, var(--tone-2) 50%, transparent) 70%, transparent 100%),
+    radial-gradient(ellipse 2.5% 2.5% at 40% 72%, color-mix(in srgb, var(--tone-deep) 85%, #000) 0 50%, color-mix(in srgb, var(--tone-2) 55%, transparent) 72%, transparent 100%),
+    radial-gradient(ellipse 4% 4% at 88% 38%, color-mix(in srgb, var(--tone-deep) 85%, #000) 0 50%, color-mix(in srgb, var(--tone-2) 55%, transparent) 72%, transparent 100%),
+    radial-gradient(ellipse 2% 2% at 10% 58%, color-mix(in srgb, var(--tone-deep) 85%, #000) 0 50%, color-mix(in srgb, var(--tone-2) 55%, transparent) 72%, transparent 100%),
+    radial-gradient(ellipse 3.5% 3.5% at 50% 46%, color-mix(in srgb, var(--tone-deep) 85%, #000) 0 50%, color-mix(in srgb, var(--tone-2) 55%, transparent) 72%, transparent 100%),
+    radial-gradient(ellipse 18% 12% at 34% 52%, color-mix(in srgb, var(--tone-deep) 55%, transparent), transparent 100%),
+    radial-gradient(ellipse 16% 10% at 80% 18%, color-mix(in srgb, var(--tone-deep) 45%, transparent), transparent 100%),
+    radial-gradient(ellipse 22% 9% at 60% 84%, color-mix(in srgb, var(--tone-deep) 50%, transparent), transparent 100%),
+    radial-gradient(ellipse 26% 14% at 18% 12%, color-mix(in srgb, var(--tone-2) 30%, transparent), transparent 100%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--tone) 70%, var(--tone-deep)) 0%,
+      color-mix(in srgb, var(--tone) 85%, var(--tone-2)) 22%,
+      color-mix(in srgb, var(--tone) 60%, var(--tone-deep)) 40%,
+      color-mix(in srgb, var(--tone) 80%, var(--tone-2)) 58%,
+      color-mix(in srgb, var(--tone) 55%, var(--tone-deep)) 78%,
+      color-mix(in srgb, var(--tone) 45%, var(--tone-deep)) 100%
+    );
+}
+
+/* Ocean world: deep water, continents with shelves, ice caps and a fast
+   cloud deck. */
+.orbit-select__orb[data-surface="oceanic"] .orbit-select__map {
+  background-image:
+    radial-gradient(ellipse 13% 17% at 26% 38%, color-mix(in srgb, #4f7a3c 70%, var(--tone-deep)) 0 55%, color-mix(in srgb, var(--tone-2) 40%, transparent) 72%, transparent 82%),
+    radial-gradient(ellipse 9% 12% at 33% 56%, color-mix(in srgb, #7a6a3a 60%, var(--tone-deep)) 0 55%, color-mix(in srgb, var(--tone-2) 40%, transparent) 72%, transparent 82%),
+    radial-gradient(ellipse 7% 9% at 20% 26%, color-mix(in srgb, #5d8a46 65%, var(--tone-deep)) 0 55%, transparent 80%),
+    radial-gradient(ellipse 15% 10% at 70% 30%, color-mix(in srgb, #5a7d3e 70%, var(--tone-deep)) 0 55%, color-mix(in srgb, var(--tone-2) 40%, transparent) 72%, transparent 82%),
+    radial-gradient(ellipse 8% 14% at 76% 52%, color-mix(in srgb, #8a7442 60%, var(--tone-deep)) 0 55%, color-mix(in srgb, var(--tone-2) 40%, transparent) 72%, transparent 82%),
+    radial-gradient(ellipse 5% 6% at 86% 70%, color-mix(in srgb, #4f7a3c 65%, var(--tone-deep)) 0 55%, transparent 80%),
+    radial-gradient(ellipse 4% 4% at 52% 66%, color-mix(in srgb, #5d8a46 60%, var(--tone-deep)) 0 55%, transparent 80%),
+    linear-gradient(180deg, rgba(240, 250, 255, 0.92) 0 5%, transparent 10% 90%, rgba(240, 250, 255, 0.9) 95%),
+    radial-gradient(ellipse 30% 30% at 50% 50%, color-mix(in srgb, var(--tone) 45%, var(--tone-deep)), transparent 100%),
+    linear-gradient(180deg, var(--tone-deep), color-mix(in srgb, var(--tone) 40%, var(--tone-deep)) 50%, var(--tone-deep));
+}
+.orbit-select__orb[data-surface="oceanic"] .orbit-select__clouds,
+.orbit-select__orb[data-surface="storm"] .orbit-select__clouds {
+  background-image:
+    radial-gradient(ellipse 20% 3% at 30% 20%, rgba(255, 255, 255, 0.55), transparent 100%),
+    radial-gradient(ellipse 14% 2.4% at 44% 23%, rgba(255, 255, 255, 0.4), transparent 100%),
+    radial-gradient(ellipse 24% 3.2% at 70% 44%, rgba(255, 255, 255, 0.5), transparent 100%),
+    radial-gradient(ellipse 8% 8% at 56% 60%, rgba(255, 255, 255, 0.42) 0 25%, rgba(255, 255, 255, 0.12) 60%, transparent 100%),
+    radial-gradient(ellipse 18% 2.6% at 16% 66%, rgba(255, 255, 255, 0.45), transparent 100%),
+    radial-gradient(ellipse 22% 2.8% at 82% 82%, rgba(255, 255, 255, 0.4), transparent 100%);
+}
+
+/* Storm world: soft swirling belts, a bright vortex and auroral tint. */
+.orbit-select__orb[data-surface="storm"] .orbit-select__map {
+  background-image:
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0 0.35%, transparent 0.35% 3.7%),
+    repeating-linear-gradient(180deg, transparent 0 2.1%, rgba(0, 0, 0, 0.08) 2.1% 2.5%, transparent 2.5% 5.3%),
+    radial-gradient(ellipse 9% 9% at 64% 40%, color-mix(in srgb, var(--tone-2) 90%, #fff) 0 12%, color-mix(in srgb, var(--tone) 70%, transparent) 30%, color-mix(in srgb, var(--tone-deep) 80%, transparent) 52%, color-mix(in srgb, var(--tone-2) 40%, transparent) 70%, transparent 100%),
+    radial-gradient(ellipse 26% 5% at 30% 30%, color-mix(in srgb, var(--tone-2) 40%, transparent), transparent 100%),
+    radial-gradient(ellipse 30% 6% at 40% 70%, color-mix(in srgb, var(--tone) 45%, transparent), transparent 100%),
+    radial-gradient(ellipse 20% 4% at 86% 58%, color-mix(in srgb, var(--tone-2) 30%, transparent), transparent 100%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--tone-deep) 65%, #000) 0%,
+      color-mix(in srgb, var(--tone) 40%, var(--tone-deep)) 14%,
+      var(--tone-deep) 24%,
+      color-mix(in srgb, var(--tone) 65%, var(--tone-deep)) 36%,
+      color-mix(in srgb, var(--tone-2) 45%, var(--tone)) 46%,
+      color-mix(in srgb, var(--tone) 55%, var(--tone-deep)) 56%,
+      var(--tone-deep) 66%,
+      color-mix(in srgb, var(--tone) 45%, var(--tone-deep)) 80%,
+      color-mix(in srgb, var(--tone-deep) 65%, #000) 100%
+    );
+}
+.orbit-select__orb[data-surface="cratered"] .orbit-select__clouds {
+  display: none;
+}
+
+/* Ring: one tilted ellipse drawn twice; the back copy keeps its upper half
+   (behind the globe), the front copy its lower half (over it). */
+.orbit-select__ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--orb-d) * 1.8);
+  height: calc(var(--orb-d) * 0.42);
+  border-radius: 50%;
+  /* Hard stops: crisp ringlets with a dark gap between the two main bands. */
+  background: radial-gradient(
+    closest-side,
+    transparent 0 63%,
+    color-mix(in srgb, var(--ring) 30%, transparent) 63.5%,
+    color-mix(in srgb, var(--ring) 55%, transparent) 67%,
+    color-mix(in srgb, var(--ring) 85%, transparent) 70.5%,
+    color-mix(in srgb, var(--ring) 70%, transparent) 74%,
+    transparent 74.6% 76.4%,
+    color-mix(in srgb, var(--ring) 62%, transparent) 77%,
+    color-mix(in srgb, var(--ring) 42%, transparent) 82%,
+    color-mix(in srgb, var(--ring) 60%, transparent) 84.5%,
+    color-mix(in srgb, var(--ring) 22%, transparent) 90%,
+    transparent 91%
+  );
+  transform: translate(-50%, -50%) rotate(-14deg);
+  pointer-events: none;
+}
+.orbit-select__ring.is-back {
+  z-index: 0;
+  clip-path: inset(0 0 50% 0);
+  opacity: 0.7;
+}
+.orbit-select__ring.is-front {
+  z-index: 2;
+  clip-path: inset(50% 0 0 0);
+}
+
+/* Moon: the path swings left-right while the moon bobs up-down a quarter
+   period later, which traces a tilted ellipse; it sits behind the globe for
+   the far half of each orbit. */
+.orbit-select__moon-path {
+  position: absolute;
+  z-index: 4;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  animation:
+    orb-moon-x 9s ease-in-out infinite alternate,
+    orb-moon-depth 18s step-end infinite;
+}
+.orbit-select__moon {
+  position: absolute;
+  top: calc(var(--orb-d) * -0.06);
+  left: calc(var(--orb-d) * -0.06);
+  width: calc(var(--orb-d) * 0.12);
+  height: calc(var(--orb-d) * 0.12);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 30%, rgba(255, 255, 255, 0.85) 0 6%, transparent 30%),
+    radial-gradient(circle at 60% 62%, rgba(0, 0, 0, 0.25) 0 10%, transparent 22%),
+    radial-gradient(circle at 36% 32%, color-mix(in srgb, var(--tone-2) 80%, #fff), color-mix(in srgb, var(--tone-2) 30%, #3a3550) 55%, #0b0a14 85%);
+  box-shadow: 0 0 calc(var(--orb-d) * 0.05) color-mix(in srgb, var(--tone-2) 40%, transparent);
+  animation: orb-moon-y 9s ease-in-out -4.5s infinite alternate;
+}
+
+/* Starlight halo behind the centred world: soft glow plus slow rays. */
+.orbit-select__halo {
+  position: absolute;
+  z-index: -1;
+  inset: -42%;
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, color-mix(in srgb, var(--tone) 22%, transparent) 0 40%, color-mix(in srgb, var(--tone) 8%, transparent) 62%, transparent 100%),
+    repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--tone-2) 16%, transparent) 0 1.2deg, transparent 1.2deg 11deg, color-mix(in srgb, var(--tone-2) 9%, transparent) 11deg 12deg, transparent 12deg 22.5deg);
+  -webkit-mask-image: radial-gradient(closest-side, #000 34%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 34%, transparent 100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 600ms ease;
+  animation: orb-halo 140s linear infinite;
+}
+.orbit-select__slot[data-slot="center"] .orbit-select__halo {
+  opacity: 1;
+}
+
+@keyframes orb-spin {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes orb-halo {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes orb-moon-x {
+  from {
+    transform: translateX(calc(var(--orb-d) * -0.78));
+  }
+  to {
+    transform: translateX(calc(var(--orb-d) * 0.78));
+  }
+}
+@keyframes orb-moon-y {
+  from {
+    transform: translateY(calc(var(--orb-d) * -0.2));
+  }
+  to {
+    transform: translateY(calc(var(--orb-d) * 0.2));
+  }
+}
+/* Front for the first half (moving right, low), behind for the second. */
+@keyframes orb-moon-depth {
+  0% {
+    z-index: 4;
+  }
+  50% {
+    z-index: 0;
+  }
+}
+/* Nothing spins while the selector is off screen. */
+.orbit-select[data-offscreen] :is(.orbit-select__map, .orbit-select__clouds, .orbit-select__halo, .orbit-select__moon-path, .orbit-select__moon) {
+  animation-play-state: paused;
+}
+
 .orbit-select__name {
   /* Out of flow so a long label never shifts its sphere off the slot point. */
   position: absolute;
-  top: calc(100% + 0.7rem);
-  left: 50%;
+  top: calc(var(--orb-d) / 2 + 0.7rem);
+  left: 0;
   width: max-content;
-  max-width: 16rem;
+  white-space: nowrap;
   transform: translateX(-50%);
   font-size: 1.35rem;
   font-weight: 600;
   line-height: 1.2;
   text-align: center;
-  text-wrap: balance;
   text-shadow: 0 0 18px color-mix(in srgb, var(--tone) 45%, transparent);
-  transition: opacity 260ms ease;
+  /* Size and offset follow the slot's scale with the same easing, so the
+     label never jumps when an item changes slot. */
+  transition:
+    opacity 260ms ease,
+    font-size var(--orbit-dur) var(--orbit-y-ease),
+    top var(--orbit-dur) var(--orbit-y-ease);
 }
 /* Outer items: the label is counter-scaled so it stays readable, and only
    shows on hover / keyboard focus (wide screens show the side labels). */
 .orbit-select__slot:not([data-slot="center"]) .orbit-select__name {
-  max-width: none;
   width: max-content;
-  top: calc(100% + 0.6rem / var(--s));
+  top: calc(var(--orb-d) / 2 + 0.6rem / var(--s));
   font-size: calc(0.9rem / var(--s));
   opacity: 0;
 }
-.orbit-select__slot:not([data-slot="center"]) .orbit-select__body:focus-visible .orbit-select__name {
+.orbit-select__slot:not([data-slot="center"]) .orbit-select__body:focus-visible ~ .orbit-select__name {
   opacity: 1;
 }
 @media (hover: hover) {
-  .orbit-select__slot:not([data-slot="center"]) .orbit-select__body:hover .orbit-select__name {
+  .orbit-select__slot:not([data-slot="center"]) .orbit-select__body:hover ~ .orbit-select__name {
     opacity: 1;
   }
-  .orbit-select__body:hover .orbit-select__orb {
+  .orbit-select__body:hover ~ .orbit-select__orb .orbit-select__globe {
     box-shadow:
-      inset -14px -18px 40px rgba(0, 0, 0, 0.45),
-      inset 6px 8px 24px color-mix(in srgb, var(--tone-2) 30%, transparent),
-      0 0 0 3px color-mix(in srgb, var(--tone) 60%, transparent),
-      0 0 80px color-mix(in srgb, var(--tone) 60%, transparent),
-      0 0 160px color-mix(in srgb, var(--tone) 24%, transparent);
+      0 0 0 2px color-mix(in srgb, var(--tone) 60%, transparent),
+      0 0 calc(var(--orb-d) * 0.28) color-mix(in srgb, var(--tone) 50%, transparent),
+      0 0 calc(var(--orb-d) * 0.55) color-mix(in srgb, var(--tone) 20%, transparent);
   }
 }
 @media (min-width: 900px) {
@@ -2143,19 +2445,16 @@ button:focus-visible {
 .orbit-select__body:focus-visible {
   outline: none;
 }
-.orbit-select__body:focus-visible .orbit-select__orb {
+.orbit-select__body:focus-visible ~ .orbit-select__orb {
   outline: 3px solid #bed0ff;
   outline-offset: 8px;
 }
-.orbit-select__slot:not([data-slot="center"]) .orbit-select__body:focus-visible .orbit-select__orb {
+.orbit-select__slot:not([data-slot="center"]) .orbit-select__body:focus-visible ~ .orbit-select__orb {
   outline-width: calc(3px / var(--s));
   outline-offset: calc(8px / var(--s));
 }
-/* Entering: the centred item zooms toward the viewer, the rest fade away. */
-.orbit-select__body.is-zooming {
-  scale: 1.8;
-  opacity: 0;
-}
+/* Entering: the centred item zooms toward the viewer (.is-zooming on its
+   lift, above), the rest fade away. */
 .orbit-select.is-entering .orbit-select__slot:not([data-slot="center"]),
 .orbit-select.is-entering .orbit-select__track {
   opacity: 0;
@@ -2165,12 +2464,10 @@ button:focus-visible {
 .orbit-select__detail {
   display: grid;
   justify-items: center;
-  gap: 0.4rem;
-  min-height: 1.6rem;
-}
-.orbit-select__count {
-  font: 600 0.7rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
-  letter-spacing: 0.22em;
+  /* Room for a two-line tagline, so worlds with and without one keep the
+     heading above in place. */
+  min-height: 3rem;
+  align-content: start;
 }
 .orbit-select__tagline {
   max-width: 34rem;
@@ -2179,51 +2476,9 @@ button:focus-visible {
   font-size: 1rem;
   line-height: 1.5;
 }
-.orbit-select__controls {
-  position: relative;
-  z-index: 4;
-  display: flex;
-  align-items: center;
-  gap: 0.9rem;
-}
-.orbit-select__step,
-.orbit-select__enter {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 48px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 999px;
-  background: rgba(8, 11, 26, 0.72);
-  color: var(--fg);
-  font: inherit;
-  cursor: pointer;
-  transition: border-color 180ms ease, background 180ms ease;
-}
-.orbit-select__step {
-  width: 48px;
-  font-size: 1.2rem;
-}
-.orbit-select__enter {
-  gap: 0.5rem;
-  padding: 0 1.4rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-  text-decoration: none;
-}
-.orbit-select__step:hover,
-.orbit-select__enter:hover {
-  border-color: rgba(190, 208, 255, 0.45);
-  background: rgba(20, 26, 52, 0.85);
-}
-.orbit-select__step:focus-visible,
-.orbit-select__enter:focus-visible {
-  outline: 2px solid #bed0ff;
-  outline-offset: 3px;
-}
 @media (max-width: 560px) {
   .orbit-select {
-    --orb-d: min(44vw, 180px);
+    --orb-d: min(58vw, 240px);
     /* Side items sit half off-screen on phones, still visible. */
     --rx: 47vw;
     --ry: calc(var(--orb-d) * 0.66);
@@ -2234,6 +2489,9 @@ button:focus-visible {
   .orbit-select__slot:not([data-slot="center"]) .orbit-select__name {
     font-size: calc(0.78rem / var(--s));
   }
+  .orbit-select__ring {
+    width: calc(var(--orb-d) * 1.42);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .orbit-select__slot,
@@ -2241,5 +2499,19 @@ button:focus-visible {
   .orbit-select__body,
   .orbit-select__name {
     transition: none;
+  }
+  .orbit-select__map,
+  .orbit-select__clouds,
+  .orbit-select__halo,
+  .orbit-select__moon-path,
+  .orbit-select__moon {
+    animation: none;
+  }
+  /* Park the moon in front, low on the right. */
+  .orbit-select__moon-path {
+    transform: translateX(calc(var(--orb-d) * 0.56));
+  }
+  .orbit-select__moon {
+    transform: translateY(calc(var(--orb-d) * 0.14));
   }
 }
