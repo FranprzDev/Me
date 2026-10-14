@@ -4,8 +4,9 @@
  * overlay that runs in parallel with the route change (it never delays it).
  *
  * This module is tiny on purpose (it ships with the selector): the per-world
- * config, the curve maths, the visitor's country phase and a one-listener
- * channel to the lazily loaded overlay (components/WorldEntryFlight).
+ * config, the curve maths and a one-listener channel to the lazily loaded
+ * overlay (components/WorldEntryFlight), which also derives the visitor's
+ * country phase (lib/geoPhase).
  */
 
 /** Worlds reachable from the home selector (route slugs). */
@@ -193,57 +194,6 @@ export function flightPath(curve: FlightCurve, phaseRad: number, target: Target,
 export function pathSignature(points: readonly FlightPoint[]): string {
   const pick = [points[0], points[Math.floor(points.length / 2)], points[points.length - 1]];
   return pick.map((p) => `${Math.round(p.x)},${Math.round(p.y)},${Math.round(p.angle)}`).join(" ");
-}
-
-// ─── Country phase ───────────────────────────────────────────────────────
-
-const PHASE_ENDPOINT = "/api/geo-phase";
-const PHASE_STORAGE_KEY = "world-flight-phase";
-
-let phaseRad = 0;
-let phaseRequested = false;
-
-/** The visitor's country phase φ in radians (0 until loaded, or when unknown). */
-export function flightPhase(): number {
-  return phaseRad;
-}
-
-function setPhaseDegrees(degrees: number) {
-  phaseRad = (degrees * Math.PI) / 180;
-}
-
-/**
- * Loads φ once per session: the edge route turns the visitor's country into
- * degrees (lib/geoPhase), cached in sessionStorage so later visits in the
- * session skip the request. Called at idle, never on the critical path.
- */
-export async function loadFlightPhase(): Promise<void> {
-  if (phaseRequested) return;
-  phaseRequested = true;
-  try {
-    const cached = sessionStorage.getItem(PHASE_STORAGE_KEY);
-    if (cached !== null && Number.isFinite(Number(cached))) {
-      setPhaseDegrees(Number(cached));
-      return;
-    }
-  } catch {
-    // Storage blocked: just ask the endpoint.
-  }
-  try {
-    const response = await fetch(PHASE_ENDPOINT);
-    if (!response.ok) return;
-    const body: unknown = await response.json();
-    const degrees = typeof body === "object" && body !== null && "phaseDeg" in body ? Number(body.phaseDeg) : NaN;
-    if (!Number.isFinite(degrees)) return;
-    setPhaseDegrees(degrees);
-    try {
-      sessionStorage.setItem(PHASE_STORAGE_KEY, String(degrees));
-    } catch {
-      // Storage blocked: the phase still applies for this page.
-    }
-  } catch {
-    // Offline or blocked: φ stays 0.
-  }
 }
 
 // ─── Launch channel ──────────────────────────────────────────────────────

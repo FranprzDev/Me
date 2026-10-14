@@ -13,7 +13,6 @@ import { expireLaunchLoader } from "@/lib/launchLoader";
 import { hasWebGPU } from "@/lib/webgpu";
 import { SceneStatus, setSceneStatus } from "@/lib/sceneStatus";
 import type { BackdropView } from "@/components/three/Backdrop";
-import { loadFlightPhase } from "@/lib/worldFlight";
 
 // The world-entry vehicles (SVG art + flight overlay) are their own chunk,
 // fetched after hydration; a click before it lands just skips the flight.
@@ -44,8 +43,6 @@ function usePrefetchWorlds() {
     const warm = () => {
       router.prefetch("/");
       for (const p of PROJECTS) router.prefetch(`/${p.slug}`);
-      // The visitor's country phase for the world-entry flights, once per session.
-      void loadFlightPhase();
     };
     // Safari has no requestIdleCallback: a plain delay keeps it off the first paint.
     if (typeof window.requestIdleCallback !== "function") {
