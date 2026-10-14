@@ -1,55 +1,55 @@
 {
-  "sourceHash": "0f35de39c20945d573289956283f1c19bda8c5223d42d2d51c7586ab2d03bafc",
+  "sourceHash": "9c92623f3ea37f5934a32a36862f79d9adf19efd292fb923a3aa5ac0f97f6758",
   "files": [
     {
       "route": "/cv/fde",
       "file": "francisco-perez-cv-fde-en.pdf",
-      "pages": 2
+      "pages": 1
     },
     {
       "route": "/cv/fullstack",
       "file": "francisco-perez-cv-fullstack-en.pdf",
-      "pages": 2
+      "pages": 1
     },
     {
       "route": "/cv/frontend",
       "file": "francisco-perez-cv-frontend-en.pdf",
-      "pages": 2
+      "pages": 1
     },
     {
       "route": "/cv/backend",
       "file": "francisco-perez-cv-backend-en.pdf",
-      "pages": 2
+      "pages": 1
     },
     {
       "route": "/cv/applied-ai",
       "file": "francisco-perez-cv-applied-ai-en.pdf",
-      "pages": 2
+      "pages": 1
     },
     {
       "route": "/es/cv/fde",
       "file": "francisco-perez-cv-fde-es.pdf",
-      "pages": 2
+      "pages": 1
     },
     {
       "route": "/es/cv/fullstack",
       "file": "francisco-perez-cv-fullstack-es.pdf",
-      "pages": 2
+      "pages": 1
     },
     {
       "route": "/es/cv/frontend",
       "file": "francisco-perez-cv-frontend-es.pdf",
-      "pages": 2
+      "pages": 1
     },
     {
       "route": "/es/cv/backend",
       "file": "francisco-perez-cv-backend-es.pdf",
-      "pages": 2
+      "pages": 1
     },
     {
       "route": "/es/cv/applied-ai",
       "file": "francisco-perez-cv-applied-ai-es.pdf",
-      "pages": 2
+      "pages": 1
     }
   ]
 }

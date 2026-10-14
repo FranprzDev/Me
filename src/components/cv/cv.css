@@ -8,8 +8,10 @@
  * The two live in separate media blocks so neither leaks into the other.
  */
 
+/* One A4 page per résumé (enforced by `pnpm cv:pdf`). */
 @page {
-  margin: 12mm 14mm;
+  size: A4;
+  margin: 10mm 12mm;
 }
 
 html:has(.cv-root) {
@@ -922,8 +924,9 @@ html:has(.cv-root) {
   }
   .cv-root {
     min-height: 0;
+    /* Body never below 9.5pt: one page comes from content choices, not tiny type. */
     font-size: 9.6pt;
-    line-height: 1.42;
+    line-height: 1.36;
     color: #1d2a3f;
   }
   .cv-bar {
@@ -962,7 +965,7 @@ html:has(.cv-root) {
     color: var(--cv-accent);
   }
   .cv-section {
-    margin-top: 9pt;
+    margin-top: 7pt;
   }
   .cv-section h2 {
     font-size: 8.5pt;
@@ -977,7 +980,7 @@ html:has(.cv-root) {
     gap: 6pt;
   }
   .cv-skills__row {
-    grid-template-columns: 38mm 1fr;
+    grid-template-columns: 33mm 1fr;
     gap: 3mm;
   }
   .cv-entry,
@@ -987,5 +990,51 @@ html:has(.cv-root) {
   }
   .cv-entry__head {
     break-after: avoid;
+  }
+  .cv-bullets {
+    margin-top: 1.5pt;
+    gap: 1pt;
+  }
+  /* The closing short sections share rows: education and languages side by
+     side, certifications after them across the full width. */
+  .cv-doc {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 8mm;
+  }
+  .cv-doc > * {
+    grid-column: 1 / -1;
+  }
+  .cv-doc > .cv-section--education,
+  .cv-doc > .cv-section--languages {
+    grid-column: auto;
+  }
+  .cv-doc > .cv-section--certifications {
+    order: 1;
+  }
+  /* Projects: name and detail on one run of text. */
+  .cv-section--projects .cv-entry h3,
+  .cv-section--projects .cv-entry p {
+    display: inline;
+  }
+  .cv-section--projects .cv-entry h3::after {
+    content: ": ";
+  }
+  .cv-entry--compact + .cv-entry--compact {
+    margin-top: 0;
+  }
+  .cv-section--projects .cv-list {
+    gap: 2pt;
+  }
+  /* Certifications run as one compact line-wrapped list. */
+  .cv-certs {
+    display: block;
+  }
+  .cv-certs li {
+    display: inline;
+  }
+  .cv-certs li + li::before {
+    content: "  ·  ";
+    color: var(--cv-mute);
   }
 }

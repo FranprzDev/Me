@@ -91,11 +91,6 @@ export const PROJECT_PROOFY: ProjectEntry = {
   },
   href: "https://proofyai.vercel.app",
 };
-export const PROJECT_VORTEX: ProjectEntry = {
-  name: { en: "Vortex Software n8n Hackathon 2025", es: "Hackathon de n8n de Vortex Software 2025" },
-  detail: { en: "On-site competitor in Tucumán.", es: "Competidor presencial en Tucumán." },
-};
-
 /* Experience periods and organisations, shared by every variant. */
 
 export const REPUESTOSHOP = {
@@ -125,11 +120,6 @@ export const JUDICIARY = {
   period: { en: "Sep 2025 – Oct 2025", es: "sep 2025 – oct 2025" },
 } as const;
 
-export const ROLLINGCODE_SCHOOL = {
-  org: "RollingCode School",
-  period: { en: "Nov 2023 – Aug 2024", es: "nov 2023 – ago 2024" },
-} as const;
-
 /* Roles and bullets reused verbatim across variants. */
 
 export const ROLE_SOFTWARE_AI: Localized = { en: "Software / AI Engineer", es: "Desarrollador de Software / IA" };
@@ -141,7 +131,6 @@ export const ROLE_INSTRUCTOR: Localized = {
   en: "Instructor, Process Automation with n8n",
   es: "Capacitador en Automatización con n8n",
 };
-export const ROLE_TA: Localized = { en: "Teaching Assistant, Web & Backend", es: "Ayudante docente Web y Backend" };
 
 export const B_REPUESTO_TOOLS: Localized = {
   en: "Build and maintain internal tools and customer-facing automation for an auto-parts e-commerce, integrating Meta APIs and the product catalog.",
@@ -151,10 +140,6 @@ export const B_REPUESTO_AGENT: Localized = {
   en: "Designed a multi-agent assistant (LangGraph) with RAG over scraped catalog data to answer customer questions.",
   es: "Diseñé un asistente multiagente (LangGraph) con RAG sobre el catálogo para responder consultas de clientes.",
 };
-export const B_REPUESTO_LLM: Localized = {
-  en: "Compared several LLM providers to choose the best cost/quality trade-off for production.",
-  es: "Comparé varios proveedores de LLM para elegir la mejor relación costo/calidad en producción.",
-};
 
 export const B_LVC_PLATFORM: Localized = {
   en: "Co-built a tax-deadline management platform for an accounting firm: approval flows, change history and Google Calendar/Gmail integration. Running in production.",
@@ -163,11 +148,6 @@ export const B_LVC_PLATFORM: Localized = {
 export const B_LVC_HANDOVER: Localized = {
   en: "Delivered full handover: technical report, executive summary and user guide.",
   es: "Entregué documentación completa: informe técnico, resumen ejecutivo y guía de usuario.",
-};
-
-export const B_STUDIO_N8N: Localized = {
-  en: "Automated internal tasks with n8n; worked in Scrum teams with Git Flow and code review.",
-  es: "Automaticé tareas internas con n8n; trabajé en equipos Scrum con Git Flow y code review.",
 };
 
 export const B_FLA: Localized = {
@@ -180,11 +160,6 @@ export const B_JUDICIARY: Localized = {
   es: "Diseñé y dicté un curso de 20 horas sobre n8n, APIs y flujos de automatización para personal judicial; presenté la estrategia de automatización a las autoridades.",
 };
 
-export const B_TA: Localized = {
-  en: "Mentored students in web and backend development.",
-  es: "Acompañé a estudiantes en desarrollo web y backend.",
-};
-
 /* Skill rows reused across variants. */
 
 export const SKILL_LANGUAGES = {
@@ -194,20 +169,6 @@ export const SKILL_LANGUAGES = {
 export const SKILL_DATA_CLOUD = {
   label: { en: "Databases & Cloud", es: "Bases de datos y cloud" },
   value: { en: "PostgreSQL, MongoDB, Supabase, AWS, Vercel, Netlify", es: "PostgreSQL, MongoDB, Supabase, AWS, Vercel, Netlify" },
-};
-export const SKILL_INTEGRATIONS = {
-  label: { en: "Integrations & Automation", es: "Integraciones y automatización" },
-  value: {
-    en: "n8n, Google Workspace APIs, Meta APIs, web scraping",
-    es: "n8n, APIs de Google Workspace, APIs de Meta, web scraping",
-  },
-};
-export const SKILL_AI = {
-  label: { en: "AI", es: "IA" },
-  value: {
-    en: "LLM APIs (OpenAI, Anthropic, Gemini), LangChain, LangGraph, RAG",
-    es: "APIs de LLM (OpenAI, Anthropic, Gemini), LangChain, LangGraph, RAG",
-  },
 };
 export const SKILL_PRACTICES = {
   label: { en: "Practices", es: "Prácticas" },

@@ -3,7 +3,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import { chromium, devices } from "playwright";
 import AxeBuilder from "@axe-core/playwright";
 import ts from "typescript";
-import { CV_LOCALES, CV_VARIANTS, MANIFEST, cvPdfFile, cvRoute, cvSourceHash } from "./cv-pdf-shared.mjs";
+import { CV_LOCALES, CV_VARIANTS, MANIFEST, PDF_DIR, cvPdfFile, cvRoute, cvSourceHash, pdfPageCount } from "./cv-pdf-shared.mjs";
 
 const baseURL = process.env.PORTFOLIO_URL || "http://localhost:3000";
 const output = `artifacts/portfolio-quality/${process.env.HEADFUL === "1" ? "headful" : "headless"}`;
@@ -57,6 +57,13 @@ async function checkPage(page, route, name) {
 async function checkCvPages(browser) {
   const manifest = JSON.parse(await readFile(MANIFEST, "utf8"));
   assert.equal(manifest.sourceHash, await cvSourceHash(), "CV PDFs are stale: run `pnpm cv:pdf` against a fresh build and commit public/cv/files");
+  // One A4 page per résumé, for the committed PDFs and the live print layout.
+  for (const locale of CV_LOCALES) {
+    for (const variant of CV_VARIANTS) {
+      const file = cvPdfFile(variant, locale);
+      assert.equal(pdfPageCount(await readFile(`${PDF_DIR}/${file}`)), 1, `${file}: one page`);
+    }
+  }
   const pages = CV_LOCALES.flatMap((locale) => [
     { route: locale === "es" ? "/es/cv" : "/cv", locale, variant: null },
     ...CV_VARIANTS.map((variant) => ({ route: cvRoute(variant, locale), locale, variant })),
@@ -108,6 +115,14 @@ async function checkCvPages(browser) {
         assert.equal(await page.locator(".cv-section h2").count() >= 6, true, `${route}: résumé sections`);
         assert.equal(await page.locator(`.cv-bar__versions a[aria-current='page']`).getAttribute("href"), route);
         await page.emulateMedia({ media: "print" });
+        if (name === "cv-desktop") {
+          await page.evaluate(async () => {
+            await Promise.allSettled(Array.from(document.fonts, (face) => face.load()));
+            await document.fonts.ready;
+          });
+          const printed = await page.pdf({ format: "A4", printBackground: true, preferCSSPageSize: true });
+          assert.equal(pdfPageCount(printed), 1, `${route}: prints on one A4 page`);
+        }
         for (const screenOnly of [".cv-bar", ".site-nav", ".cv-cosmos"]) {
           assert.equal(await page.locator(screenOnly).isVisible(), false, `${route}: ${screenOnly} hidden in print`);
         }

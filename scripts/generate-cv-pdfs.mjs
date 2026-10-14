@@ -17,7 +17,8 @@ import { CV_LOCALES, CV_VARIANTS, MANIFEST, PDF_DIR, cvPdfFile, cvRoute, cvSourc
  * source hash no longer matches, so a stale PDF cannot ship unnoticed.
  */
 const baseURL = (process.env.PORTFOLIO_URL || "http://localhost:3000").replace(/\/$/, "");
-const MAX_PAGES = 2;
+/** Every résumé is one A4 page (Francisco's rule): a longer render fails the run. */
+const MAX_PAGES = 1;
 
 async function main() {
   await mkdir(PDF_DIR, { recursive: true });
