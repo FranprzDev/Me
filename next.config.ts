@@ -36,8 +36,13 @@ const nextConfig: NextConfig = {
         source: "/me/:file*",
         headers: [{ key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" }],
       },
+      // Only the PDFs: /cv/<variant> are pages and keep Next's own caching.
       {
-        source: "/cv/:file*",
+        source: "/cv/files/:file*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
+      },
+      {
+        source: "/cv/FranciscoPerez-AIEngineer.pdf",
         headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
       },
     ];

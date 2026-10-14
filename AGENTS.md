@@ -13,6 +13,13 @@ Guidance for coding agents working on this repo (Francisco Perez's portfolio, Ne
   - `pnpm build`
   - with `pnpm start` running: `PORTFOLIO_URL=http://localhost:3000 pnpm check:agent` and `pnpm check:portfolio` (Playwright + axe browser checks; update them when UI changes).
 
+## CV pages (/cv, /es/cv)
+
+- Content: `src/content/cv/` is the single typed source (`CvVariant`, `CvLocale`, `CvSection` enums). `facts.ts` holds the real facts from Francisco's CVs; `variants.ts` only reorders and re-emphasises them. Never invent roles, dates, metrics or skills, and never publish a phone number or home address (email, GitHub, LinkedIn and portfolio URL only).
+- Rendering: `src/components/cv/` (server components, print CSS in `cv.css`). Routes are static (`generateStaticParams`, `dynamicParams = false`).
+- PDFs: committed in `public/cv/files/`, rendered from the pages with Playwright. After changing anything in `src/content/cv/` or `src/components/cv/`, rebuild, start the server and run `PORTFOLIO_URL=http://localhost:3000 pnpm cv:pdf`, then commit `public/cv/files/`. They are not generated during `next build` because the build host (Vercel) has no browser. `check:portfolio` fails when `manifest.json`'s source hash no longer matches, so a stale PDF cannot ship.
+- Language: the root layout renders `<html lang="es">`; on CV routes the content root carries the route's `lang` and the i18n provider sets `document.documentElement.lang` from the URL after hydration.
+
 ## Workflow
 
 - Never push to `main`. Work on `feat/`, `fix/`, `chore/` or `agent/` branches and open a PR with What changes / Why / Impact / Validation.
