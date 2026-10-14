@@ -6,9 +6,10 @@
 
 import "@/lib/silenceR3FClockWarning";
 import { Component, useEffect, useState, type ReactNode } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { WebGPURenderer } from "three/webgpu";
 import { SceneStatus, setSceneStatus } from "@/lib/sceneStatus";
+import { hasWebGPU } from "@/lib/webgpu";
 import { worldFor } from "@/data/worlds";
 import { FirstFrameSignal } from "./FirstFrameSignal";
 import { OrbitClock, isConstrainedDevice, useReducedMotion } from "./shared";
@@ -36,6 +37,32 @@ class RendererFallback extends Component<{ children: ReactNode }, { failed: bool
   render() {
     return this.state.failed ? null : this.props.children;
   }
+}
+
+/** Frame rate of the cheaper profile (phones, low-power, data saver). */
+const CONSTRAINED_FPS = 30;
+
+/**
+ * Drives an on-demand canvas at a fixed rate. Scene motion is delta-based, so
+ * halving the frame rate halves GPU work without slowing anything down; on a
+ * phone that headroom goes to smooth scrolling instead of the background.
+ */
+function FrameCap({ fps }: { fps: number }) {
+  const invalidate = useThree((state) => state.invalidate);
+  useEffect(() => {
+    const step = 1000 / fps;
+    let last = 0;
+    let raf = 0;
+    const loop = (now: number) => {
+      raf = requestAnimationFrame(loop);
+      if (now - last < step - 1) return;
+      last = now;
+      invalidate();
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [fps, invalidate]);
+  return null;
 }
 
 /** Scene shown by the backdrop: the home cosmos, a world, or nothing (paused). */
@@ -69,25 +96,16 @@ export default function Backdrop({ view }: { view: BackdropView }) {
     return () => window.removeEventListener("resize", apply);
   }, [reduced]);
 
-  // Probed once per visit: the adapter answer does not change between routes.
+  // The layout only mounts the backdrop after the shared probe found an
+  // adapter; reading the same cached answer here keeps a single probe.
   useEffect(() => {
     let alive = true;
-    const gpu = (navigator as Navigator & { gpu?: { requestAdapter(): Promise<unknown> } }).gpu;
-    if (!gpu) {
-      setSceneStatus(SceneStatus.Failed);
-      return;
-    }
-    const probe = async () => {
-      try {
-        const adapter = await gpu.requestAdapter();
-        if (!adapter) setSceneStatus(SceneStatus.Failed);
-        if (alive) setWebgpuReady(Boolean(adapter));
-      } catch {
-        setSceneStatus(SceneStatus.Failed);
-        if (alive) setWebgpuReady(false);
-      }
+    const check = async () => {
+      const supported = await hasWebGPU();
+      if (!supported) setSceneStatus(SceneStatus.Failed);
+      if (alive) setWebgpuReady(supported);
     };
-    void probe();
+    void check();
     return () => {
       alive = false;
     };
@@ -117,7 +135,7 @@ export default function Backdrop({ view }: { view: BackdropView }) {
           <Canvas
             camera={{ position: [0, 0.3, 6], fov: 60 }}
             dpr={dpr}
-            frameloop={active && !hidden ? "always" : "never"}
+            frameloop={active && !hidden ? (performanceMode ? "demand" : "always") : "never"}
             resize={{ scroll: false, debounce: { scroll: 0, resize: 50 } }}
             // alpha:false -> opaque canvas, so there is never a white flash.
             gl={async (props) => {
@@ -135,6 +153,7 @@ export default function Backdrop({ view }: { view: BackdropView }) {
               gl.setClearColor(FALLBACK_BG, 1);
             }}
           >
+            {performanceMode && active && !hidden ? <FrameCap fps={CONSTRAINED_FPS} /> : null}
             <FirstFrameSignal />
             <OrbitClock reduced={reduced} />
             {view.kind === "home" && (

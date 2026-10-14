@@ -144,6 +144,18 @@ export function revealStagger(
 }
 
 /**
+ * Intro reveal for content in the first viewport (hero copy, the education
+ * orbit). On phones, touch-first and low-power devices it does nothing: the
+ * server-rendered content stays visible, so the largest paint happens with the
+ * first frame instead of waiting for JavaScript to fade it back in (LCP).
+ * Desktop keeps the staggered entrance.
+ */
+export function revealIntro(targets: gsap.TweenTarget, options: Parameters<typeof revealStagger>[1]) {
+  if (isLiteMode()) return;
+  revealStagger(targets, options);
+}
+
+/**
  * Anima un texto numérico desde 0 hasta su valor final al entrar en pantalla.
  * Respeta el separador de miles del locale activo para que "1.000" noienta.
  */

@@ -7,7 +7,8 @@ import { PROJECTS, type Project, type ProjectItem } from "@/data/projects";
 import { useI18n } from "@/lib/i18n";
 import gsap from "gsap";
 import { EntryIndex, type IndexEntry } from "@/components/EntryIndex";
-import { countUp, drawOnEnter, drawOnScroll, revealStagger, scrollLinked, scrubNumber, useScrollScene } from "@/lib/scrollFX";
+import { countUp, drawOnEnter, drawOnScroll, revealIntro, revealStagger, scrollLinked, scrubNumber, useScrollScene } from "@/lib/scrollFX";
+import { isLiteMode } from "@/lib/lite";
 
 function pad(value: number) {
   return String(value).padStart(2, "0");
@@ -167,14 +168,15 @@ function HackathonJourney({ project }: { project: Project }) {
     const q = <T extends Element>(sel: string) => root.querySelector<T>(sel);
 
     // Hero: entra por partes, como si el HUD encendiera al armar la consola.
-    revealStagger(".arena-hero__copy > *", {
+    revealIntro(".arena-hero__copy > *", {
       trigger: q(".arena-hero")!,
       y: 22,
       stagger: 0.08,
       start: "top 92%",
     });
     const radar = q(".arena-radar");
-    if (radar) {
+    // First viewport on phones: stays static there so it paints immediately.
+    if (radar && !isLiteMode()) {
       gsap.from(radar, {
         opacity: 0,
         scale: 0.86,
@@ -400,7 +402,7 @@ function MentorshipJourney({ project }: { project: Project }) {
   const ref = useScrollScene((root) => {
     const q = <T extends Element>(sel: string) => root.querySelector<T>(sel);
 
-    revealStagger(".aula-hero__copy > *", { trigger: q(".aula-hero")!, y: 22, stagger: 0.08 });
+    revealIntro(".aula-hero__copy > *", { trigger: q(".aula-hero")!, y: 22, stagger: 0.08 });
 
     const dial = q(".aula-dial");
     if (dial) {
@@ -608,7 +610,7 @@ function ProjectAtlas({ project }: { project: Project }) {
   const ref = useScrollScene((root) => {
     const q = <T extends Element>(sel: string) => root.querySelector<T>(sel);
 
-    revealStagger(".atlas-hero__copy > *", { trigger: q(".atlas-hero")!, y: 24, stagger: 0.09 });
+    revealIntro(".atlas-hero__copy > *", { trigger: q(".atlas-hero")!, y: 24, stagger: 0.09 });
 
     // El plano se dibuja con el scroll: el lector "trazando" la cartografía.
     drawOnScroll(".atlas-blueprint svg rect, .atlas-blueprint svg circle", {
@@ -746,7 +748,7 @@ function UniversityJourney({ project }: { project: Project }) {
   const ref = useScrollScene((root) => {
     const q = <T extends Element>(sel: string) => root.querySelector<T>(sel);
 
-    revealStagger(".edu-hero__copy > *", { trigger: q(".edu-hero")!, y: 24, stagger: 0.09 });
+    revealIntro(".edu-hero__copy > *", { trigger: q(".edu-hero")!, y: 24, stagger: 0.09 });
 
     // La órbita: la ruta se dibuja y el planeta gira levemente al bajar.
     drawOnScroll(".edu-orbit svg path[stroke^='url']", {
@@ -756,13 +758,16 @@ function UniversityJourney({ project }: { project: Project }) {
     });
     const orbit = q(".edu-orbit");
     if (orbit) {
-      gsap.from(orbit, {
-        opacity: 0,
-        y: 30,
-        duration: 0.95,
-        ease: "power3.out",
-        scrollTrigger: { trigger: orbit, start: "top 92%", once: true },
-      });
+      // First viewport on phones: stays static there so it paints immediately.
+      if (!isLiteMode()) {
+        gsap.from(orbit, {
+          opacity: 0,
+          y: 30,
+          duration: 0.95,
+          ease: "power3.out",
+          scrollTrigger: { trigger: orbit, start: "top 92%", once: true },
+        });
+      }
       // Waypoints: cada punto de la ruta se ilumina en orden.
       gsap.utils.toArray<SVGCircleElement>(".edu-orbit svg circle[stroke]").forEach((dot) => {
         gsap.fromTo(
@@ -778,7 +783,7 @@ function UniversityJourney({ project }: { project: Project }) {
         );
       });
     }
-    revealStagger(".edu-orbit__tag, .edu-orbit__legend", {
+    revealIntro(".edu-orbit__tag, .edu-orbit__legend", {
       trigger: q(".edu-orbit")!,
       y: 12,
       stagger: 0.14,
@@ -937,7 +942,7 @@ function DossierJourney({ project }: { project: Project }) {
 
   const ref = useScrollScene((root) => {
     const q = <T extends Element>(sel: string) => root.querySelector<T>(sel);
-    revealStagger(".dossier-hero > *", { trigger: q(".dossier-hero")!, y: 22, stagger: 0.08 });
+    revealIntro(".dossier-hero > *", { trigger: q(".dossier-hero")!, y: 22, stagger: 0.08 });
     revealStagger(".dossier-group .hud-title > *, .dossier-row", {
       trigger: q(".dossier-catalog")!,
       y: 20,
