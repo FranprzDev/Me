@@ -17,7 +17,7 @@ import {
 
 /** Flight time along the curve: long enough to read, short enough to never feel like a wait. */
 const FLIGHT_MS = 560;
-/** Hard cap: the overlay is gone by then even if the route has not committed. */
+/** Hard cap from the flight's first frame: the overlay is gone by then even if the route has not committed. */
 const MAX_MS = 700;
 /** Keyframes sampled along the curve (WAAPI interpolates linearly between them). */
 const SAMPLES = 28;
@@ -34,13 +34,14 @@ type Flight = {
   flip: boolean;
   scaleFrom: number;
   scaleTo: number;
+  headingFollow: number;
 };
 
 /** Inline style carrying a world's colour tokens as CSS custom properties. */
 type ToneStyle = CSSProperties & Record<`--${string}`, string>;
 
-/** Gentle start, fast middle, soft arrival. */
-const easeFlight = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2);
+/** Bursts in from the edge, then slows as it dives into the world. */
+const easeFlight = (x: number) => 1 - (1 - x) ** 2.2;
 
 function keyframesFor(flight: Flight): Keyframe[] {
   const frames: Keyframe[] = [];
@@ -51,7 +52,9 @@ function keyframesFor(flight: Flight): Keyframe[] {
     const index = Math.round(easeFlight(offset) * last);
     const p = flight.points[index];
     const s = flight.scaleFrom + (flight.scaleTo - flight.scaleFrom) * offset ** 1.6;
-    const angle = flight.flip ? p.angle - 180 : p.angle;
+    // Heading relative to the way the art faces, in (-180°, 180°], then the vehicle's share of it.
+    const relative = ((((flight.flip ? p.angle - 180 : p.angle) + 180) % 360) + 360) % 360 - 180;
+    const angle = relative * flight.headingFollow;
     const opacity = offset < 0.08 ? offset / 0.08 : offset > 0.86 ? (1 - offset) / 0.14 : 1;
     frames.push({
       offset,
@@ -94,6 +97,7 @@ export default function WorldEntryFlight() {
           flip: dx < 0,
           scaleFrom: config.curve.scaleFrom,
           scaleTo: config.curve.scaleTo,
+          headingFollow: config.headingFollow,
         });
       }),
     [],
@@ -103,7 +107,6 @@ export default function WorldEntryFlight() {
     const vehicle = vehicleRef.current;
     if (!flight || !vehicle) return;
     const targetPath = `/${flight.slug}`;
-    const started = performance.now();
     const frames = keyframesFor(flight);
     const animations: Animation[] = [vehicle.animate(frames, { duration: FLIGHT_MS, easing: "linear", fill: "both" })];
     for (const [i, echo] of echoRefs.current.entries()) {
@@ -123,17 +126,31 @@ export default function WorldEntryFlight() {
       );
     }
     let raf = 0;
-    const tick = () => {
-      const elapsed = performance.now() - started;
-      const arrived = window.location.pathname === targetPath;
-      if (elapsed >= MAX_MS || (arrived && animations.every((a) => a.playState === "finished"))) {
-        setFlight((current) => (current?.id === flight.id ? null : current));
-        return;
+    let alive = true;
+    // Timed from when the flight is really on screen: the first frame after
+    // the click can land after the new route has committed.
+    const watch = async () => {
+      try {
+        await animations[0].ready;
+      } catch {
+        return; // Cancelled.
       }
+      if (!alive) return;
+      const started = performance.now();
+      const tick = () => {
+        const elapsed = performance.now() - started;
+        const arrived = window.location.pathname === targetPath;
+        if (elapsed >= MAX_MS || (arrived && animations.every((a) => a.playState === "finished"))) {
+          setFlight((current) => (current?.id === flight.id ? null : current));
+          return;
+        }
+        raf = requestAnimationFrame(tick);
+      };
       raf = requestAnimationFrame(tick);
     };
-    raf = requestAnimationFrame(tick);
+    void watch();
     return () => {
+      alive = false;
       cancelAnimationFrame(raf);
       for (const a of animations) a.cancel();
     };

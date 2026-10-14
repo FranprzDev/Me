@@ -48,28 +48,37 @@ export type FlightCurve = {
   scaleTo: number;
 };
 
-export type WorldFlightConfig = { vehicle: WorldVehicle; curve: FlightCurve };
+/**
+ * headingFollow: how much of the tangent heading the vehicle turns by (1 =
+ * nose along the path). The saucer only banks into it, so its tractor beam
+ * keeps pointing down at the world.
+ */
+export type WorldFlightConfig = { vehicle: WorldVehicle; curve: FlightCurve; headingFollow: number };
 
 export const WORLD_FLIGHTS: Readonly<Record<WorldSlug, WorldFlightConfig>> = {
   // The UFO comes in wide from the lower left on a deep S-swoop.
   [WorldSlug.Hackathons]: {
     vehicle: WorldVehicle.Ufo,
-    curve: { amplitude: 0.42, frequency: 1.1, tStart: -1.15, tEnd: 1.2, entryDeg: -35, mirror: false, scaleFrom: 1.25, scaleTo: 0.3 },
+    curve: { amplitude: 0.42, frequency: 1.1, tStart: -1.15, tEnd: 1.2, entryDeg: -35, mirror: false, scaleFrom: 1.3, scaleTo: 0.3 },
+    headingFollow: 0.35,
   },
   // The paper plane glides down from the upper right, a shallow arc.
   [WorldSlug.Teaching]: {
     vehicle: WorldVehicle.PaperPlane,
     curve: { amplitude: 0.26, frequency: 0.9, tStart: -0.6, tEnd: 1.55, entryDeg: 150, mirror: true, scaleFrom: 1.1, scaleTo: 0.35 },
+    headingFollow: 1,
   },
   // The hammer is hurled up from the bottom, a tight, steep curve.
   [WorldSlug.Projects]: {
     vehicle: WorldVehicle.Hammer,
     curve: { amplitude: 0.34, frequency: 1.6, tStart: -0.85, tEnd: 0.75, entryDeg: -95, mirror: false, scaleFrom: 1.15, scaleTo: 0.3 },
+    headingFollow: 1,
   },
   // The book flutters in from the left on a long, lazy wave.
   [WorldSlug.Education]: {
     vehicle: WorldVehicle.Book,
     curve: { amplitude: 0.3, frequency: 0.75, tStart: -1.7, tEnd: 1.0, entryDeg: 15, mirror: true, scaleFrom: 1.2, scaleTo: 0.35 },
+    headingFollow: 1,
   },
 };
 
@@ -81,8 +90,19 @@ export function isWorldSlug(slug: string): slug is WorldSlug {
 const ASYMPTOTE_MARGIN = 0.16;
 /** How much of φ turns the whole curve (φ = 180° turns it by ±45°). */
 const PHASE_TURN = 0.25;
-/** Distance from the entry point to the world, as a fraction of the viewport diagonal. */
-const ENTRY_DISTANCE = 0.62;
+/** The entry point sits just past the viewport edge, this far out (px), so the vehicle flies in from off screen. */
+const ENTRY_MARGIN = 70;
+/** Shortest flight (px), for a world sitting close to the edge it is entered from. */
+const MIN_DISTANCE = 260;
+
+/** Distance from `target` to the viewport edge, walking backwards along `heading`. */
+function distanceToEdge(target: Target, heading: number, viewport: Viewport): number {
+  const dx = -Math.cos(heading);
+  const dy = -Math.sin(heading);
+  const tx = dx > 1e-6 ? (viewport.width - target.x) / dx : dx < -1e-6 ? -target.x / dx : Infinity;
+  const ty = dy > 1e-6 ? (viewport.height - target.y) / dy : dy < -1e-6 ? -target.y / dy : Infinity;
+  return Math.max(0, Math.min(tx, ty));
+}
 
 export type FlightPoint = {
   /** Position in viewport px. */
@@ -140,7 +160,7 @@ export function flightPath(curve: FlightCurve, phaseRad: number, target: Target,
 
   // Screen line from the entry point to the target, turned by the phase.
   const heading = (curve.entryDeg * Math.PI) / 180 + PHASE_TURN * wrapPi(phaseRad);
-  const distance = ENTRY_DISTANCE * Math.hypot(viewport.width, viewport.height);
+  const distance = Math.max(MIN_DISTANCE, distanceToEdge(target, heading, viewport) + ENTRY_MARGIN);
   const startX = target.x - Math.cos(heading) * distance;
   const startY = target.y - Math.sin(heading) * distance;
 

@@ -51,6 +51,42 @@ async function checkPage(page, route, name) {
   }
 }
 
+/** Vehicle each world sends the visitor in with (WORLD_FLIGHTS in src/lib/worldFlight.ts). */
+const VEHICLE_BY_ROUTE = { "/hackathons": "ufo", "/teaching": "paper-plane", "/projects": "hammer", "/education": "book" };
+
+/** Records every world-entry flight overlay that mounts (it lives well under a second). */
+function recordFlights() {
+  window.__flights = [];
+  new MutationObserver((records) => {
+    for (const record of records) {
+      for (const node of record.addedNodes) {
+        if (!(node instanceof HTMLElement) || !node.matches("[data-world-flight]")) continue;
+        const entry = { vehicle: node.dataset.worldFlight, world: node.dataset.world, path: node.dataset.path, overflow: null };
+        window.__flights.push(entry);
+        setTimeout(() => {
+          entry.overflow = document.documentElement.scrollWidth > innerWidth;
+        }, 200);
+      }
+    }
+  }).observe(document, { childList: true, subtree: true });
+}
+
+/** Opens home on the selector, waits for the idle work (vehicle chunk, phase), then enters `route` with Enter. */
+async function enterWorld(page, route) {
+  const phase = page.waitForResponse((response) => response.url().endsWith("/api/geo-phase"), { timeout: 8000 }).catch(() => null);
+  await page.goto(`${baseURL}/#projects`);
+  await phase;
+  await page.waitForTimeout(300);
+  const card = page.locator("#world-details");
+  await card.focus();
+  while ((await card.getAttribute("href")) !== route) await page.keyboard.press("ArrowRight");
+  await card.focus();
+  await Promise.all([page.waitForURL(`**${route}`), page.keyboard.press("Enter")]);
+  await page.waitForFunction(() => document.querySelector("[data-world-flight]") === null, null, { timeout: 2000 });
+  await page.locator("h1").waitFor();
+  return page.evaluate(() => window.__flights);
+}
+
 /** Scenario + page being checked, reported with any failure. */
 const progress = { scenario: "", page: null, logs: [] };
 
@@ -84,6 +120,7 @@ async function main() {
     ];
     for (const [name, options, fallback] of scenarios.filter(([, , fallback]) => process.env.HEADFUL !== "1" || !fallback)) {
       const context = await browser.newContext(options);
+      await context.addInitScript(recordFlights);
       if (fallback) await context.addInitScript(() => Object.defineProperty(navigator, "gpu", { value: undefined }));
       const page = await context.newPage();
       progress.scenario = name;
@@ -206,6 +243,7 @@ async function main() {
       await worldCard.focus();
       await Promise.all([page.waitForURL(`**${routes[1]}`), page.keyboard.press("Enter")]);
       await page.locator(".story-back").waitFor();
+      if (name === "reduced-motion") assert.deepEqual(await page.evaluate(() => window.__flights), [], "Reduced motion: no world-entry flight, instant navigation");
       assert.equal(await page.locator("[data-rocket-loader]").count(), 0, "Launch loader never replays on client navigation");
       await page.locator(".story-back").click();
       await page.waitForURL((url) => new URL(url).pathname === "/" && new URL(url).hash.startsWith("#projects"));
@@ -284,6 +322,55 @@ async function main() {
       }
       await context.close();
       console.log(`PASS ${name} navigation, keyboard, CV and metadata`);
+    }
+
+    // World-entry vehicles: each world flies its own vehicle in over the jump;
+    // the overlay never scrolls sideways and is gone once the world is shown.
+    for (const [name, options, worlds] of [
+      ["vehicles-desktop", { viewport: { width: 1440, height: 900 } }, routes.slice(1)],
+      ["vehicles-mobile", { viewport: { width: 412, height: 915 }, isMobile: true, hasTouch: true }, ["/hackathons"]],
+    ]) {
+      const context = await browser.newContext(options);
+      await context.addInitScript(recordFlights);
+      const page = await context.newPage();
+      progress.scenario = name;
+      progress.page = page;
+      page.setDefaultTimeout(15000);
+      for (const route of worlds) {
+        const flights = await enterWorld(page, route);
+        assert.equal(flights.length, 1, `${name}: one flight entering ${route}`);
+        assert.equal(flights[0].vehicle, VEHICLE_BY_ROUTE[route], `${name}: ${route} flies its own vehicle`);
+        assert.equal(flights[0].world, route.slice(1));
+        assert.equal(flights[0].overflow, false, `${name}: no horizontal overflow mid-flight`);
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${name}: no horizontal overflow after ${route}`);
+      }
+      await context.close();
+      console.log(`PASS ${name} world-entry vehicles`);
+    }
+
+    // Country phase: φ = ISO 3166-1 numeric code mod 360 degrees, 0 when unknown.
+    {
+      const context = await browser.newContext();
+      for (const [country, degrees] of [["AR", 32], ["ar", 32], ["US", 120], ["JP", 32], ["BR", 76], ["XX", 0], ["", 0], [null, 0]]) {
+        const response = await context.request.get(`${baseURL}/api/geo-phase`, { headers: country === null ? {} : { "x-vercel-ip-country": country } });
+        assert.equal(response.status(), 200);
+        assert.match(response.headers()["cache-control"], /no-store/, "Phase is never cached across visitors");
+        assert.deepEqual(await response.json(), { phaseDeg: degrees }, `Country ${country} → ${degrees}°`);
+      }
+      await context.close();
+      // Two phases fly visibly different paths into the same world.
+      const paths = [];
+      for (const phaseDeg of [0, 120]) {
+        const phased = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+        await phased.addInitScript(recordFlights);
+        await phased.route("**/api/geo-phase", (route) => route.fulfill({ json: { phaseDeg }, headers: { "cache-control": "private, no-store" } }));
+        const flights = await enterWorld(await phased.newPage(), "/hackathons");
+        assert.equal(flights.length, 1, `Flight with phase ${phaseDeg}°`);
+        paths.push(flights[0].path);
+        await phased.close();
+      }
+      assert.notEqual(paths[0], paths[1], `Different phases give different flight paths (${paths.join(" vs ")})`);
+      console.log("PASS country phase mapping and phased paths");
     }
 
     if (process.env.HEADFUL === "1") return;
