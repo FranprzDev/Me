@@ -364,20 +364,6 @@ button.chip {
   font: 0.75rem/1.7 ui-monospace, monospace;
 }
 
-.planet-hud {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  width: 100%;
-  max-width: 620px;
-  padding: clamp(1.2rem, 4vw, 2rem);
-  border: 1px solid color-mix(in srgb, var(--hud-glow, var(--space)) 45%, transparent);
-  border-radius: 1.4rem;
-  background: rgba(8, 12, 28, 0.88);
-  backdrop-filter: blur(12px);
-}
-
 .btn-cosmic-primary {
   display: inline-flex;
   align-items: center;
@@ -395,13 +381,6 @@ button.chip {
 
 .btn-cosmic-primary:hover {
   background: #1c2844;
-}
-
-.world-controls {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1.2rem;
 }
 
 .timeline-container {
@@ -1627,7 +1606,6 @@ button:focus-visible {
 .glass,
 .glass-soft,
 .glass-panel,
-.planet-hud,
 .arena-hero,
 .arena-trophy,
 .mission__body,
@@ -1651,7 +1629,6 @@ button:focus-visible {
   .glass,
   .glass-soft,
   .glass-panel,
-  .planet-hud,
   .arena-hero,
   .arena-trophy,
   .mission__body,
@@ -1678,7 +1655,6 @@ button:focus-visible {
     .glass,
     .glass-soft,
     .glass-panel,
-    .planet-hud,
     .arena-hero,
     .arena-trophy,
     .mission__body,
@@ -1701,57 +1677,6 @@ button:focus-visible {
 }
 .atlas-row + .atlas-row {
   border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-/* --- Home "Cuatro mundos": the whole card is a link to its world --- */
-.world-card {
-  position: relative;
-  color: var(--fg);
-  text-decoration: none;
-  transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
-}
-.world-card:hover,
-.world-card:focus-visible {
-  border-color: color-mix(in srgb, var(--hud-glow, var(--space)) 75%, transparent);
-  box-shadow:
-    var(--glass-shadow),
-    0 0 56px color-mix(in srgb, var(--hud-glow, var(--space)) 30%, transparent);
-  transform: translateY(-3px);
-}
-.world-card:focus-visible {
-  outline: 2px solid var(--hud-glow, var(--space));
-  outline-offset: 4px;
-}
-.world-card__title {
-  margin: 0;
-  font-size: clamp(1.6rem, 3.5vw, 2.2rem);
-  line-height: 1.15;
-}
-.world-card__tagline {
-  max-width: 500px;
-  color: var(--fg);
-  font-size: 1.05rem;
-  font-weight: 500;
-  line-height: 1.5;
-}
-.world-card__cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.55rem 1.1rem;
-  border: 1px solid color-mix(in srgb, var(--hud-glow, var(--space)) 55%, transparent);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--hud-glow, var(--space)) 12%, rgba(7, 10, 24, 0.6));
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-.world-card__cta span {
-  transition: transform 220ms ease;
-}
-.world-card:hover .world-card__cta span,
-.world-card:focus-visible .world-card__cta span {
-  transform: translateX(4px);
 }
 
 /* --- "← Volver al universo": prominent glass pill with a nudging rocket --- */
@@ -1918,11 +1843,8 @@ button:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .story-back:hover,
   .story-back:focus-visible,
-  .world-card:hover,
-  .world-card:focus-visible { transform: none; }
   .story-back:hover .story-back__icon svg,
-  .story-back:focus-visible .story-back__icon svg,
-  .world-card:hover .world-card__cta span { transform: none; }
+  .story-back:focus-visible .story-back__icon svg { transform: none; }
 }
 
 /* --- One-time launch loader: tangent-curve flight, burst and iris reveal --- */
@@ -2052,5 +1974,228 @@ button:focus-visible {
   *::after {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Home orbital selector. Items ride a tilted ring around a glowing core; the
+   front item is the focused one. All motion is transform/opacity
+   transitions (compositor-only): the ring is squashed with scaleY, each arm
+   rotates, each body counter-rotates and un-squashes, so a step travels
+   along the arc. Transforms are written inline by the component.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.orbit-select {
+  --orbit-r: min(38vw, 210px);
+  --orbit-dur: 700ms;
+  --orbit-ease: cubic-bezier(0.65, 0, 0.35, 1);
+  display: grid;
+  justify-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  max-width: 640px;
+}
+.orbit-select[data-speed="auto"] {
+  --orbit-dur: 1600ms;
+}
+.orbit-select__stage {
+  position: relative;
+  width: 100%;
+  /* Ring height after the tilt, plus room for the item labels. */
+  height: calc(var(--orbit-r) + 9.5rem);
+  touch-action: pan-y;
+}
+.orbit-select__core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 10;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 34%, #fff 0 8%, var(--tone) 42%, color-mix(in srgb, var(--tone) 30%, #050817) 72%);
+  box-shadow: 0 0 46px color-mix(in srgb, var(--tone) 55%, transparent), 0 0 120px color-mix(in srgb, var(--tone) 22%, transparent);
+  transform: translate(-50%, -50%);
+  transition: background 600ms ease, box-shadow 600ms ease;
+  pointer-events: none;
+}
+.orbit-select__ring {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+}
+.orbit-select__track {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--orbit-r) * 2);
+  height: calc(var(--orbit-r) * 2);
+  border: 2px dashed rgba(190, 208, 255, 0.18);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.orbit-select__arm {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+  transition: transform var(--orbit-dur) var(--orbit-ease);
+}
+.orbit-select__body {
+  position: absolute;
+  /* Centre the orb (first child) on the ring point. */
+  top: -1.8rem;
+  left: -4.5rem;
+  display: grid;
+  justify-items: center;
+  gap: 0.45rem;
+  width: 9rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fg);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform var(--orbit-dur) var(--orbit-ease),
+    opacity var(--orbit-dur) ease,
+    scale 420ms cubic-bezier(0.5, 0, 0.75, 0);
+}
+.orbit-select__orb {
+  width: 3.6rem;
+  height: 3.6rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, color-mix(in srgb, var(--tone-2) 70%, #fff) 0 6%, var(--tone) 46%, color-mix(in srgb, var(--tone) 25%, #04060f) 80%);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--tone) 45%, transparent);
+}
+.orbit-select__name {
+  max-width: 9rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  text-wrap: balance;
+}
+.orbit-select__body.is-front .orbit-select__orb {
+  width: 4.6rem;
+  height: 4.6rem;
+  margin-top: -0.5rem;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--tone) 70%, transparent), 0 0 38px color-mix(in srgb, var(--tone) 60%, transparent);
+}
+.orbit-select__body.is-front .orbit-select__name {
+  font-size: 1rem;
+}
+.orbit-select__body:focus-visible {
+  outline: none;
+}
+.orbit-select__body:focus-visible .orbit-select__orb {
+  outline: 2px solid #bed0ff;
+  outline-offset: 5px;
+}
+@media (hover: hover) {
+  .orbit-select__body:hover .orbit-select__orb {
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--tone) 80%, transparent), 0 0 44px color-mix(in srgb, var(--tone) 70%, transparent);
+  }
+}
+/* Entering: the focused item zooms toward the viewer, the rest fade away. */
+.orbit-select__body.is-zooming {
+  scale: 2.6;
+  opacity: 0 !important;
+}
+.orbit-select.is-entering .orbit-select__body:not(.is-zooming),
+.orbit-select.is-entering .orbit-select__track,
+.orbit-select.is-entering .orbit-select__core {
+  opacity: 0 !important;
+  transition: opacity 300ms ease;
+}
+
+.orbit-select__detail {
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+  min-height: 3.6rem;
+}
+.orbit-select__count {
+  font: 600 0.7rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.22em;
+}
+.orbit-select__tagline {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--fg);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.orbit-select__controls {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+.orbit-select__step,
+.orbit-select__enter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(8, 11, 26, 0.72);
+  color: var(--fg);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 180ms ease, background 180ms ease;
+}
+.orbit-select__step {
+  width: 48px;
+  font-size: 1.2rem;
+}
+.orbit-select__enter {
+  gap: 0.5rem;
+  padding: 0 1.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.orbit-select__step:hover,
+.orbit-select__enter:hover {
+  border-color: rgba(190, 208, 255, 0.45);
+  background: rgba(20, 26, 52, 0.85);
+}
+.orbit-select__step:focus-visible,
+.orbit-select__enter:focus-visible {
+  outline: 2px solid #bed0ff;
+  outline-offset: 3px;
+}
+@media (max-width: 560px) {
+  .orbit-select {
+    --orbit-r: min(36vw, 150px);
+  }
+  .orbit-select__body {
+    left: -3.75rem;
+    width: 7.5rem;
+  }
+  .orbit-select__body {
+    top: -1.45rem;
+  }
+  .orbit-select__orb {
+    width: 2.9rem;
+    height: 2.9rem;
+  }
+  .orbit-select__body.is-front .orbit-select__orb {
+    width: 3.8rem;
+    height: 3.8rem;
+    margin-top: -0.45rem;
+  }
+  .orbit-select__name {
+    font-size: 0.74rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .orbit-select__arm,
+  .orbit-select__body {
+    transition: none;
   }
 }

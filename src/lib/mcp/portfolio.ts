@@ -79,7 +79,7 @@ function summarizeProject(project: Project, language: Language, origin: string) 
   return {
     slug: project.slug,
     title: project.title?.[l] ?? project.name,
-    tagline: project.tagline[l],
+    tagline: project.tagline?.[l] ?? null,
     years: project.year,
     url: absolute(origin, `/${project.slug}`),
   };

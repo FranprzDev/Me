@@ -82,6 +82,8 @@ export function WarpTransition() {
       const a = e.target instanceof Element ? e.target.closest("a") : null;
       if (!a) return;
       if (a.target === "_blank" || a.hasAttribute("download")) return;
+      // Links with their own entrance (the orbit selector's zoom) opt out.
+      if (a.hasAttribute("data-no-warp")) return;
       const href = a.getAttribute("href");
       if (!href || !href.startsWith("/")) return;
       const target = new URL(a.href);

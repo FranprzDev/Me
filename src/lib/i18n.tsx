@@ -28,15 +28,10 @@ const UI = {
   edu_certs: { es: "Certificaciones", en: "Certifications" },
   edu_highlights: { es: "Participaciones destacadas", en: "Highlights" },
 
-  proj_title: { es: "Cuatro mundos. Trabajo real.", en: "Four worlds. Real work." },
-  proj_instruction: {
-    es: "Hackathones, mentorías, productos y formación. Elegí un mundo y descubrí qué construí en él.",
-    en: "Hackathons, teaching, products and education. Choose a world and discover what I built there.",
-  },
+  proj_title: { es: "Construir cosas que importan.", en: "Ship things that matter." },
   proj_back: { es: "← Volver al universo", en: "← Back to the universe" },
 
   career_path: { es: "TRAYECTORIA PROFESIONAL", en: "CAREER PATH" },
-  world: { es: "MUNDO", en: "WORLD" },
 
   contact_title: { es: "Charlemos", en: "Let's chat" },
 

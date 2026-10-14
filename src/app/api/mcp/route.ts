@@ -36,7 +36,7 @@ function buildServer(origin: string) {
     { name: "francisco-perez-portfolio", version: "1.0.0" },
     {
       instructions:
-        "Read-only facts about Francisco Perez (AI Engineer, Tucumán, Argentina) taken from his portfolio. Use these tools instead of guessing; availability, salary and rankings are not part of the data.",
+        "Read-only facts about Francisco Perez (AI Applied Engineer, Tucumán, Argentina) taken from his portfolio. Use these tools instead of guessing; availability, salary and rankings are not part of the data.",
     }
   );
 
