@@ -7,7 +7,7 @@
 
 /* Shaders de la capa cósmica: nebulosa procedural (fbm en esfera invertida) y
    planeta con atmósfera fresnel. Todo procedural: 0 KB de assets. */
-import { useFrame, useThree } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { MeshBasicNodeMaterial } from "three/webgpu";
@@ -15,11 +15,7 @@ import type { Node } from "three/webgpu";
 import { normalView, positionLocal, positionViewDirection, uniform } from "three/tsl";
 import { tslExports } from "vgpu/three";
 import cosmosShader from "./shaders/nebula.wgsl";
-import { PROJECTS, type PlanetSpec } from "@/data/projects";
-import { bumpWeight, measuredSectionCenter } from "@/lib/scroll";
-import { getActiveProject, getSlideDirection } from "@/lib/projectFocus";
 import { orbitTime } from "./shared";
-import { useRouter } from "next/navigation";
 
 type CosmosShaderInputs = {
   nebulaColor: { position: Node; time: Node; scroll: Node; intensity: Node; octaves: Node };
@@ -183,183 +179,6 @@ export function Planet({ pRef }: { pRef: RefObject<number> }) {
       <pointLight position={[4, 5, 3]} intensity={12} color="#bcd0ff" />
       <mesh geometry={atmoGeo} material={atmoMat} scale={1} />
       <mesh geometry={ringGeo} material={ringMat} rotation={[Math.PI / 2.25, 0.2, 0]} />
-    </group>
-  );
-}
-
-/**
- * Los proyectos como planetas del slider: UNO a la vez, al frente y al centro
- * de la escena (protagonista absoluto). Las flechas ← → del DOM cambian el
- * slide; el planeta activo entra deslizándose y el anterior sale por el lado
- * contrario. No son decorado de fondo: el único planeta de fondo es el ancla
- * original del inicio del viaje.
- */
-const PLANET_FRONT = { x: 0, y: 0.15, z: -5.4 };
-
-export function ProjectPlanets({ pRef }: { pRef: RefObject<number> }) {
-  return (
-    <>
-      {PROJECTS.map((p, i) => (
-        <ProjectPlanet
-          key={p.name}
-          spec={p.planet}
-          index={i}
-          seed={i}
-          pRef={pRef}
-        />
-      ))}
-    </>
-  );
-}
-
-function ProjectPlanet({
-  spec,
-  index,
-  seed,
-  pRef,
-}: {
-  spec: PlanetSpec;
-  index: number;
-  seed: number;
-  pRef: RefObject<number>;
-}) {
-  const group = useRef<THREE.Group>(null);
-  const { camera, size } = useThree();
-  const router = useRouter();
-  // Slide: 0 = fuera de escena, 1 = en el centro del escenario.
-  const slideRef = useRef(0);
-  // Hover: el planeta "respira" un poco más grande bajo el puntero.
-  const hoverRef = useRef(0);
-  const hoverTarget = useRef(0);
-
-  const { bodyMat, atmoMat, atmoOpacity, ringMat, geo, atmoGeo, ringGeo, hitGeo, hitMat } = useMemo(() => {
-    const bodyMat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color(spec.body),
-      // Emisión tenue del mismo tono: garantiza que el cuerpo se vea aunque
-      // la iluminación de la escena varíe (nunca una silueta negra).
-      emissive: new THREE.Color(spec.body),
-      emissiveIntensity: 0.35,
-      roughness: 0.92,
-      metalness: 0.08,
-      transparent: true,
-      opacity: 0,
-    });
-    const { material: atmoMat, opacity: atmoOpacity } = createAtmosphereMaterial(
-      new THREE.Color(spec.atmoA),
-      new THREE.Color(spec.atmoB),
-      0
-    );
-    const ringMat = spec.ring
-      ? new THREE.MeshBasicMaterial({
-          color: new THREE.Color(spec.ring),
-          transparent: true,
-          opacity: 0,
-          side: THREE.DoubleSide,
-          blending: THREE.AdditiveBlending,
-          depthWrite: false,
-        })
-      : null;
-    return {
-      bodyMat,
-      atmoMat,
-      atmoOpacity,
-      ringMat,
-      geo: new THREE.SphereGeometry(1, 40, 28),
-      atmoGeo: new THREE.SphereGeometry(1.18, 40, 28),
-      ringGeo: new THREE.RingGeometry(1.32, 1.78, 88),
-      hitGeo: new THREE.SphereGeometry(1.3, 16, 12),
-      hitMat: new THREE.MeshBasicMaterial({
-        visible: false, // invisible pero raycasteable: hitbox generosa del planeta
-      }),
-    };
-  }, [spec]);
-
-  useEffect(
-    () => () => {
-      bodyMat.dispose();
-      atmoMat.dispose();
-      ringMat?.dispose();
-      geo.dispose();
-      atmoGeo.dispose();
-      ringGeo.dispose();
-      hitGeo.dispose();
-      hitMat.dispose();
-    },
-    [bodyMat, atmoMat, ringMat, geo, atmoGeo, ringGeo, hitGeo, hitMat]
-  );
-
-  useFrame((_, dt) => {
-    if (!group.current) return;
-    // Axial spin on the shared orbit clock (frame-rate independent, slowed
-    // rather than frozen under reduced motion).
-    const t = orbitTime();
-    group.current.rotation.y = t * (0.36 + seed * 0.12);
-
-    // Ventana CORTA medida del DOM real: los planetas viven sólo en plena
-    // sección Proyectos y se apagan antes de que empiece a armarse CHARLEMOS.
-    const inSection = bumpWeight(pRef.current, measuredSectionCenter(2), 0.09);
-
-    // Slide del activo: entra/sale deslizándose horizontalmente.
-    const goal = getActiveProject() === index ? 1 : 0;
-    slideRef.current += (goal - slideRef.current) * (1 - Math.exp(-dt * 4));
-    const s = slideRef.current;
-    hoverRef.current += (hoverTarget.current - hoverRef.current) * (1 - Math.exp(-dt * 8));
-
-    // Posición: centro del escenario, desplazado fuera de pantalla según el
-    // lado del que viene/va la transición.
-    const camZ = camera.position.z;
-    const off = (1 - s) * getSlideDirection() * 8;
-    // A small inclined orbit around its stage spot, so it never sits still.
-    const orbit = t * 0.35 + seed;
-    group.current.position.set(
-      PLANET_FRONT.x + off + Math.cos(orbit) * 0.22,
-      PLANET_FRONT.y + Math.sin(orbit) * 0.08,
-      camZ + PLANET_FRONT.z + Math.sin(orbit) * 0.18
-    );
-    const viewportScale = Math.min(1, Math.max(0.48, size.width / 1200));
-    group.current.scale.setScalar(spec.radius * 1.82 * viewportScale * (1 + 0.06 * hoverRef.current));
-
-    const f = inSection * s;
-    bodyMat.opacity = f;
-    atmoOpacity.value = f * (0.85 + 0.15 * hoverRef.current);
-    if (ringMat) ringMat.opacity = 0.26 * f;
-    group.current.visible = f > 0.01;
-  });
-
-  // El planeta entero es el botón: click → su ruta. Hover → cursor de mano.
-  const handlers = {
-    onPointerOver: (e: { stopPropagation: () => void }) => {
-      e.stopPropagation();
-      hoverTarget.current = 1;
-      document.body.style.cursor = "pointer";
-    },
-    onPointerOut: () => {
-      hoverTarget.current = 0;
-      document.body.style.cursor = "";
-    },
-    onClick: (e: { stopPropagation: () => void }) => {
-      e.stopPropagation();
-      router.push(`/${PROJECTS[index].slug}`);
-    },
-  };
-
-  return (
-    <group
-      ref={group}
-      position={[0, PLANET_FRONT.y, PLANET_FRONT.z]}
-      scale={spec.radius}
-      rotation={[0.24 + seed * 0.08, 0, -0.12]}
-      visible={false}
-    >
-      <mesh geometry={geo} material={bodyMat} {...handlers} />
-      {/* Hitbox invisible generosa: el click no depende de puntería fina. */}
-      <mesh geometry={hitGeo} material={hitMat} {...handlers} />
-      {/* Luz clave + relleno: los cuerpos son oscuros y sin esto se ven como
-          siluetas negras contra el cielo. */}
-      <pointLight position={[5, 4, 6]} intensity={350} color="#dff0ff" />
-      <pointLight position={[-6, -2, 4]} intensity={80} color="#8f7bff" />
-      <mesh geometry={atmoGeo} material={atmoMat} {...handlers} />
-      {ringMat && <mesh geometry={ringGeo} material={ringMat} rotation={[Math.PI / 2.25, 0.25, 0]} {...handlers} />}
     </group>
   );
 }

@@ -1978,137 +1978,213 @@ button:focus-visible {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Home orbital selector. Items ride a tilted ring around a glowing core; the
-   front item is the focused one. All motion is transform/opacity
-   transitions (compositor-only): the ring is squashed with scaleY, each arm
-   rotates, each body counter-rotates and un-squashes, so a step travels
-   along the arc. Transforms are written inline by the component.
-   ═══════════════════════════════════════════════════════════════════════════ */
+   Home sections selector, laid out as a small solar system. The focused item
+   is large in the centre; the others ride a faint tilted ellipse around it:
+   one on each side and a smaller, dimmer one at the back. Each slot is a
+   pair of wrappers: the outer one moves horizontally, the inner one moves
+   vertically and scales, each with its own easing, so a step travels along a
+   curve. Everything is transform/opacity (compositor-only).
+   ═════════════════════════════════════════════════════════════════════════ */
+#projects {
+  overflow-x: clip;
+}
 .orbit-select {
-  --orbit-r: min(38vw, 210px);
-  --orbit-dur: 700ms;
-  --orbit-ease: cubic-bezier(0.65, 0, 0.35, 1);
+  /* Diameter of the centred sphere; outer items are scaled-down copies. */
+  --orb-d: clamp(190px, 21vw, 290px);
+  /* Ellipse radii: wide enough to reach the empty sides of the hero. */
+  --rx: min(39vw, 600px);
+  --ry: calc(var(--orb-d) * 0.62);
+  /* Tilt of the ellipse (left side higher), as a vertical offset at ±rx. */
+  --tilt-dy: calc(var(--rx) * 0.07);
+  --orbit-dur: 760ms;
+  --orbit-x-ease: cubic-bezier(0.55, 0, 0.45, 1);
+  --orbit-y-ease: cubic-bezier(0.25, 0.8, 0.35, 1);
   display: grid;
   justify-items: center;
   gap: 0.9rem;
   width: 100%;
-  max-width: 640px;
 }
 .orbit-select[data-speed="auto"] {
-  --orbit-dur: 1600ms;
+  --orbit-dur: 1500ms;
 }
 .orbit-select__stage {
   position: relative;
   width: 100%;
-  /* Ring height after the tilt, plus room for the item labels. */
-  height: calc(var(--orbit-r) + 9.5rem);
+  /* Back item peeking above the centre sphere + centre sphere + its name. */
+  height: calc(var(--orb-d) * 1.32 + 3.4rem);
   touch-action: pan-y;
 }
-.orbit-select__core {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 10;
-  width: 2.4rem;
-  height: 2.4rem;
-  border-radius: 50%;
-  background: radial-gradient(circle at 38% 34%, #fff 0 8%, var(--tone) 42%, color-mix(in srgb, var(--tone) 30%, #050817) 72%);
-  box-shadow: 0 0 46px color-mix(in srgb, var(--tone) 55%, transparent), 0 0 120px color-mix(in srgb, var(--tone) 22%, transparent);
-  transform: translate(-50%, -50%);
-  transition: background 600ms ease, box-shadow 600ms ease;
-  pointer-events: none;
-}
-.orbit-select__ring {
-  position: absolute;
-  inset: 0;
-  transform-origin: 50% 50%;
-}
+/* Faint orbit line through the outer items. */
 .orbit-select__track {
   position: absolute;
-  top: 50%;
+  top: calc(var(--orb-d) * 0.8);
   left: 50%;
-  width: calc(var(--orbit-r) * 2);
-  height: calc(var(--orbit-r) * 2);
-  border: 2px dashed rgba(190, 208, 255, 0.18);
+  width: calc(var(--rx) * 2);
+  height: calc(var(--ry) * 2);
+  border: 1px solid rgba(190, 208, 255, 0.16);
   border-radius: 50%;
-  transform: translate(-50%, -50%);
+  box-shadow: 0 0 24px rgba(122, 162, 255, 0.08);
+  transform: translate(-50%, -50%) rotate(4deg);
   pointer-events: none;
+  transition: opacity 300ms ease;
 }
-.orbit-select__arm {
+.orbit-select__slot {
+  /* Defaults: the centre. */
+  --x: 0px;
+  --y: 0px;
+  --s: 1;
+  --o: 1;
   position: absolute;
-  top: 50%;
+  top: calc(var(--orb-d) * 0.8);
   left: 50%;
+  z-index: 3;
   width: 0;
   height: 0;
-  transform-origin: 0 0;
-  transition: transform var(--orbit-dur) var(--orbit-ease);
+  transform: translateX(var(--x));
+  transition: transform var(--orbit-dur) var(--orbit-x-ease);
+}
+.orbit-select__slot[data-slot="right"] {
+  --x: var(--rx);
+  --y: var(--tilt-dy);
+  --s: 0.42;
+  --o: 0.92;
+  z-index: 2;
+}
+.orbit-select__slot[data-slot="left"] {
+  --x: calc(var(--rx) * -1);
+  --y: calc(var(--tilt-dy) * -1);
+  --s: 0.42;
+  --o: 0.92;
+  z-index: 2;
+}
+.orbit-select__slot[data-slot="back"] {
+  --y: calc(var(--ry) * -1);
+  --s: 0.26;
+  --o: 0.55;
+  z-index: 1;
+}
+.orbit-select__lift {
+  position: absolute;
+  inset: 0;
+  opacity: var(--o);
+  transform: translateY(var(--y)) scale(var(--s));
+  transition:
+    transform var(--orbit-dur) var(--orbit-y-ease),
+    opacity var(--orbit-dur) ease;
 }
 .orbit-select__body {
   position: absolute;
-  /* Centre the orb (first child) on the ring point. */
-  top: -1.8rem;
-  left: -4.5rem;
+  /* Centre the sphere (first child) on the slot point. */
+  top: calc(var(--orb-d) / -2);
+  left: calc(var(--orb-d) / -2);
   display: grid;
   justify-items: center;
-  gap: 0.45rem;
-  width: 9rem;
+  gap: 0.7rem;
+  width: var(--orb-d);
   padding: 0;
   border: 0;
+  border-radius: 0;
   background: none;
   color: var(--fg);
   font: inherit;
   text-decoration: none;
   cursor: pointer;
   transition:
-    transform var(--orbit-dur) var(--orbit-ease),
-    opacity var(--orbit-dur) ease,
-    scale 420ms cubic-bezier(0.5, 0, 0.75, 0);
+    scale 420ms cubic-bezier(0.5, 0, 0.75, 0),
+    opacity 300ms ease;
 }
 .orbit-select__orb {
-  width: 3.6rem;
-  height: 3.6rem;
+  position: relative;
+  width: var(--orb-d);
+  height: var(--orb-d);
   border-radius: 50%;
-  background: radial-gradient(circle at 34% 30%, color-mix(in srgb, var(--tone-2) 70%, #fff) 0 6%, var(--tone) 46%, color-mix(in srgb, var(--tone) 25%, #04060f) 80%);
-  box-shadow: 0 0 22px color-mix(in srgb, var(--tone) 45%, transparent);
+  background:
+    radial-gradient(circle at 32% 28%, color-mix(in srgb, var(--tone-2) 80%, #fff) 0 4%, transparent 26%),
+    radial-gradient(circle at 70% 76%, rgba(2, 4, 14, 0.78) 0 18%, transparent 62%),
+    radial-gradient(circle at 38% 34%, var(--tone) 0%, color-mix(in srgb, var(--tone) 55%, var(--tone-deep)) 40%, color-mix(in srgb, var(--tone-deep) 70%, #02040c) 78%);
+  box-shadow:
+    inset -14px -18px 40px rgba(0, 0, 0, 0.45),
+    inset 6px 8px 24px color-mix(in srgb, var(--tone-2) 30%, transparent),
+    0 0 0 2px color-mix(in srgb, var(--tone) 30%, transparent),
+    0 0 60px color-mix(in srgb, var(--tone) 40%, transparent),
+    0 0 140px color-mix(in srgb, var(--tone) 18%, transparent);
+  transition: box-shadow 220ms ease;
+}
+/* Thin atmosphere halo. */
+.orbit-select__orb::after {
+  content: "";
+  position: absolute;
+  inset: -7%;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--tone) 22%, transparent);
+  pointer-events: none;
 }
 .orbit-select__name {
-  max-width: 9rem;
-  font-size: 0.82rem;
+  /* Out of flow so a long label never shifts its sphere off the slot point. */
+  position: absolute;
+  top: calc(100% + 0.7rem);
+  left: 50%;
+  width: max-content;
+  max-width: 16rem;
+  transform: translateX(-50%);
+  font-size: 1.35rem;
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.2;
   text-align: center;
   text-wrap: balance;
+  text-shadow: 0 0 18px color-mix(in srgb, var(--tone) 45%, transparent);
+  transition: opacity 260ms ease;
 }
-.orbit-select__body.is-front .orbit-select__orb {
-  width: 4.6rem;
-  height: 4.6rem;
-  margin-top: -0.5rem;
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--tone) 70%, transparent), 0 0 38px color-mix(in srgb, var(--tone) 60%, transparent);
+/* Outer items: the label is counter-scaled so it stays readable, and only
+   shows on hover / keyboard focus (wide screens show the side labels). */
+.orbit-select__slot:not([data-slot="center"]) .orbit-select__name {
+  max-width: none;
+  width: max-content;
+  top: calc(100% + 0.6rem / var(--s));
+  font-size: calc(0.9rem / var(--s));
+  opacity: 0;
 }
-.orbit-select__body.is-front .orbit-select__name {
-  font-size: 1rem;
+.orbit-select__slot:not([data-slot="center"]) .orbit-select__body:focus-visible .orbit-select__name {
+  opacity: 1;
+}
+@media (hover: hover) {
+  .orbit-select__slot:not([data-slot="center"]) .orbit-select__body:hover .orbit-select__name {
+    opacity: 1;
+  }
+  .orbit-select__body:hover .orbit-select__orb {
+    box-shadow:
+      inset -14px -18px 40px rgba(0, 0, 0, 0.45),
+      inset 6px 8px 24px color-mix(in srgb, var(--tone-2) 30%, transparent),
+      0 0 0 3px color-mix(in srgb, var(--tone) 60%, transparent),
+      0 0 80px color-mix(in srgb, var(--tone) 60%, transparent),
+      0 0 160px color-mix(in srgb, var(--tone) 24%, transparent);
+  }
+}
+@media (min-width: 900px) {
+  .orbit-select__slot[data-slot="left"] .orbit-select__name,
+  .orbit-select__slot[data-slot="right"] .orbit-select__name {
+    opacity: 0.8;
+  }
 }
 .orbit-select__body:focus-visible {
   outline: none;
 }
 .orbit-select__body:focus-visible .orbit-select__orb {
-  outline: 2px solid #bed0ff;
-  outline-offset: 5px;
+  outline: 3px solid #bed0ff;
+  outline-offset: 8px;
 }
-@media (hover: hover) {
-  .orbit-select__body:hover .orbit-select__orb {
-    box-shadow: 0 0 0 1px color-mix(in srgb, var(--tone) 80%, transparent), 0 0 44px color-mix(in srgb, var(--tone) 70%, transparent);
-  }
+.orbit-select__slot:not([data-slot="center"]) .orbit-select__body:focus-visible .orbit-select__orb {
+  outline-width: calc(3px / var(--s));
+  outline-offset: calc(8px / var(--s));
 }
-/* Entering: the focused item zooms toward the viewer, the rest fade away. */
+/* Entering: the centred item zooms toward the viewer, the rest fade away. */
 .orbit-select__body.is-zooming {
-  scale: 2.6;
-  opacity: 0 !important;
+  scale: 1.8;
+  opacity: 0;
 }
-.orbit-select.is-entering .orbit-select__body:not(.is-zooming),
-.orbit-select.is-entering .orbit-select__track,
-.orbit-select.is-entering .orbit-select__core {
-  opacity: 0 !important;
+.orbit-select.is-entering .orbit-select__slot:not([data-slot="center"]),
+.orbit-select.is-entering .orbit-select__track {
+  opacity: 0;
   transition: opacity 300ms ease;
 }
 
@@ -2116,7 +2192,7 @@ button:focus-visible {
   display: grid;
   justify-items: center;
   gap: 0.4rem;
-  min-height: 3.6rem;
+  min-height: 1.6rem;
 }
 .orbit-select__count {
   font: 600 0.7rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -2130,6 +2206,8 @@ button:focus-visible {
   line-height: 1.5;
 }
 .orbit-select__controls {
+  position: relative;
+  z-index: 4;
   display: flex;
   align-items: center;
   gap: 0.9rem;
@@ -2171,31 +2249,23 @@ button:focus-visible {
 }
 @media (max-width: 560px) {
   .orbit-select {
-    --orbit-r: min(36vw, 150px);
-  }
-  .orbit-select__body {
-    left: -3.75rem;
-    width: 7.5rem;
-  }
-  .orbit-select__body {
-    top: -1.45rem;
-  }
-  .orbit-select__orb {
-    width: 2.9rem;
-    height: 2.9rem;
-  }
-  .orbit-select__body.is-front .orbit-select__orb {
-    width: 3.8rem;
-    height: 3.8rem;
-    margin-top: -0.45rem;
+    --orb-d: min(44vw, 180px);
+    /* Side items sit half off-screen on phones, still visible. */
+    --rx: 47vw;
+    --ry: calc(var(--orb-d) * 0.66);
   }
   .orbit-select__name {
-    font-size: 0.74rem;
+    font-size: 1.1rem;
+  }
+  .orbit-select__slot:not([data-slot="center"]) .orbit-select__name {
+    font-size: calc(0.78rem / var(--s));
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .orbit-select__arm,
-  .orbit-select__body {
+  .orbit-select__slot,
+  .orbit-select__lift,
+  .orbit-select__body,
+  .orbit-select__name {
     transition: none;
   }
 }
