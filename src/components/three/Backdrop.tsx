@@ -15,6 +15,7 @@ import { FirstFrameSignal } from "./FirstFrameSignal";
 import { OrbitClock, isConstrainedDevice, useReducedMotion } from "./shared";
 import { CosmosContents } from "./Scene";
 import { WorldContents } from "./PlanetScene";
+import { SceneWarmup } from "./warmup";
 
 /** Solid dark fallback: clear colour and CSS background, never a white flash. */
 const FALLBACK_BG = "#050817";
@@ -156,6 +157,9 @@ export default function Backdrop({ view }: { view: BackdropView }) {
             {performanceMode && active && !hidden ? <FrameCap fps={CONSTRAINED_FPS} /> : null}
             <FirstFrameSignal />
             <OrbitClock reduced={reduced} />
+            {/* Before the scene contents: a warm-up portal is torn down before a
+                world mounts in the same commit. */}
+            <SceneWarmup view={view} performanceMode={performanceMode} reduced={reduced} />
             {view.kind === "home" && (
               <CosmosContents reduced={reduced} minimal={performanceMode} performanceMode={performanceMode} />
             )}

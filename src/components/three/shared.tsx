@@ -51,15 +51,21 @@ export function prefersReducedMotion(): boolean {
  */
 export function isConstrainedDevice(reduced: boolean): boolean {
   if (typeof window === "undefined") return false;
-  const connection = (navigator as Navigator & {
-    connection?: { saveData?: boolean };
-  }).connection;
   return (
     window.innerWidth < 768 ||
     reduced ||
     (navigator.hardwareConcurrency > 0 && navigator.hardwareConcurrency <= 4) ||
-    connection?.saveData === true
+    saveDataEnabled()
   );
+}
+
+/** The visitor asked the browser to save data (Data Saver / Lite mode). */
+export function saveDataEnabled(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const connection = (navigator as Navigator & {
+    connection?: { saveData?: boolean };
+  }).connection;
+  return connection?.saveData === true;
 }
 
 /** Reacciona a cambios del media query de reduced-motion en caliente. */
