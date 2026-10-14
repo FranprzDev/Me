@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { Nav } from "@/components/Nav";
@@ -26,8 +26,33 @@ function viewFor(pathname: string | null): BackdropView {
   return PROJECTS.some((p) => p.slug === slug) ? { kind: "world", slug } : { kind: "none" };
 }
 
+/**
+ * Warms every world route (and home) once the first page is idle, so a jump
+ * from the selector, the world-to-world nav or the way back home never waits
+ * on the network. The routes are static, so each prefetch is a small cached
+ * payload; outer selector items are buttons, not links, and would otherwise
+ * only be prefetched once centred.
+ */
+function usePrefetchWorlds() {
+  const router = useRouter();
+  useEffect(() => {
+    const warm = () => {
+      router.prefetch("/");
+      for (const p of PROJECTS) router.prefetch(`/${p.slug}`);
+    };
+    // Safari has no requestIdleCallback: a plain delay keeps it off the first paint.
+    if (typeof window.requestIdleCallback !== "function") {
+      const timer = window.setTimeout(warm, 1200);
+      return () => window.clearTimeout(timer);
+    }
+    const id = window.requestIdleCallback(warm, { timeout: 2500 });
+    return () => window.cancelIdleCallback(id);
+  }, [router]);
+}
+
 export function SiteChrome() {
   const pathname = usePathname();
+  usePrefetchWorlds();
   const { tl } = useI18n();
   const [sceneReady, setSceneReady] = useState(false);
   const view = viewFor(pathname);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
@@ -36,59 +36,98 @@ export const EASE_SOFT = "power2.out";
 type Scene = (root: HTMLElement) => void;
 
 /**
+ * Builds a scene inside its own GSAP context. Scroll animations are
+ * decoration: if GSAP throws while building them (seen on mobile when
+ * ScrollTrigger refreshes during a client-side route change), what was
+ * created is reverted so the content stays visible instead of the error
+ * taking the whole page down.
+ */
+function buildContext(scene: Scene, root: HTMLElement): gsap.Context | null {
+  let failed = false;
+  const ctx = gsap.context(() => {
+    try {
+      scene(root);
+    } catch (error) {
+      failed = true;
+      console.warn("Scroll animations skipped:", error);
+    }
+  }, root);
+  if (!failed) return ctx;
+  ctx.revert();
+  return null;
+}
+
+/**
  * Contexto de animación por página de planeta. Encapsula el ciclo de vida de
  * GSAP: registra los triggers dentro del nodo, los revierte al desmontar y
  * respeta `prefers-reduced-motion` (en cuyo caso no se anima nada y el
  * contenido queda estático pero visible).
+ *
+ * Two phases, so a jump between worlds paints the new page right away:
+ * - `intro` (optional) holds only what is in the first viewport and starts
+ *   hidden (hero copy, hero art). It runs before the first paint, as before,
+ *   so nothing flashes.
+ * - `build` holds everything else. Wiring it is the heaviest main-thread work
+ *   of a route change (every trigger measures layout and every tween reads
+ *   computed styles), so it runs right after the first paint instead of
+ *   inside the commit. Its targets are below the fold at that point.
  */
-export function useScrollScene(build: Scene) {
+export function useScrollScene(build: Scene, intro?: Scene) {
   const ref = useRef<HTMLElement | null>(null);
   const buildRef = useRef(build);
+  const introRef = useRef(intro);
 
   // Se asigna en un efecto (no durante render) para mantener la escena
   // actualizada sin reconstruir los triggers en cada render del consumidor.
   useLayoutEffect(() => {
     buildRef.current = build;
+    introRef.current = intro;
   });
 
   useLayoutEffect(() => {
+    const root = ref.current;
+    const scene = introRef.current;
+    if (!root || !scene) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const ctx = buildContext(scene, root);
+    return () => {
+      ctx?.revert();
+    };
+  }, []);
+
+  useEffect(() => {
     const root = ref.current;
     if (!root) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) return;
 
-    // Scroll animations are decoration: if GSAP throws while building them
-    // (seen on mobile when ScrollTrigger refreshes during a client-side route
-    // change), revert what was created so the content stays visible instead of
-    // the error taking the whole page down.
-    let failed = false;
-    const ctx = gsap.context(() => {
-      try {
-        buildRef.current(root);
-      } catch (error) {
-        failed = true;
-        console.warn("Scroll animations skipped:", error);
-      }
-    }, root);
-    if (failed) {
-      ctx.revert();
-      return;
-    }
-
-    // El contenido bilingüe puede cambiar de alto tras montar; recalculamos.
-    const refresh = () => {
-      try {
-        ScrollTrigger.refresh();
-      } catch (error) {
-        console.warn("ScrollTrigger refresh skipped:", error);
-      }
+    let ctx: gsap.Context | null = null;
+    let refreshTimer: number | undefined;
+    const build = () => {
+      ctx = buildContext(buildRef.current, root);
+      if (!ctx) return;
+      // El contenido bilingüe puede cambiar de alto tras montar; recalculamos.
+      refreshTimer = window.setTimeout(() => {
+        try {
+          ScrollTrigger.refresh();
+        } catch (error) {
+          console.warn("ScrollTrigger refresh skipped:", error);
+        }
+      }, 120);
     };
-    const id = window.setTimeout(refresh, 120);
+    // requestAnimationFrame runs right before the next paint; the timeout
+    // inside it lands right after that paint.
+    let buildTimer: number | undefined;
+    const raf = window.requestAnimationFrame(() => {
+      buildTimer = window.setTimeout(build, 0);
+    });
 
     return () => {
-      window.clearTimeout(id);
-      ctx.revert();
+      window.cancelAnimationFrame(raf);
+      window.clearTimeout(buildTimer);
+      window.clearTimeout(refreshTimer);
+      ctx?.revert();
     };
   }, []);
 
@@ -143,6 +182,11 @@ export function revealStagger(
   );
 }
 
+/** Entrance of first-viewport content (seconds); revealStagger's default is 0.75. */
+const INTRO_DURATION = 0.5;
+/** Upper bound for the delay between intro items (seconds). */
+const INTRO_STAGGER = 0.06;
+
 /**
  * Intro reveal for content in the first viewport (hero copy, the education
  * orbit). On phones, touch-first and low-power devices it does nothing: the
@@ -152,7 +196,13 @@ export function revealStagger(
  */
 export function revealIntro(targets: gsap.TweenTarget, options: Parameters<typeof revealStagger>[1]) {
   if (isLiteMode()) return;
-  revealStagger(targets, options);
+  // Arrival content: a short entrance, so a jump between worlds reads as
+  // instant while keeping the staggered build-up.
+  revealStagger(targets, {
+    ...options,
+    duration: options.duration ?? INTRO_DURATION,
+    stagger: Math.min(options.stagger ?? INTRO_STAGGER, INTRO_STAGGER),
+  });
 }
 
 /**

@@ -164,7 +164,7 @@ function HackathonJourney({ project }: { project: Project }) {
     ...missions.map((item) => ({ id: nodeId("mission", item.name), label: item.name, meta: item.year })),
   ];
 
-  const ref = useScrollScene((root) => {
+  const arenaIntro = (root: HTMLElement) => {
     const q = <T extends Element>(sel: string) => root.querySelector<T>(sel);
 
     // Hero: entra por partes, como si el HUD encendiera al armar la consola.
@@ -186,6 +186,17 @@ function HackathonJourney({ project }: { project: Project }) {
       });
     }
 
+    // T-minus: cuenta hacia cero mientras el lector recorre el bloque.
+    scrubNumber(q(".arena-radar__t-minus b"), 48 * 3600, 0, {
+      trigger: q(".arena-hero")!,
+      end: "bottom 30%",
+      format: clock,
+    });
+  };
+
+  const ref = useScrollScene((root) => {
+    const q = <T extends Element>(sel: string) => root.querySelector<T>(sel);
+
     // Radar: el barrido gira con el scroll (en vez de un loop infinito), así
     // el mismo gesto que baja la página es lo que "barre" el sector.
     const sweep = q<SVGGElement>(".arena-sweep");
@@ -197,13 +208,6 @@ function HackathonJourney({ project }: { project: Project }) {
         scrollTrigger: scrollLinked({ trigger: q(".arena-hero")!, start: "top top", end: "bottom top", scrub: 0.7 }),
       });
     }
-
-    // T-minus: cuenta hacia cero mientras el lector recorre el bloque.
-    scrubNumber(q(".arena-radar__t-minus b"), 48 * 3600, 0, {
-      trigger: q(".arena-hero")!,
-      end: "bottom 30%",
-      format: clock,
-    });
 
     // Trofeo: entra de lado, como una placa que se descuenta.
     const trophy = q(".arena-trophy");
@@ -254,7 +258,7 @@ function HackathonJourney({ project }: { project: Project }) {
       stagger: 0.08,
       start: "top 95%",
     });
-  });
+  }, arenaIntro);
 
   return (
     <article
@@ -399,7 +403,7 @@ function MentorshipJourney({ project }: { project: Project }) {
     ...[...materials, ...demos].map((item) => ({ id: nodeId("aula", item.name), label: item.name, meta: item.year })),
   ];
 
-  const ref = useScrollScene((root) => {
+  const aulaIntro = (root: HTMLElement) => {
     const q = <T extends Element>(sel: string) => root.querySelector<T>(sel);
 
     revealIntro(".aula-hero__copy > *", { trigger: q(".aula-hero")!, y: 22, stagger: 0.08 });
@@ -413,10 +417,19 @@ function MentorshipJourney({ project }: { project: Project }) {
         ease: "power3.out",
         scrollTrigger: { trigger: dial, start: "top 92%", once: true },
       });
+      // Dimmed before the first paint; the build below lights them up.
+      gsap.set(root.querySelectorAll(".aula-dial__segment"), { opacity: 0.14 });
+    }
+  };
+
+  const ref = useScrollScene((root) => {
+    const q = <T extends Element>(sel: string) => root.querySelector<T>(sel);
+
+    const dial = q(".aula-dial");
+    if (dial) {
       // El dial se "marca" a medida que el lector recorre el bloque: cada
       // segmento se enciende uno tras otro, como una clase que avanza.
       const segments = root.querySelectorAll(".aula-dial__segment");
-      gsap.set(segments, { opacity: 0.14 });
       gsap.to(segments, {
         opacity: 1,
         duration: 0.35,
@@ -462,7 +475,7 @@ function MentorshipJourney({ project }: { project: Project }) {
       stagger: 0.08,
       start: "top 95%",
     });
-  });
+  }, aulaIntro);
 
   return (
     <article
@@ -607,7 +620,7 @@ function ProjectAtlas({ project }: { project: Project }) {
     meta: item.year,
   }));
 
-  const ref = useScrollScene((root) => {
+  const atlasIntro = (root: HTMLElement) => {
     const q = <T extends Element>(sel: string) => root.querySelector<T>(sel);
 
     revealIntro(".atlas-hero__copy > *", { trigger: q(".atlas-hero")!, y: 24, stagger: 0.09 });
@@ -623,6 +636,10 @@ function ProjectAtlas({ project }: { project: Project }) {
       duration: 1,
       stagger: 0.14,
     });
+  };
+
+  const ref = useScrollScene((root) => {
+    const q = <T extends Element>(sel: string) => root.querySelector<T>(sel);
 
     revealStagger(".atlas-row", { trigger: q(".atlas-rows")!, x: 22, y: 0, stagger: 0.08 });
     root.querySelectorAll(".atlas-row").forEach((row) => {
@@ -644,7 +661,7 @@ function ProjectAtlas({ project }: { project: Project }) {
       stagger: 0.06,
       start: "top 95%",
     });
-  });
+  }, atlasIntro);
 
   return (
     <article
@@ -745,7 +762,7 @@ function UniversityJourney({ project }: { project: Project }) {
     ...academicProjects.map((item) => ({ id: nodeId("edu", item.name), label: item.name, meta: item.year })),
   ];
 
-  const ref = useScrollScene((root) => {
+  const eduIntro = (root: HTMLElement) => {
     const q = <T extends Element>(sel: string) => root.querySelector<T>(sel);
 
     revealIntro(".edu-hero__copy > *", { trigger: q(".edu-hero")!, y: 24, stagger: 0.09 });
@@ -789,6 +806,10 @@ function UniversityJourney({ project }: { project: Project }) {
       stagger: 0.14,
       start: "top 62%",
     });
+  };
+
+  const ref = useScrollScene((root) => {
+    const q = <T extends Element>(sel: string) => root.querySelector<T>(sel);
 
     // Chapters: la barra de etapas entra como un índice.
     revealStagger(".edu-chapters a", { trigger: q(".edu-chapters")!, y: 16, stagger: 0.09 });
@@ -816,7 +837,7 @@ function UniversityJourney({ project }: { project: Project }) {
       stagger: 0.08,
       start: "top 95%",
     });
-  });
+  }, eduIntro);
 
   return (
     <article ref={ref} className="edu-page" style={{ "--planet": project.planet.atmoA } as React.CSSProperties}>
@@ -940,9 +961,12 @@ function DossierJourney({ project }: { project: Project }) {
   const items = project.items ?? [];
   const categories = [...new Set(items.map((item) => item.category?.es ?? "Otros"))];
 
+  const dossierIntro = (root: HTMLElement) => {
+    revealIntro(".dossier-hero > *", { trigger: root.querySelector(".dossier-hero")!, y: 22, stagger: 0.08 });
+  };
+
   const ref = useScrollScene((root) => {
     const q = <T extends Element>(sel: string) => root.querySelector<T>(sel);
-    revealIntro(".dossier-hero > *", { trigger: q(".dossier-hero")!, y: 22, stagger: 0.08 });
     revealStagger(".dossier-group .hud-title > *, .dossier-row", {
       trigger: q(".dossier-catalog")!,
       y: 20,
@@ -954,7 +978,7 @@ function DossierJourney({ project }: { project: Project }) {
       stagger: 0.07,
       start: "top 95%",
     });
-  });
+  }, dossierIntro);
 
   return (
     <article

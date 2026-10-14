@@ -3,13 +3,27 @@
 import { useEffect, useRef } from "react";
 import { isLiteMode } from "@/lib/lite";
 
+/** Streaks accelerate to full speed and the veil to full dark over this time. */
+const RAMP_MS = 260;
+/** Earliest the warp may fade out, so it never reads as a glitch. */
+const MIN_MS = 220;
+/** Hard cap: on a slow route the streaks keep flying until then, then fade anyway. */
+const MAX_MS = 1200;
+/** Fade revealing the new scene. */
+const FADE_MS = 220;
+
+/**
+ * Hyperspace streaks over a same-site link click. The warp lasts as long as
+ * the jump itself: it fades as soon as the target route has committed (after
+ * a short minimum), instead of a fixed duration the route never needed.
+ */
 export function WarpTransition() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const lock = useRef(false);
   const raf = useRef(0);
   const timer = useRef<number | undefined>(undefined);
 
-  const runWarp = () => {
+  const runWarp = (targetPath: string) => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) {
@@ -34,14 +48,14 @@ export function WarpTransition() {
       return { a, r: Math.random() * 40, speed: 3 + Math.random() * 6 };
     });
 
-    const DURATION = 480;
     const t0 = performance.now();
 
     canvas.style.transition = "none";
     canvas.style.opacity = "1";
 
     const frame = (now: number) => {
-      const t = Math.min(1, (now - t0) / DURATION);
+      const elapsed = now - t0;
+      const t = Math.min(1, elapsed / RAMP_MS);
       ctx.fillStyle = `rgba(4, 6, 18, ${0.25 + t * 0.75})`;
       ctx.fillRect(0, 0, W, H);
       for (const s of stars) {
@@ -59,18 +73,19 @@ export function WarpTransition() {
           s.a = Math.random() * Math.PI * 2;
         }
       }
-      if (t < 1) {
+      const arrived = window.location.pathname === targetPath;
+      if ((elapsed < MIN_MS || !arrived) && elapsed < MAX_MS) {
         raf.current = requestAnimationFrame(frame);
-      } else {
-        // Fundimos el overlay revelando la nueva escena ya montada.
-        canvas.style.transition = "opacity 320ms ease";
-        canvas.style.opacity = "0";
-        timer.current = window.setTimeout(() => {
-          lock.current = false;
-          const c = canvasRef.current?.getContext("2d");
-          if (c && canvasRef.current) c.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-        }, 360);
+        return;
       }
+      // The new route is mounted: fade the overlay to reveal it.
+      canvas.style.transition = `opacity ${FADE_MS}ms ease`;
+      canvas.style.opacity = "0";
+      timer.current = window.setTimeout(() => {
+        lock.current = false;
+        const c = canvasRef.current?.getContext("2d");
+        if (c && canvasRef.current) c.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      }, FADE_MS + 40);
     };
     raf.current = requestAnimationFrame(frame);
   };
@@ -91,7 +106,7 @@ export function WarpTransition() {
       // El efecto decora el enlace; nunca intercepta ni bloquea la navegación.
       if (lock.current) return;
       lock.current = true;
-      runWarp();
+      runWarp(target.pathname);
     };
     document.addEventListener("click", onClick, true);
     return () => {
