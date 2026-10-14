@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import { subscribeScroll } from "@/lib/scroll";
@@ -70,7 +71,12 @@ export function Nav() {
         aria-label={tl({ es: "Navegación principal", en: "Main navigation" })}
         className="content-layer site-nav"
       >
-        <Link href="/" className="h-display" style={{ fontSize: "1.15rem", fontWeight: 600 }}>
+        <Link
+          href="/"
+          className="h-display"
+          style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", fontSize: "1.15rem", fontWeight: 600 }}
+        >
+          <Image src="/brand/logo.svg" alt="" width={26} height={26} unoptimized />
           FP.
         </Link>
 

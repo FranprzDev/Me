@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- FP. brand mark: an "F" crossed by an orbit ring. At 24px and below the back half of the ring is hidden and strokes thicken so the glyph stays legible in a browser tab. -->
+  <style>
+    @media (max-width: 24px) {
+      .ring-back { display: none; }
+      .ring { stroke-width: 4.5; }
+      .glyph { stroke-width: 10; }
+    }
+  </style>
+  <defs>
+    <radialGradient id="bg" cx="0.3" cy="0.2" r="1"><stop offset="0" stop-color="#232c6b"/><stop offset="1" stop-color="#05060f"/></radialGradient>
+    <linearGradient id="ink" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9dbaff"/><stop offset="1" stop-color="#b388ff"/></linearGradient>
+    <clipPath id="front"><rect x="0" y="33" width="33" height="31"/></clipPath>
+  </defs>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="14.5" fill="url(#bg)" stroke="#5b8cff" stroke-opacity="0.35" stroke-width="1"/>
+  <ellipse class="ring ring-back" cx="32" cy="33" rx="27" ry="9" transform="rotate(-24 32 33)" fill="none" stroke="#e9c270" stroke-width="3"/>
+  <path class="glyph" d="M25 49V16h18M25 32.5h12" fill="none" stroke="url(#ink)" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <ellipse class="ring" cx="32" cy="33" rx="27" ry="9" transform="rotate(-24 32 33)" fill="none" stroke="#e9c270" stroke-width="3" clip-path="url(#front)"/>
+  <circle cx="53.5" cy="19.5" r="4.2" fill="#ffe7a8"/>
+</svg>
