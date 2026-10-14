@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
+import { isLiteMode } from "@/lib/lite";
 
 export function GsapHeroName({ text }: { text: string }) {
   const ref = useRef<HTMLHeadingElement>(null);
@@ -9,6 +10,9 @@ export function GsapHeroName({ text }: { text: string }) {
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
+    // Phones and low-power devices keep the server-rendered name as is: hiding
+    // the letters and fading them back in delayed the first big paint (LCP).
+    if (isLiteMode()) return;
 
     const media = gsap.matchMedia();
     media.add("(prefers-reduced-motion: no-preference)", () => {

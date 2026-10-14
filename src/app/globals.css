@@ -455,6 +455,11 @@ button.chip {
 .hiring-agents-link:focus-visible {
   color: var(--fg);
 }
+/* Phones: the scaled contact constellation overflows its box by a few px;
+   keep this link clear of it (WCAG 2.2 target spacing). */
+@media (max-width: 767px) {
+  .hiring-agents-link { margin-top: 2.25rem; }
+}
 
 body:has([data-contact-heading="true"] canvas) .contact-copy h2 {
   position: absolute;
