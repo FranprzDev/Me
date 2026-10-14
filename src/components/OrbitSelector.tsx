@@ -16,7 +16,7 @@ const ENTER_MS = 420;
 /** Horizontal swipe distance (px) that counts as a step. */
 const SWIPE_PX = 40;
 /** Vertical squash of the ring: how tilted the orbit looks. */
-const RING_TILT = 0.42;
+const RING_TILT = 0.5;
 
 enum StepSpeed {
   Auto = "auto",
@@ -177,8 +177,8 @@ export function OrbitSelector() {
             const isFront = i === active;
             const armStyle = { transform: `rotate(${angle}deg)`, zIndex: Math.round((depth + 1) * 10) } as CSSProperties;
             const bodyStyle = {
-              transform: `translateX(var(--orbit-r)) rotate(${-angle}deg) scaleY(${(1 / RING_TILT).toFixed(4)}) scale(${(0.58 + 0.42 * ((depth + 1) / 2)).toFixed(3)})`,
-              opacity: (0.5 + 0.5 * ((depth + 1) / 2)).toFixed(3),
+              transform: `translateX(var(--orbit-r)) rotate(${-angle}deg) scaleY(${(1 / RING_TILT).toFixed(4)}) scale(${(0.7 + 0.3 * ((depth + 1) / 2)).toFixed(3)})`,
+              opacity: (0.65 + 0.35 * ((depth + 1) / 2)).toFixed(3),
               "--tone": p.planet.atmoA,
               "--tone-2": p.planet.atmoB,
             } as CSSProperties;

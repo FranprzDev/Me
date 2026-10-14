@@ -2001,7 +2001,7 @@ button:focus-visible {
   position: relative;
   width: 100%;
   /* Ring height after the tilt, plus room for the item labels. */
-  height: calc(var(--orbit-r) * 0.84 + 9.5rem);
+  height: calc(var(--orbit-r) + 9.5rem);
   touch-action: pan-y;
 }
 .orbit-select__core {
@@ -2009,8 +2009,8 @@ button:focus-visible {
   top: 50%;
   left: 50%;
   z-index: 10;
-  width: 3.4rem;
-  height: 3.4rem;
+  width: 2.4rem;
+  height: 2.4rem;
   border-radius: 50%;
   background: radial-gradient(circle at 38% 34%, #fff 0 8%, var(--tone) 42%, color-mix(in srgb, var(--tone) 30%, #050817) 72%);
   box-shadow: 0 0 46px color-mix(in srgb, var(--tone) 55%, transparent), 0 0 120px color-mix(in srgb, var(--tone) 22%, transparent);
@@ -2045,7 +2045,8 @@ button:focus-visible {
 }
 .orbit-select__body {
   position: absolute;
-  top: -2.6rem;
+  /* Centre the orb (first child) on the ring point. */
+  top: -1.8rem;
   left: -4.5rem;
   display: grid;
   justify-items: center;
@@ -2176,6 +2177,9 @@ button:focus-visible {
     left: -3.75rem;
     width: 7.5rem;
   }
+  .orbit-select__body {
+    top: -1.45rem;
+  }
   .orbit-select__orb {
     width: 2.9rem;
     height: 2.9rem;
@@ -2183,6 +2187,7 @@ button:focus-visible {
   .orbit-select__body.is-front .orbit-select__orb {
     width: 3.8rem;
     height: 3.8rem;
+    margin-top: -0.45rem;
   }
   .orbit-select__name {
     font-size: 0.74rem;
