@@ -17,6 +17,15 @@ const SPIN_AXIS = new THREE.Vector3(0, 1, 0);
 const tmpDir = new THREE.Vector3();
 
 /**
+ * One ambient and one key light shared by every world. The renderer compiles a
+ * lit material per light instance, so reusing the same two lights is what lets
+ * the idle warm-up (warmup.tsx) compile the moon exactly as a visit draws it.
+ * Colour and intensity are uniforms: changing them per world costs nothing.
+ */
+export const WORLD_AMBIENT_LIGHT = new THREE.AmbientLight(0xffffff, 0.5);
+export const WORLD_KEY_LIGHT = new THREE.PointLight();
+
+/**
  * Where the camera sits at scroll progress `p`: on the approach axis, swung
  * around the planet by the shared orbit clock (a slow, slightly inclined
  * orbit), then drifting around the centre once inside.
@@ -149,7 +158,7 @@ function WorldAtmosphere({
 }
 
 /**
- * The visible parts of a world: lights, set piece, membrane, moon and sky. The
+ * The visible parts of a world: set piece, membrane, moon and sky. The
  * live route scene and the idle warm-up (warmup.tsx) render the same body, so
  * the warm-up compiles exactly the materials a visit will draw.
  */
@@ -177,9 +186,6 @@ export function WorldBody({
 
   return (
     <>
-      <ambientLight intensity={0.5} />
-      <pointLight color={world.key.color} intensity={world.key.intensity * 6} position={[0, 4, 5]} />
-
       <PlanetSpin>
         <SetPiece
           progress={progress}
@@ -238,6 +244,13 @@ export function WorldContents({
 
   return (
     <>
+      <primitive object={WORLD_AMBIENT_LIGHT} />
+      <primitive
+        object={WORLD_KEY_LIGHT}
+        color={world.key.color}
+        intensity={world.key.intensity * 6}
+        position={[0, 4, 5]}
+      />
       <WorldRig world={world} progress={progress} reduced={reduced} />
       <WorldAtmosphere world={world} progress={progress} />
       <WorldBody

@@ -13,7 +13,7 @@
      rendered) just long enough to copy its materials;
    - keeps one lightweight copy of every material (and of the visible scene,
      home included) on a tiny stand-in geometry with the same vertex layout,
-     compiled with `compileAsync`;
+     compiled with `compileAsync` under the shared world lights;
    - never disposes those copies, so the shader and pipeline caches stay warm.
 
    A later visit builds fresh materials with the same configuration and finds
@@ -27,7 +27,7 @@ import type { WebGPURenderer } from "three/webgpu";
 import { WORLDS, type WorldSpec } from "@/data/worlds";
 import { SceneStatus, getSceneStatus, subscribeSceneStatus } from "@/lib/sceneStatus";
 import type { BackdropView } from "./Backdrop";
-import { WorldBody } from "./PlanetScene";
+import { WORLD_AMBIENT_LIGHT, WORLD_KEY_LIGHT, WorldBody } from "./PlanetScene";
 import { saveDataEnabled } from "./shared";
 
 /** Material configurations differ between the full and the constrained profile. */
@@ -70,24 +70,59 @@ function standInGeometry(source: THREE.BufferGeometry): THREE.BufferGeometry {
   return geometry;
 }
 
+/** Identity fields that must stay unique per material; everything else is copied. */
+const IDENTITY_KEYS = new Set(["uuid", "id", "name", "version"]);
+
+/**
+ * `clone()` does not carry every flag (node materials drop `fog`, for one), and
+ * the renderer keys its caches on those flags: copy every plain value across so
+ * the stand-in compiles to exactly the same shader as the original.
+ */
+function cloneOne(source: THREE.Material): THREE.Material {
+  const copy = source.clone();
+  const from = source as unknown as Record<string, unknown>;
+  const to = copy as unknown as Record<string, unknown>;
+  for (const [key, value] of Object.entries(from)) {
+    if (key.startsWith("_") || IDENTITY_KEYS.has(key)) continue;
+    const plain = typeof value === "boolean" || typeof value === "number" || typeof value === "string";
+    if (plain && to[key] !== value) to[key] = value;
+  }
+  return copy;
+}
+
 function cloneMaterial(material: THREE.Material | THREE.Material[]): THREE.Material | THREE.Material[] {
-  return Array.isArray(material) ? material.map((m) => m.clone()) : material.clone();
+  return Array.isArray(material) ? material.map(cloneOne) : cloneOne(material);
+}
+
+/** Holds the shared world lights while no world is on screen. */
+const lightHolder = new THREE.Scene();
+
+/** The scene that currently holds the shared world lights. */
+function worldLightScene(): THREE.Scene {
+  const parent = WORLD_KEY_LIGHT.parent;
+  if (parent instanceof THREE.Scene && WORLD_AMBIENT_LIGHT.parent === parent) return parent;
+  lightHolder.add(WORLD_AMBIENT_LIGHT, WORLD_KEY_LIGHT);
+  return lightHolder;
 }
 
 /**
- * Copies the lights, fog and every material of `source` into a stand-in scene,
- * compiles it and keeps it under `key`.
+ * Copies the fog and every material of `source` into a stand-in scene, then
+ * compiles it lit by the lights of `lights` (lit materials are compiled per
+ * light instance, so they must be the very lights the live scene uses) and
+ * keeps it under `key`.
  */
-async function retainScene(renderer: WebGPURenderer, camera: THREE.Camera, source: THREE.Scene, key: string) {
+async function retainScene(
+  renderer: WebGPURenderer,
+  camera: THREE.Camera,
+  source: THREE.Scene,
+  lights: THREE.Scene,
+  key: string
+) {
   if (retained.has(key)) return;
   const standIn = new THREE.Scene();
   standIn.fog = source.fog ? source.fog.clone() : null;
   if (source.background instanceof THREE.Color) standIn.background = source.background.clone();
   source.traverse((object) => {
-    if (object instanceof THREE.Light) {
-      standIn.add(object.clone(false));
-      return;
-    }
     if (!isRenderable(object)) return;
     const copy = object.clone(false);
     copy.geometry = standInGeometry(object.geometry);
@@ -98,7 +133,7 @@ async function retainScene(renderer: WebGPURenderer, camera: THREE.Camera, sourc
     standIn.add(copy);
   });
   retained.set(key, standIn);
-  await renderer.compileAsync(standIn, camera);
+  await renderer.compileAsync(standIn, camera, lights);
 }
 
 function viewKey(view: BackdropView, profile: RenderProfile): string {
@@ -155,7 +190,7 @@ function WarmWorld({ warming, performanceMode, reduced }: { warming: Warming; pe
       // One frame so R3F has attached every object to the portal scene.
       await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
       try {
-        await retainScene(renderer, camera, scene, key);
+        await retainScene(renderer, camera, scene, worldLightScene(), key);
       } catch {
         // A failed warm-up only means this world compiles on its first visit.
         retained.delete(key);
@@ -197,7 +232,7 @@ export function SceneWarmup({ view, performanceMode, reduced }: { view: Backdrop
     let alive = true;
 
     const warmWorld = (slug: string, world: WorldSpec, key: string) => {
-      // Same fog type and lights as the live world, so the compiled shaders match.
+      // Same fog type as the live world, so the compiled shaders match.
       const scene = new THREE.Scene();
       scene.fog = new THREE.FogExp2(new THREE.Color(world.fog.color).getHex(), world.fog.density);
       scene.background = new THREE.Color(world.bg[0]);
@@ -221,7 +256,7 @@ export function SceneWarmup({ view, performanceMode, reduced }: { view: Backdrop
         if (!alive) return;
         const key = viewKey(view, profile);
         try {
-          await retainScene(renderer, camera, mainScene, key);
+          await retainScene(renderer, camera, mainScene, mainScene, key);
         } catch {
           retained.delete(key);
         }
