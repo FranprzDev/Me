@@ -1,0 +1,45 @@
+import { CvLocale, CvVariant } from "./types";
+
+/*
+ * URL helpers for the CV routes. Kept free of résumé content so client code
+ * (the language provider, the site chrome, the nav) can import them cheaply.
+ */
+
+/** Every variant, in index / switcher order. */
+export const CV_VARIANTS: CvVariant[] = Object.values(CvVariant);
+
+export const CV_LOCALES: CvLocale[] = Object.values(CvLocale);
+
+export function isCvVariant(value: string): value is CvVariant {
+  return CV_VARIANTS.some((variant) => variant === value);
+}
+
+/** English lives at the root, Spanish under /es. */
+function localePrefix(locale: CvLocale): string {
+  return locale === CvLocale.Es ? "/es" : "";
+}
+
+export function cvIndexPath(locale: CvLocale): string {
+  return `${localePrefix(locale)}/cv`;
+}
+
+export function cvPath(variant: CvVariant, locale: CvLocale): string {
+  return `${cvIndexPath(locale)}/${variant}`;
+}
+
+/** Committed PDF rendered from the page by `pnpm cv:pdf`. */
+export function cvPdfPath(variant: CvVariant, locale: CvLocale): string {
+  return `/cv/files/francisco-perez-cv-${variant}-${locale}.pdf`;
+}
+
+/** Locale a CV route is written in, or null when the path is not a CV route. */
+export function cvLocaleForPath(pathname: string | null): CvLocale | null {
+  if (!pathname) return null;
+  if (pathname === "/es/cv" || pathname.startsWith("/es/cv/")) return CvLocale.Es;
+  if (pathname === "/cv" || pathname.startsWith("/cv/")) return CvLocale.En;
+  return null;
+}
+
+export function otherLocale(locale: CvLocale): CvLocale {
+  return locale === CvLocale.En ? CvLocale.Es : CvLocale.En;
+}

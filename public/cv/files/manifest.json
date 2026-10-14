@@ -1,0 +1,55 @@
+{
+  "sourceHash": "711fc50a1a635b294d5294cacc8e57b1c5046215629201d5853e9ab3cd6af3aa",
+  "files": [
+    {
+      "route": "/cv/fde",
+      "file": "francisco-perez-cv-fde-en.pdf",
+      "pages": 2
+    },
+    {
+      "route": "/cv/fullstack",
+      "file": "francisco-perez-cv-fullstack-en.pdf",
+      "pages": 2
+    },
+    {
+      "route": "/cv/frontend",
+      "file": "francisco-perez-cv-frontend-en.pdf",
+      "pages": 2
+    },
+    {
+      "route": "/cv/backend",
+      "file": "francisco-perez-cv-backend-en.pdf",
+      "pages": 2
+    },
+    {
+      "route": "/cv/applied-ai",
+      "file": "francisco-perez-cv-applied-ai-en.pdf",
+      "pages": 2
+    },
+    {
+      "route": "/es/cv/fde",
+      "file": "francisco-perez-cv-fde-es.pdf",
+      "pages": 2
+    },
+    {
+      "route": "/es/cv/fullstack",
+      "file": "francisco-perez-cv-fullstack-es.pdf",
+      "pages": 2
+    },
+    {
+      "route": "/es/cv/frontend",
+      "file": "francisco-perez-cv-frontend-es.pdf",
+      "pages": 2
+    },
+    {
+      "route": "/es/cv/backend",
+      "file": "francisco-perez-cv-backend-es.pdf",
+      "pages": 2
+    },
+    {
+      "route": "/es/cv/applied-ai",
+      "file": "francisco-perez-cv-applied-ai-es.pdf",
+      "pages": 2
+    }
+  ]
+}

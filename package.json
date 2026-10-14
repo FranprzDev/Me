@@ -10,6 +10,7 @@
     "lint": "eslint",
     "check:portfolio": "node scripts/check-portfolio.mjs",
     "check:agent": "node scripts/check-agent.mjs",
+    "cv:pdf": "node scripts/generate-cv-pdfs.mjs",
     "check:shaders": "vgpu check src/components/three/shaders/nebula.wgsl --require-validation"
   },
   "dependencies": {

@@ -8,7 +8,10 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { usePathname } from "next/navigation";
 import type { Lang } from "@/data/cv";
+import { CvLocale } from "@/content/cv/types";
+import { cvLocaleForPath } from "@/content/cv/routes";
 
 type Dict = Record<Lang, string>;
 
@@ -18,6 +21,7 @@ const UI = {
   nav_education: { es: "Educación", en: "Education" },
   nav_projects: { es: "Proyectos", en: "Projects" },
   nav_contact: { es: "Contacto", en: "Contact" },
+  nav_cv: { es: "CV", en: "CV" },
 
   hero_cta_cv: { es: "Descargar CV", en: "Download Resume" },
 
@@ -51,8 +55,17 @@ interface I18nCtx {
 
 const Ctx = createContext<I18nCtx | null>(null);
 
+/** CV routes are written in one language each (/cv English, /es/cv Spanish). */
+function routeLang(pathname: string | null): Lang | null {
+  const locale = cvLocaleForPath(pathname);
+  if (locale === null) return null;
+  return locale === CvLocale.Es ? "es" : "en";
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>("es");
+  const [storedLang, setLangState] = useState<Lang>("es");
+  // A CV route fixes the language by its URL; everywhere else the visitor's choice wins.
+  const lang = routeLang(usePathname()) ?? storedLang;
 
   useEffect(() => {
     let saved: string | null = null;

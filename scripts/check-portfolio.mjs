@@ -3,6 +3,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import { chromium, devices } from "playwright";
 import AxeBuilder from "@axe-core/playwright";
 import ts from "typescript";
+import { CV_LOCALES, CV_VARIANTS, MANIFEST, cvPdfFile, cvRoute, cvSourceHash } from "./cv-pdf-shared.mjs";
 
 const baseURL = process.env.PORTFOLIO_URL || "http://localhost:3000";
 const output = `artifacts/portfolio-quality/${process.env.HEADFUL === "1" ? "headful" : "headless"}`;
@@ -49,6 +50,83 @@ async function checkPage(page, route, name) {
     console.log(`PASS ${name} ${route}`);
   } finally {
     page.off("pageerror", onError);
+  }
+}
+
+/** Hosted résumés: /cv (English) and /es/cv (Spanish), five variants plus an index each. */
+async function checkCvPages(browser) {
+  const manifest = JSON.parse(await readFile(MANIFEST, "utf8"));
+  assert.equal(manifest.sourceHash, await cvSourceHash(), "CV PDFs are stale: run `pnpm cv:pdf` against a fresh build and commit public/cv/files");
+  const pages = CV_LOCALES.flatMap((locale) => [
+    { route: locale === "es" ? "/es/cv" : "/cv", locale, variant: null },
+    ...CV_VARIANTS.map((variant) => ({ route: cvRoute(variant, locale), locale, variant })),
+  ]);
+  for (const [name, options] of [
+    ["cv-mobile", { viewport: { width: 412, height: 915 }, isMobile: true, hasTouch: true }],
+    ["cv-desktop", { viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" }],
+  ]) {
+    const context = await browser.newContext(options);
+    const page = await context.newPage();
+    progress.scenario = name;
+    progress.page = page;
+    page.setDefaultTimeout(15000);
+    const errors = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    for (const { route, locale, variant } of pages) {
+      const response = await page.goto(`${baseURL}${route}`);
+      assert.equal(response.status(), 200, `${name}: ${route}`);
+      await page.waitForFunction((lang) => document.documentElement.lang === lang, locale, { timeout: 5000 });
+      assert.equal(await page.locator(".cv-root").getAttribute("lang"), locale, `${route}: content language`);
+      assert.equal(await page.locator("h1").count(), 1, `${route}: one h1`);
+      assert.equal(await page.locator("main#main-content").count(), 1, `${route}: main landmark`);
+      assert.equal(await page.locator(".site-nav, [data-scene-root]").count(), 0, `${route}: no portfolio chrome or 3D layer`);
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${name}: horizontal overflow ${route}`);
+      const html = await page.content();
+      assert.equal(/planet/i.test(await page.locator(".cv-root").evaluate((el) => el.outerHTML)), false, `${route}: no 'planet' wording`);
+      assert.equal(/541[-\s]?2480|5493815412480|Delf[ií]n Gallo|Cruz Alta/i.test(html), false, `${route}: no phone number or home address`);
+      assert.equal(new URL(await page.locator("link[rel='canonical']").getAttribute("href")).pathname, route, `${route}: canonical`);
+      const alternates = Object.fromEntries(
+        await page.locator("link[rel='alternate'][hreflang]").evaluateAll((links) => links.map((l) => [l.getAttribute("hreflang"), new URL(l.href).pathname])),
+      );
+      const enRoute = route.replace(/^\/es/, "");
+      assert.deepEqual(alternates, { en: enRoute, es: `/es${enRoute}`, "x-default": enRoute }, `${route}: hreflang alternates`);
+      const toggle = page.locator(".cv-bar__lang");
+      assert.equal(await toggle.getAttribute("href"), locale === "es" ? enRoute : `/es${enRoute}`, `${route}: EN/ES toggle`);
+      if (variant) {
+        const pdf = await page.locator("a[data-cv-pdf]").getAttribute("href");
+        assert.equal(pdf, `/cv/files/${cvPdfFile(variant, locale)}`);
+        const file = await page.request.get(`${baseURL}${pdf}`);
+        assert.equal(file.status(), 200, `${route}: PDF ${pdf}`);
+        assert.match(file.headers()["content-type"], /pdf/);
+        assert.equal((await file.body()).subarray(0, 4).toString(), "%PDF");
+        assert.equal(await page.locator(".cv-section h2").count() >= 6, true, `${route}: résumé sections`);
+        assert.equal(await page.locator(`.cv-bar__versions a[aria-current='page']`).getAttribute("href"), route);
+        await page.emulateMedia({ media: "print" });
+        assert.equal(await page.locator(".cv-bar").isVisible(), false, `${route}: toolbar hidden in print`);
+        await page.emulateMedia({ media: "screen" });
+      } else {
+        assert.equal(await page.locator(".cv-card").count(), CV_VARIANTS.length, `${route}: index lists every version`);
+      }
+      if (name === "cv-mobile") {
+        const audit = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+        assert.deepEqual(audit.violations.map(({ id, nodes }) => ({ id, targets: nodes.map(({ target }) => target) })), [], `${name}: accessibility ${route}`);
+      }
+      if (route === "/cv/applied-ai" || route === "/es/cv/fullstack") {
+        await page.screenshot({ path: `${output}/${name}-${route.slice(1).replaceAll("/", "-")}.png`, fullPage: true });
+      }
+    }
+    // The toggle keeps the variant and switches the language.
+    await page.goto(`${baseURL}/cv/backend`);
+    await Promise.all([page.waitForURL("**/es/cv/backend"), page.locator(".cv-bar__lang").click()]);
+    await page.waitForFunction(() => document.documentElement.lang === "es");
+    assert.equal(await page.locator("h2#cv-experience").textContent(), "Experiencia");
+    // Leaving the CV gives the portfolio back its own language choice.
+    await page.goto(baseURL);
+    const cvLink = page.locator(`a[href="/es/cv"]`);
+    assert.equal(await cvLink.count() >= 1, true, "Nav links to the CV index");
+    assert.deepEqual(errors, [], `${name}: browser errors on CV pages`);
+    await context.close();
+    console.log(`PASS ${name} CV pages (${pages.length} routes)`);
   }
 }
 
@@ -405,6 +483,7 @@ async function main() {
     }
 
     if (process.env.HEADFUL === "1") return;
+    await checkCvPages(browser);
     // /for-agents: lunar landing page with one-click assistant launchers.
     for (const [name, options] of [
       ["agents-desktop", { viewport: { width: 1440, height: 900 } }],

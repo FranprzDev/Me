@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import { subscribeScroll } from "@/lib/scroll";
+import { CvLocale } from "@/content/cv/types";
+import { cvIndexPath } from "@/content/cv/routes";
 
 /** Scroll offset (px) after which the header gets its solid band. */
 const BAND_AFTER = 8;
@@ -56,6 +58,7 @@ export function Nav() {
     { href: "/#experience", key: "nav_experience" },
     { href: "/#projects", key: "nav_projects" },
     { href: "/#contact", key: "nav_contact" },
+    { href: cvIndexPath(lang === "es" ? CvLocale.Es : CvLocale.En), key: "nav_cv" },
   ];
 
   return (

@@ -13,6 +13,7 @@ import { expireLaunchLoader } from "@/lib/launchLoader";
 import { hasWebGPU } from "@/lib/webgpu";
 import { SceneStatus, setSceneStatus } from "@/lib/sceneStatus";
 import type { BackdropView } from "@/components/three/Backdrop";
+import { cvLocaleForPath } from "@/content/cv/routes";
 
 // The world-entry vehicles (SVG art + flight overlay) are their own chunk,
 // fetched after hydration; a click before it lands just skips the flight.
@@ -61,7 +62,8 @@ export function SiteChrome() {
   const [sceneReady, setSceneReady] = useState(false);
   const view = viewFor(pathname);
   const onSceneRoute = view.kind !== "none";
-  const onMe = pathname?.startsWith("/me") ?? false;
+  // /me and the CV pages are standalone editorial pages with their own header.
+  const standalone = (pathname?.startsWith("/me") ?? false) || cvLocaleForPath(pathname) !== null;
   // The backdrop is created the first time a scene route is shown (never for a
   // visit that stays on /me) and then kept for the rest of the visit.
   const [visitedScene, setVisitedScene] = useState(onSceneRoute);
@@ -114,8 +116,8 @@ export function SiteChrome() {
       {/* Mounted for every route (paused and hidden where there is no scene),
           so the WebGPU renderer survives a detour through /me or a 404. */}
       {sceneReady && visitedScene ? <Backdrop view={view} /> : null}
-      {/* /me is a standalone editorial page with its own header. */}
-      {onMe ? null : (
+      {/* Standalone editorial pages (/me, /cv) bring their own header. */}
+      {standalone ? null : (
         <>
           <a href="#main-content" className="skip-link">
             {tl({ es: "Saltar al contenido", en: "Skip to content" })}
