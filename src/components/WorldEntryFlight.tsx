@@ -3,11 +3,11 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { PROJECTS } from "@/data/projects";
 import { WorldVehicleArt } from "@/components/WorldVehicleArt";
+import { localePhaseDegrees } from "@/lib/geoPhase";
 import {
   WORLD_FLIGHTS,
   WorldVehicle,
   flightPath,
-  flightPhase,
   onWorldEntryLaunch,
   pathSignature,
   type FlightPoint,
@@ -39,6 +39,19 @@ type Flight = {
 
 /** Inline style carrying a world's colour tokens as CSS custom properties. */
 type ToneStyle = CSSProperties & Record<`--${string}`, string>;
+
+/**
+ * The visitor's country phase φ in radians, from the browser's preferred
+ * languages (lib/geoPhase): no request, computed once per page load.
+ */
+let visitorPhaseRad: number | null = null;
+function visitorPhase(): number {
+  if (visitorPhaseRad === null) {
+    const degrees = localePhaseDegrees([...navigator.languages, navigator.language]);
+    visitorPhaseRad = (degrees * Math.PI) / 180;
+  }
+  return visitorPhaseRad;
+}
 
 /** Bursts in from the edge, then slows as it dives into the world. */
 const easeFlight = (x: number) => 1 - (1 - x) ** 2.2;
@@ -85,7 +98,7 @@ export default function WorldEntryFlight() {
       onWorldEntryLaunch((launch: WorldEntryLaunch) => {
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
         const config = WORLD_FLIGHTS[launch.slug];
-        const points = flightPath(config.curve, flightPhase(), launch.target, { width: window.innerWidth, height: window.innerHeight }, SAMPLES);
+        const points = flightPath(config.curve, visitorPhase(), launch.target, { width: window.innerWidth, height: window.innerHeight }, SAMPLES);
         const dx = points[points.length - 1].x - points[0].x;
         counter.current += 1;
         setFlight({

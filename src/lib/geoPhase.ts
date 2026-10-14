@@ -1,12 +1,16 @@
 /**
- * Country phase for the world-entry flights.
+ * Country phase for the world-entry flights, derived on the client with no
+ * network request.
  *
- *   φ = (ISO 3166-1 numeric code of the visitor's country mod 360) degrees
+ *   φ = (ISO 3166-1 numeric code of the visitor's locale region mod 360) degrees
  *
- * e.g. AR → 032 → 32°, US → 840 → 120°, JP → 392 → 32°. The country comes
- * from Vercel's `x-vercel-ip-country` request header (ISO 3166-1 alpha-2).
- * A missing, unknown or non-ISO code (local dev, "XX", Tor "T1") gives 0°.
- * Only this derived angle ever reaches the client: no IP is read or stored.
+ * e.g. es-AR → AR → 032 → 32°, en-US → US → 840 → 120°, ja → JP → 392 → 32°.
+ * The region comes from the browser's preferred languages (Intl.Locale
+ * maximize() fills it in for a bare language). A missing, unknown or non-ISO
+ * region ("419", "XX") gives 0°.
+ *
+ * Only imported by the lazily loaded flight overlay (components/WorldEntryFlight),
+ * so this table never ships in the initial bundle.
  */
 
 /**
@@ -43,6 +47,9 @@ function isoNumericTable(): ReadonlyMap<string, number> {
   return table;
 }
 
+/** φ for an unknown country. */
+const UNKNOWN_PHASE_DEG = 0;
+
 /** ISO 3166-1 numeric code for an alpha-2 code, or null when it is not an assigned country. */
 export function isoNumericCode(alpha2: string | null): number | null {
   if (!alpha2) return null;
@@ -52,5 +59,26 @@ export function isoNumericCode(alpha2: string | null): number | null {
 /** φ in degrees, in [0, 360): the country's ISO numeric code mod 360, or 0 when unknown. */
 export function countryPhaseDegrees(alpha2: string | null): number {
   const numeric = isoNumericCode(alpha2);
-  return numeric === null ? 0 : numeric % 360;
+  return numeric === null ? UNKNOWN_PHASE_DEG : numeric % 360;
+}
+
+/** Region of a BCP 47 language tag ("es-AR" → "AR", "ja" → "JP"), or null when it has none or is malformed. */
+export function localeRegion(tag: string): string | null {
+  try {
+    return new Intl.Locale(tag).maximize().region ?? null;
+  } catch {
+    return null; // Not a valid language tag.
+  }
+}
+
+/**
+ * φ in degrees for a list of preferred language tags (navigator.languages):
+ * the first tag whose region is an assigned ISO country wins, 0 when none is.
+ */
+export function localePhaseDegrees(tags: readonly string[]): number {
+  for (const tag of tags) {
+    const region = localeRegion(tag);
+    if (isoNumericCode(region) !== null) return countryPhaseDegrees(region);
+  }
+  return UNKNOWN_PHASE_DEG;
 }

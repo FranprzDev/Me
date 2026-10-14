@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
-import { mkdir } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import { chromium, devices } from "playwright";
 import AxeBuilder from "@axe-core/playwright";
+import ts from "typescript";
 
 const baseURL = process.env.PORTFOLIO_URL || "http://localhost:3000";
 const output = `artifacts/portfolio-quality/${process.env.HEADFUL === "1" ? "headful" : "headless"}`;
@@ -71,11 +72,30 @@ function recordFlights() {
   }).observe(document, { childList: true, subtree: true });
 }
 
-/** Opens home on the selector, waits for the idle work (vehicle chunk, phase), then enters `route` with Enter. */
+/** The country phase is derived on the client: no page may ever ask the removed endpoint for it. */
+const REMOVED_PHASE_ENDPOINT = "/api/geo-phase";
+
+/** Records every request the page makes to the removed phase endpoint (expected: none). */
+function recordPhaseRequests(page) {
+  const urls = [];
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname.startsWith(REMOVED_PHASE_ENDPOINT)) urls.push(request.url());
+  });
+  return urls;
+}
+
+/** Loads src/lib/geoPhase.ts (pure, no imports) as an ES module, transpiled with the repo's TypeScript. */
+async function importGeoPhase() {
+  const source = await readFile(new URL("../src/lib/geoPhase.ts", import.meta.url), "utf8");
+  const { outputText } = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } });
+  return import(`data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`);
+}
+
+/** Opens home on the selector, waits for the idle work (vehicle chunk), then enters `route` with Enter. */
 async function enterWorld(page, route) {
-  const phase = page.waitForResponse((response) => response.url().endsWith("/api/geo-phase"), { timeout: 8000 }).catch(() => null);
+  const phaseRequests = recordPhaseRequests(page);
   await page.goto(`${baseURL}/#projects`);
-  await phase;
+  await page.waitForLoadState("networkidle");
   await page.waitForTimeout(300);
   const card = page.locator("#world-details");
   await card.focus();
@@ -84,6 +104,7 @@ async function enterWorld(page, route) {
   await Promise.all([page.waitForURL(`**${route}`), page.keyboard.press("Enter")]);
   await page.waitForFunction(() => document.querySelector("[data-world-flight]") === null, null, { timeout: 2000 });
   await page.locator("h1").waitFor();
+  assert.deepEqual(phaseRequests, [], `No request to ${REMOVED_PHASE_ENDPOINT} entering ${route}`);
   return page.evaluate(() => window.__flights);
 }
 
@@ -348,29 +369,39 @@ async function main() {
       console.log(`PASS ${name} world-entry vehicles`);
     }
 
-    // Country phase: φ = ISO 3166-1 numeric code mod 360 degrees, 0 when unknown.
+    // Country phase: φ = ISO 3166-1 numeric code of the locale region mod 360 degrees, 0 when unknown.
     {
-      const context = await browser.newContext();
+      const { countryPhaseDegrees, localePhaseDegrees } = await importGeoPhase();
       for (const [country, degrees] of [["AR", 32], ["ar", 32], ["US", 120], ["JP", 32], ["BR", 76], ["XX", 0], ["", 0], [null, 0]]) {
-        const response = await context.request.get(`${baseURL}/api/geo-phase`, { headers: country === null ? {} : { "x-vercel-ip-country": country } });
-        assert.equal(response.status(), 200);
-        assert.match(response.headers()["cache-control"], /no-store/, "Phase is never cached across visitors");
-        assert.deepEqual(await response.json(), { phaseDeg: degrees }, `Country ${country} → ${degrees}°`);
+        assert.equal(countryPhaseDegrees(country), degrees, `Country ${country} → ${degrees}°`);
+      }
+      for (const [tags, degrees] of [[["es-AR"], 32], [["en-US"], 120], [["ja"], 32], [["pt-BR"], 76], [["es-419", "es-AR"], 32], [["es-419"], 0], [["not a tag"], 0], [[], 0]]) {
+        assert.equal(localePhaseDegrees(tags), degrees, `Locale ${tags.join(",") || "(none)"} → ${degrees}°`);
+      }
+      // The endpoint is gone: it no longer builds and answers 404.
+      const context = await browser.newContext();
+      assert.equal((await context.request.get(`${baseURL}${REMOVED_PHASE_ENDPOINT}`)).status(), 404, `${REMOVED_PHASE_ENDPOINT} is removed`);
+      // The ISO table only ships in the lazy flight chunk, never in the initial bundle.
+      const html = await (await context.request.get(`${baseURL}/`)).text();
+      const scripts = [...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map(([, src]) => src);
+      assert.ok(scripts.length > 0, "Initial scripts found");
+      for (const src of new Set(scripts)) {
+        const body = await (await context.request.get(new URL(src, baseURL).href)).text();
+        assert.equal(body.includes("AR032"), false, `ISO phase table is not in the initial bundle (${src})`);
       }
       await context.close();
-      // Two phases fly visibly different paths into the same world.
+      // Two locales (es-AR → 32°, en-US → 120°) fly visibly different paths into the same world.
       const paths = [];
-      for (const phaseDeg of [0, 120]) {
-        const phased = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+      for (const locale of ["es-AR", "en-US"]) {
+        const phased = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale });
         await phased.addInitScript(recordFlights);
-        await phased.route("**/api/geo-phase", (route) => route.fulfill({ json: { phaseDeg }, headers: { "cache-control": "private, no-store" } }));
         const flights = await enterWorld(await phased.newPage(), "/hackathons");
-        assert.equal(flights.length, 1, `Flight with phase ${phaseDeg}°`);
+        assert.equal(flights.length, 1, `Flight with locale ${locale}`);
         paths.push(flights[0].path);
         await phased.close();
       }
       assert.notEqual(paths[0], paths[1], `Different phases give different flight paths (${paths.join(" vs ")})`);
-      console.log("PASS country phase mapping and phased paths");
+      console.log("PASS country phase mapping, no phase request and phased paths");
     }
 
     if (process.env.HEADFUL === "1") return;
