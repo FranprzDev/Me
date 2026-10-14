@@ -15,7 +15,7 @@ import * as THREE from "three";
 import { getScrollProgress, measuredSectionCenter, bumpWeight } from "@/lib/scroll";
 import { getConstellations, type Constellation } from "@/data/constellations";
 import { useI18n } from "@/lib/i18n";
-import { Nebula, Planet, ProjectPlanets } from "./Cosmos";
+import { Nebula, Planet } from "./Cosmos";
 import { StarShell, WarpField, dampingFactor, smoother } from "./shared";
 
 // Familia de color del nebulón: todo dentro del "espacio" (índigos/violetas
@@ -246,7 +246,7 @@ function Rig({
   minimal: boolean;
   performanceMode: boolean;
 }) {
-  const { scene, camera, gl } = useThree();
+  const { scene, camera } = useThree();
   const { lang } = useI18n();
   const fog = useMemo(() => new THREE.FogExp2(C_BG_A.getHex(), 0.018), []);
   const background = useMemo(() => C_BG_A.clone(), []);
@@ -297,18 +297,6 @@ function Rig({
     camera.position.x += (tx - camera.position.x) * 0.05;
     camera.position.y += (ty - camera.position.y) * 0.05;
     camera.lookAt(0, 0, camera.position.z - 9);
-
-    // Los planetas del slider son clickeables: el wrapper de la escena sólo
-    // captura el puntero dentro de la zona de Proyectos (el contenido DOM vive
-    // encima; en el resto del viaje el canvas es transparente al puntero).
-    // Se escribe sobre NUESTRO wrapper (marcado con data-scene-root) y fuera
-    // de React: el div interno de R3F lo pisa React en cada re-render.
-    const root = gl.domElement.closest<HTMLElement>("[data-scene-root]");
-    if (root) {
-      const interactive = bumpWeight(pRef.current, measuredSectionCenter(2), 0.1) > 0.05;
-      const next = interactive ? "auto" : "none";
-      if (root.style.pointerEvents !== next) root.style.pointerEvents = next;
-    }
   });
 
   return (
@@ -317,7 +305,6 @@ function Rig({
 
       <Nebula pRef={pRef} reduced={reduced} performanceMode={performanceMode} />
       {!performanceMode && <Planet pRef={pRef} />}
-      <ProjectPlanets pRef={pRef} />
 
       <StarShell count={starCount} reduced={reduced} spin={0.006} opacity={0.85} />
 
@@ -354,17 +341,10 @@ export function CosmosContents({
   performanceMode: boolean;
 }) {
   const camera = useThree((state) => state.camera) as THREE.PerspectiveCamera;
-  const gl = useThree((state) => state.gl);
   useEffect(() => {
     camera.position.set(0, 0.3, 6);
     camera.fov = 60;
     camera.updateProjectionMatrix();
-    // The rig opens pointer events in the Projects zone; hand the shared
-    // wrapper back closed when the cosmos is swapped out.
-    return () => {
-      const root = gl.domElement.closest<HTMLElement>("[data-scene-root]");
-      if (root) root.style.pointerEvents = "none";
-    };
-  }, [camera, gl]);
+  }, [camera]);
   return <Rig reduced={reduced} minimal={minimal} performanceMode={performanceMode} />;
 }

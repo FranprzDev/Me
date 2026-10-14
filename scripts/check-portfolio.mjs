@@ -138,8 +138,26 @@ async function main() {
       }
       await page.waitForTimeout(1200);
       assert.equal(new URL(page.url()).hash, "#projects");
-      const arms = page.locator("#projects .orbit-select__arm");
-      assert.equal(await arms.count(), 4, "Four items on the orbit");
+      const slots = page.locator("#projects .orbit-select__slot");
+      assert.equal(await slots.count(), 4, "Four items in the system");
+      // Solar layout: one item centred and large, one visible on each side of
+      // the viewport, one smaller at the back; never a horizontal scrollbar.
+      await page.waitForTimeout(900);
+      const layout = await page.evaluate(() => {
+        const vw = document.documentElement.clientWidth;
+        const boxes = {};
+        for (const slot of document.querySelectorAll("#projects .orbit-select__slot")) {
+          const r = slot.querySelector(".orbit-select__orb").getBoundingClientRect();
+          boxes[slot.dataset.slot] = { cx: r.left + r.width / 2, w: r.width, left: r.left, right: r.right };
+        }
+        return { vw, boxes, scrollW: document.documentElement.scrollWidth };
+      });
+      const { vw, boxes } = layout;
+      assert.ok(Math.abs(boxes.center.cx - vw / 2) < 4, "Focused item is centred");
+      assert.ok(boxes.left.cx < vw * 0.25 && boxes.left.right > 8, "One item visible on the left");
+      assert.ok(boxes.right.cx > vw * 0.75 && boxes.right.left < vw - 8, "One item visible on the right");
+      assert.ok(boxes.center.w > boxes.left.w && boxes.left.w > boxes.back.w, "Depth: centre > sides > back");
+      assert.ok(layout.scrollW <= vw, "No horizontal scroll");
       assert.equal(await page.locator("#projects h2").textContent(), "Construir cosas que importan.");
       assert.equal(await page.getByText("Hackathones bajo presión").count(), 0, "Removed hackathons tagline");
       assert.equal(await page.getByText(/Elegí un mundo y descubrí/).count(), 0, "Removed the section subtitle");
@@ -161,9 +179,9 @@ async function main() {
       assert.equal(await worldCard.getAttribute("href"), routes[1], "ArrowRight brings the next item forward");
       await page.keyboard.press("ArrowLeft");
       assert.equal(await worldCard.getAttribute("href"), routes[4], "ArrowLeft brings the previous item forward");
-      // A back item is a button that brings it to the front.
-      await page.getByRole("button", { name: /^Traer al frente: / }).first().click();
-      assert.notEqual(await worldCard.getAttribute("href"), routes[4], "Clicking a back item brings it forward");
+      // An outer item is a button that brings it to the centre.
+      await page.getByRole("button", { name: /^Traer al centro: / }).first().click();
+      assert.notEqual(await worldCard.getAttribute("href"), routes[4], "Clicking an outer item brings it to the centre");
       assert.equal(await page.locator("#world-panel, .world-card__toggle, .world-card__close, #projects [aria-expanded]").count(), 0, "No inline expansion");
       for (const gone of ["Abrir página completa", "Tocá la tarjeta para cerrar", "Tocá la tarjeta para ver este mundo", "más en la ruta completa", "Explorar este mundo"]) {
         assert.equal(await page.locator("#projects").getByText(gone).count(), 0, `Worlds section never renders "${gone}"`);
