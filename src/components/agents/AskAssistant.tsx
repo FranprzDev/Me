@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { MCP_TOOLS } from "@/lib/mcp/tools";
 
 /** Public production URL the assistants are asked to read. */
 const SITE_URL = "https://me-pink-ten.vercel.app";
@@ -8,7 +9,7 @@ const SITE_URL = "https://me-pink-ten.vercel.app";
 /** One-shot prompt handed to ChatGPT / Claude through their `?q=` links. */
 export const ASSISTANT_PROMPT = [
   `Read Francisco Perez's portfolio at ${SITE_URL} and tell me about his profile, projects and experience.`,
-  `The site also exposes a public, read-only MCP server at ${SITE_URL}/api/mcp (tools: get_profile, get_experience, get_cv, list_projects, get_project, get_contact) and an agent card at ${SITE_URL}/.well-known/agent-card.json. Use them if you can; otherwise read the pages ${SITE_URL}/hackathons, ${SITE_URL}/teaching, ${SITE_URL}/projects and ${SITE_URL}/education.`,
+  `The site also exposes a public, read-only MCP server at ${SITE_URL}/api/mcp (tools: ${MCP_TOOLS.join(", ")}) and an agent card at ${SITE_URL}/.well-known/agent-card.json. Use them if you can; otherwise read the pages ${SITE_URL}/hackathons, ${SITE_URL}/teaching, ${SITE_URL}/projects and ${SITE_URL}/education.`,
   "Summarize who he is, what he has built and where he has worked, and finish with his contact links. Only use information from those sources.",
 ].join("\n\n");
 

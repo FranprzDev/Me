@@ -3,6 +3,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { AskAssistant } from "@/components/agents/AskAssistant";
 import { LunarScene } from "@/components/agents/LunarScene";
+import { MCP_TOOLS, MCP_TOOL_SUMMARIES } from "@/lib/mcp/tools";
 import "./for-agents.css";
 
 export const metadata: Metadata = {
@@ -10,14 +11,7 @@ export const metadata: Metadata = {
   description: "Connect any MCP client to Francisco Perez's read-only portfolio server at /api/mcp, or open ChatGPT or Claude with a ready prompt.",
 };
 
-const TOOLS = [
-  ["get_profile", "Name, title, location, summary, highlights and links."],
-  ["get_contact", "Email, LinkedIn, GitHub and WhatsApp."],
-  ["get_experience", "Work experience with periods and stack."],
-  ["get_cv", "Full CV: profile, experience, education, certifications and the PDF link."],
-  ["list_projects", "The four portfolio worlds with slug, tagline and page URL."],
-  ["get_project", "Every entry of one world by slug."],
-] as const;
+const TOOLS = MCP_TOOLS.map((name) => [name, MCP_TOOL_SUMMARIES[name]] as const);
 
 export default async function ForAgentsPage() {
   const host = (await headers()).get("host") ?? "me-pink-ten.vercel.app";
@@ -38,7 +32,7 @@ export default async function ForAgentsPage() {
           </h1>
           <p className="moon-lede">
             You just touched down. This is a public MCP server with Francisco Perez&apos;s portfolio data: profile,
-            experience, CV, projects and contact. No sign-in, no LLM behind it, nothing is written. Every answer comes from
+            experience, every CV version with its PDF, projects and contact. No sign-in, no LLM behind it, nothing is written. Every answer comes from
             the same data this site renders.
           </p>
           <p className="moon-coords">
