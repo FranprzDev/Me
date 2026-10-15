@@ -41,6 +41,41 @@ export function smoother(x: number, e0: number, e1: number): number {
   return t * t * (3 - 2 * t);
 }
 
+/**
+ * Half-width, in CSS px, of the centred text column (hero name, copy, CTAs)
+ * that background decor must never cross. The title tops out at ~700 px wide.
+ */
+export const CONTENT_CLEAR_HALF_WIDTH_PX = 430;
+
+/** Which side of the text column a piece of decor sits on. */
+export enum DecorSide {
+  Left = -1,
+  Right = 1,
+}
+
+/**
+ * World-space x, at depth `worldZ`, that keeps an object of horizontal
+ * half-extent `extent` beside the centred text column on the current
+ * viewport. World coordinates alone put side decor over the copy on wide
+ * screens (a 2:1 window shows far more world per pixel), so the offset is
+ * derived from the projected column width. It never pulls decor inward:
+ * `preferredX` wins when it is already clear.
+ */
+export function clearOfContentX(
+  camera: THREE.PerspectiveCamera,
+  viewportWidthPx: number,
+  worldZ: number,
+  side: DecorSide,
+  extent: number,
+  preferredX: number
+): number {
+  const distance = Math.max(0.1, camera.position.z - worldZ);
+  const halfWidth = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * distance * camera.aspect;
+  const clear = (CONTENT_CLEAR_HALF_WIDTH_PX / Math.max(1, viewportWidthPx / 2)) * halfWidth + extent;
+  // Stay world-anchored (parallax intact) unless that would cross the column.
+  return side * Math.max(Math.abs(preferredX), side * camera.position.x + clear);
+}
+
 export function prefersReducedMotion(): boolean {
   return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }

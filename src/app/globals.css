@@ -95,6 +95,132 @@ body {
     0 2px 18px rgba(2, 4, 12, 0.85);
 }
 
+/* --- Home CSS sky (first paint and devices without WebGPU) ---
+   Same family as the /cv backdrop. Painted under the 3D canvas, and removed
+   once the canvas exists so its layers and drift cost nothing there. */
+.home-sky {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: #040612;
+}
+body:has([data-scene-root] canvas) .home-sky {
+  display: none;
+}
+.home-sky > div {
+  position: absolute;
+  pointer-events: none;
+}
+.home-sky__nebula {
+  inset: -10%;
+  background:
+    radial-gradient(ellipse 46% 40% at 86% 10%, rgba(91, 140, 255, 0.42), transparent 70%),
+    radial-gradient(ellipse 30% 28% at 70% 30%, rgba(155, 123, 255, 0.2), transparent 70%),
+    radial-gradient(ellipse 46% 44% at 6% 86%, rgba(155, 123, 255, 0.38), transparent 70%),
+    radial-gradient(ellipse 30% 26% at 22% 62%, rgba(91, 140, 255, 0.14), transparent 70%),
+    radial-gradient(ellipse 58% 28% at 60% 104%, rgba(233, 194, 112, 0.2), transparent 70%),
+    radial-gradient(ellipse 24% 20% at 14% 16%, rgba(201, 184, 255, 0.1), transparent 70%);
+}
+/* A soft diagonal ribbon of light (no blur filter: the gradient is soft). */
+.home-sky__aurora {
+  inset: -20% -10%;
+  background: linear-gradient(
+    118deg,
+    transparent 28%,
+    rgba(91, 140, 255, 0.07) 38%,
+    rgba(155, 123, 255, 0.1) 46%,
+    rgba(233, 194, 112, 0.04) 53%,
+    transparent 64%
+  );
+}
+/* Each depth drifts by a whole number of its tiles, so the loop is seamless. */
+.home-sky__stars {
+  --drift: 480px;
+  inset: calc(-1 * var(--drift)) 0 0;
+  opacity: 0.75;
+  background-image:
+    radial-gradient(1px 1px at 24px 36px, rgba(255, 255, 255, 0.85), transparent 70%),
+    radial-gradient(1px 1px at 132px 88px, rgba(200, 214, 255, 0.7), transparent 70%),
+    radial-gradient(1px 1px at 196px 172px, rgba(255, 255, 255, 0.8), transparent 70%),
+    radial-gradient(1px 1px at 78px 204px, rgba(201, 184, 255, 0.7), transparent 70%),
+    radial-gradient(1px 1px at 168px 18px, rgba(255, 255, 255, 0.6), transparent 70%),
+    radial-gradient(1px 1px at 218px 120px, rgba(255, 255, 255, 0.5), transparent 70%),
+    radial-gradient(1px 1px at 52px 140px, rgba(255, 255, 255, 0.55), transparent 70%),
+    radial-gradient(1px 1px at 150px 226px, rgba(200, 214, 255, 0.6), transparent 70%),
+    radial-gradient(1px 1px at 110px 60px, rgba(255, 255, 255, 0.45), transparent 70%);
+  background-size: 240px 240px;
+}
+/* A third, odd-sized tile so the pattern never reads as a grid. */
+.home-sky__stars--far {
+  --drift: 674px;
+  opacity: 0.6;
+  background-image:
+    radial-gradient(1px 1px at 41px 77px, rgba(255, 255, 255, 0.7), transparent 70%),
+    radial-gradient(1px 1px at 233px 19px, rgba(201, 184, 255, 0.6), transparent 70%),
+    radial-gradient(1px 1px at 301px 251px, rgba(255, 255, 255, 0.65), transparent 70%),
+    radial-gradient(1px 1px at 157px 311px, rgba(200, 214, 255, 0.6), transparent 70%),
+    radial-gradient(1.2px 1.2px at 89px 203px, rgba(255, 255, 255, 0.7), transparent 70%);
+  background-size: 337px 337px;
+  background-position: 120px 70px;
+}
+.home-sky__stars--near {
+  --drift: 520px;
+  opacity: 0.85;
+  background-image:
+    radial-gradient(1.8px 1.8px at 90px 120px, rgba(233, 194, 112, 0.95), transparent 70%),
+    radial-gradient(1.6px 1.6px at 380px 300px, rgba(159, 184, 255, 0.95), transparent 70%),
+    radial-gradient(1.3px 1.3px at 300px 430px, rgba(255, 255, 255, 0.9), transparent 70%),
+    radial-gradient(2.2px 2.2px at 440px 64px, rgba(255, 255, 255, 0.85), transparent 70%),
+    radial-gradient(1.5px 1.5px at 200px 250px, rgba(201, 184, 255, 0.9), transparent 70%);
+  background-size: 520px 520px;
+  background-position: 60px 40px;
+}
+.home-sky__vignette {
+  inset: 0;
+  background: radial-gradient(ellipse 120% 90% at 50% 40%, transparent 55%, rgba(2, 3, 10, 0.6) 100%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .home-sky__stars {
+    animation: home-sky-drift 160s linear infinite;
+  }
+  .home-sky__stars--far {
+    animation: home-sky-drift 220s linear infinite;
+  }
+  .home-sky__stars--near {
+    animation:
+      home-sky-drift 110s linear infinite,
+      home-sky-twinkle 5.5s ease-in-out infinite alternate;
+  }
+  .home-sky__nebula {
+    animation: home-sky-breathe 26s ease-in-out infinite alternate;
+  }
+}
+@keyframes home-sky-drift {
+  to {
+    transform: translate3d(0, var(--drift), 0);
+  }
+}
+@keyframes home-sky-twinkle {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 0.95;
+  }
+}
+@keyframes home-sky-breathe {
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+}
+
 /* --- GSAP star aura layer (entre el canvas 3D y el contenido) --- */
 .star-aura-layer {
   position: fixed;
@@ -102,6 +228,12 @@ body {
   z-index: 5;
   pointer-events: none;
   overflow: hidden;
+}
+
+/* On the home page the layer lives inside the content stacking context: a
+   negative z-index keeps the streaks above the 3D canvas but behind the copy. */
+.content-layer > .star-aura-layer {
+  z-index: -1;
 }
 
 .star-aura-shooter {
@@ -135,9 +267,14 @@ body {
   will-change: transform, opacity;
 }
 
+/* Each word clips its letters for the rise-in. The clip box is padded (and
+   the padding cancelled by negative margins, so layout is unchanged) wide
+   enough for the title's glow, which otherwise showed as a faint box. */
 .hero-gsap-name .hero-word {
   display: inline-block;
   overflow: hidden;
+  padding: 0.3em 0.3em;
+  margin: -0.3em -0.3em;
 }
 
 .hero-gsap-name .hero-letter {
@@ -197,56 +334,95 @@ body {
   }
 }
 
-/* Botones consola del héroe: badge arriba, acción abajo, sin superposición. */
+/* Hero CTAs: a matched glass pair (same size and anatomy, badge over the
+   action), each with its own accent edge: gold for the CV, violet for GitHub. */
 .hero-actions-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 15rem));
   justify-content: center;
   gap: 0.9rem;
-  margin-top: 0.6rem;
+  width: 100%;
+  margin-top: 2.1rem;
+}
+
+.hero-actions-grid > [data-magnetic] {
+  display: flex;
 }
 
 .hero-console-btn {
-  display: inline-flex;
+  --btn-accent: 178, 196, 255;
+  position: relative;
+  display: flex;
+  flex: 1;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.35rem;
-  padding: 0.85rem 1.2rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 0.9rem;
-  background: rgba(12, 14, 30, 0.6);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 4.4rem;
+  padding: 0.9rem 1.25rem;
+  border: 1px solid rgba(var(--btn-accent), 0.4);
+  border-radius: 1rem;
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015) 45%, transparent 75%),
+    radial-gradient(120% 120% at 0% 0%, rgba(var(--btn-accent), 0.12), transparent 60%),
+    rgba(8, 11, 28, 0.62);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 14px 36px rgba(0, 0, 0, 0.32),
+    0 0 28px rgba(var(--btn-accent), 0.07);
   color: var(--fg);
   text-decoration: none;
+  text-align: left;
   transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
 }
 
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .hero-console-btn {
+    background:
+      linear-gradient(155deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015) 45%, transparent 75%),
+      radial-gradient(120% 120% at 0% 0%, rgba(var(--btn-accent), 0.12), transparent 60%),
+      rgba(8, 11, 28, 0.4);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    backdrop-filter: blur(12px) saturate(140%);
+  }
+}
+
 .btn-badge {
-  font: 600 0.6rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  font: 600 0.62rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--space);
+  color: rgb(var(--btn-accent));
 }
 
 .btn-text-row {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.95rem;
+  gap: 0.55rem;
+  font-size: 1rem;
   font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
-.btn-theme-cv { border-color: rgba(233, 194, 112, 0.35); }
-.btn-theme-github { border-color: rgba(155, 123, 255, 0.35); }
-.btn-theme-cv .btn-badge { color: var(--star); }
-.btn-theme-github .btn-badge { color: var(--space-2); }
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 1.1rem;
+  color: rgb(var(--btn-accent));
+}
+
+.btn-theme-cv { --btn-accent: 233, 194, 112; }
+.btn-theme-github { --btn-accent: 177, 156, 255; }
 
 @media (hover: hover) {
   .hero-console-btn:hover {
     transform: translateY(-3px);
-    border-color: rgba(122, 162, 255, 0.55);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45), 0 0 26px rgba(91, 140, 255, 0.2);
+    border-color: rgba(var(--btn-accent), 0.7);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      0 16px 40px rgba(0, 0, 0, 0.4),
+      0 0 34px rgba(var(--btn-accent), 0.2);
   }
 }
 
@@ -285,51 +461,139 @@ body {
   }
 }
 
-/* Halo legible detrás del héroe: la animación 3D sigue viéndose alrededor,
-   pero el texto nunca compite con estrellas/planetas. */
-.hero-veil {
+/* Hero stage: open and cinematic. Instead of a boxed card, a feathered
+   radial scrim (no edges, no blur) darkens the sky just behind the copy so
+   it reads at WCAG AA over any part of the backdrop. */
+.wrap.hero-stage {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 1.3rem;
-  padding: clamp(1.6rem, 4vw, 3rem) clamp(1rem, 3vw, 2.4rem);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 1.4rem;
-  background: radial-gradient(ellipse at center, rgba(4, 6, 16, 0.8), rgba(4, 6, 16, 0.58) 75%);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  /* Stretch so each reveal wrapper spans the column (centring is by
+     text-align); otherwise the CTA grid shrinks to its copy. */
+  align-items: stretch;
+  max-width: 880px;
+  padding: clamp(1rem, 3vw, 2rem) 0;
+}
+
+.hero-stage::before {
+  content: "";
+  position: absolute;
+  inset: -12% -18%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    closest-side,
+    rgba(3, 5, 15, 0.62),
+    rgba(3, 5, 15, 0.42) 55%,
+    rgba(3, 5, 15, 0.14) 80%,
+    transparent
+  );
 }
 
 .hero-section {
   align-items: center;
   text-align: center;
   padding-top: 6rem;
+  /* The scrim bleeds past the column; never let it widen the page. */
+  overflow-x: clip;
+}
+
+/* Location kicker framed by two hairlines that fade into the sky. */
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1.2rem;
+  color: #8fb0ff;
+  letter-spacing: 0.32em;
+}
+
+.hero-eyebrow::before,
+.hero-eyebrow::after {
+  content: "";
+  width: clamp(1.5rem, 5vw, 3rem);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(143, 176, 255, 0.6));
+}
+
+.hero-eyebrow::after {
+  transform: scaleX(-1);
+}
+
+.hero-role {
+  margin: 1.15rem 0 0;
+  font-size: clamp(1.15rem, 2.3vw, 1.55rem);
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  line-height: 1.3;
+  color: #e3eaff;
+}
+
+.hero-role-title {
+  color: #fff;
+  font-weight: 600;
+}
+
+.hero-role-place {
+  color: #b9c7ef;
 }
 
 .hero-summary {
-  max-width: 600px;
-  margin: 0;
-  color: var(--muted);
-  font-size: clamp(1rem, 2vw, 1.18rem);
+  max-width: 34em;
+  margin: 0.95rem auto 0;
+  color: #c9cde4;
+  font-size: clamp(1rem, 1.8vw, 1.12rem);
   line-height: 1.7;
   text-wrap: pretty;
 }
 
+/* Credentials as quiet glass chips with a coloured lead dot. */
 .hero-proof {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.7rem 1.5rem;
-  max-width: 660px;
-  font-size: 0.8rem;
-  line-height: 1.6;
-  color: var(--muted);
+  gap: 0.6rem;
+  max-width: 680px;
+  margin: 1.35rem auto 0;
 }
 
-.hero-proof a:hover {
-  color: var(--fg);
-  text-decoration: underline;
-  text-underline-offset: 4px;
+.hero-chip {
+  --chip-dot: 233, 194, 112;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.42rem 0.95rem 0.42rem 0.8rem;
+  border: 1px solid rgba(178, 196, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(10, 14, 34, 0.5);
+  color: #d3d8ee;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  text-decoration: none;
+  transition: border-color 180ms ease, color 180ms ease, background-color 180ms ease;
+}
+
+.hero-chip::before {
+  content: "";
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgb(var(--chip-dot));
+  box-shadow: 0 0 8px rgba(var(--chip-dot), 0.8);
+}
+
+.hero-chip-teaching { --chip-dot: 122, 162, 255; }
+
+.hero-chip:hover {
+  border-color: rgba(var(--chip-dot), 0.55);
+  background: rgba(14, 19, 44, 0.62);
+  color: #fff;
+}
+
+.hero-scroll-cue {
+  margin-top: 2.4rem;
 }
 
 .chip {
@@ -524,23 +788,25 @@ button:focus-visible {
 
 @media (max-width: 767px) {
   .hero-actions-grid {
-    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.6rem;
+    margin-top: 1.7rem;
   }
   .hero-console-btn {
-    width: 100%;
-    padding: 0.85rem;
+    padding: 0.8rem 0.75rem;
   }
   .btn-badge {
     letter-spacing: 0.08em;
   }
   .btn-text-row {
-    font-size: 0.82rem;
+    align-items: flex-start;
+    gap: 0.4rem;
+    font-size: 0.85rem;
   }
-  .hero-proof a {
-    display: flex;
-    align-items: center;
+  .btn-icon {
+    width: 0.95rem;
+  }
+  .hero-chip {
     min-height: 44px;
   }
 }
