@@ -290,6 +290,21 @@ async function describeFailure(error) {
   error.message = `[${progress.scenario}] ${JSON.stringify(where)}\nlogs: ${progress.logs.slice(-6).join(" | ")}\n${error.message}`;
 }
 
+/**
+ * The hero CV button downloads the generated Applied AI PDF in the page
+ * language, at its current manifest version (never the retired hand-committed file).
+ */
+async function assertHeroCvLink(page, locale) {
+  const manifest = JSON.parse(await readFile(MANIFEST, "utf8"));
+  const file = cvPdfFile("applied-ai", locale);
+  const entry = manifest.files.find((item) => item.file === file);
+  assert.ok(entry, `${file}: listed in the manifest`);
+  const link = page.locator("#top [data-hero-cv]");
+  assert.equal(await link.count(), 1, "Hero has one CV download link");
+  assert.equal(await link.getAttribute("href"), `/cv/files/${file}?v=${entry.version}`, `Hero CV (${locale}) links the current manifest version`);
+  assert.equal(await link.getAttribute("download"), file, `Hero CV (${locale}) downloads under a clean file name`);
+}
+
 async function main() {
   await mkdir(output, { recursive: true });
   const browser = await chromium.launch({ headless: process.env.HEADFUL !== "1" });
@@ -316,8 +331,10 @@ async function main() {
       page.setDefaultNavigationTimeout(15000);
       for (const route of routes) {
         await checkPage(page, route, name);
+        if (route === "/") await assertHeroCvLink(page, "es");
         await page.getByRole("button", { name: "Cambiar a inglés" }).click();
         assert.equal(await page.locator("html").getAttribute("lang"), "en");
+        if (route === "/") await assertHeroCvLink(page, "en");
         assert.equal(await page.getByRole("button", { name: "Switch to Spanish" }).count(), 1);
         await page.getByRole("button", { name: "Switch to Spanish" }).click();
       }
@@ -485,7 +502,7 @@ async function main() {
         assert.equal(await page.locator(".site-nav").evaluate((el) => getComputedStyle(el, "::before").backgroundColor.startsWith("rgb(")), true, "Header band is a solid colour on touch screens");
       }
       await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
-      for (const [from, to] of [["/curso-n8n", "/teaching"], ["/university", "/education"]]) {
+      for (const [from, to] of [["/curso-n8n", "/teaching"], ["/university", "/education"], ["/cv/FranciscoPerez-AIEngineer.pdf", "/cv/files/francisco-perez-cv-applied-ai-en.pdf"]]) {
         const redirect = await page.request.get(`${baseURL}${from}`, { maxRedirects: 0 });
         assert.equal(redirect.status(), 308, `${from} redirects permanently`);
         assert.equal(new URL(redirect.headers().location, baseURL).pathname, to);

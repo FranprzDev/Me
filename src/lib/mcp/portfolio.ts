@@ -9,6 +9,7 @@ import {
   type ResolvedCv,
 } from "@/content/cv";
 import { CV_UI } from "@/content/cv/ui";
+import { primaryCvPdfPath } from "@/lib/primaryCv";
 import { CV, type Lang } from "@/data/cv";
 import { PROJECTS, type Project } from "@/data/projects";
 
@@ -50,7 +51,7 @@ export function profile(language: Language, origin: string) {
     highlights: CV.highlights.map((item) => ({ title: item.title, year: item.year, detail: item.detail[l] })),
     links: {
       site: absolute(origin, "/"),
-      cv_pdf: absolute(origin, CV.cvPdf),
+      cv_pdf: absolute(origin, primaryCvPdfPath(cvLocale(language))),
       github: CV.github,
       linkedin: CV.linkedin,
     },

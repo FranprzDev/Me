@@ -15,7 +15,7 @@ import type { Node } from "three/webgpu";
 import { normalView, positionLocal, positionViewDirection, uniform } from "three/tsl";
 import { tslExports } from "vgpu/three";
 import cosmosShader from "./shaders/nebula.wgsl";
-import { orbitTime } from "./shared";
+import { DecorSide, clearOfContentX, orbitTime } from "./shared";
 
 type CosmosShaderInputs = {
   nebulaColor: { position: Node; time: Node; scroll: Node; intensity: Node; octaves: Node };
@@ -37,7 +37,7 @@ export function Nebula({
 }) {
   const time = useMemo(() => uniform(0), []);
   const scroll = useMemo(() => uniform(0), []);
-  const intensity = useMemo(() => uniform(reduced ? 0.35 : 0.55), [reduced]);
+  const intensity = useMemo(() => uniform(reduced ? 0.56 : 0.88), [reduced]);
   const octaves = useMemo(() => uniform(performanceMode ? 3 : 5), [performanceMode]);
   const mat = useMemo(() => {
     const material = new MeshBasicNodeMaterial({ side: THREE.BackSide, depthWrite: false, fog: false });
@@ -82,6 +82,8 @@ function createAtmosphereMaterial(colorA: THREE.Color, colorB: THREE.Color, opac
  */
 /** Centre of the anchor planet's orbit and its ellipse (semi-axes, tilt). */
 const ANCHOR_ORBIT = { x: -4.6, y: 1.9, z: -11, a: 0.9, b: 0.55, speed: 0.07, tilt: 0.35 };
+/** Horizontal half-extent of the anchor system: moon orbit (2.6 + its radius) plus the orbit wobble. */
+const ANCHOR_EXTENT = 2.8 + ANCHOR_ORBIT.a;
 
 export function Planet({ pRef }: { pRef: RefObject<number> }) {
   const group = useRef<THREE.Group>(null);
@@ -89,9 +91,13 @@ export function Planet({ pRef }: { pRef: RefObject<number> }) {
   const moon = useRef<THREE.Mesh>(null);
 
   const { bodyMat, atmoMat, atmoOpacity, ringMat, geo, atmoGeo, ringGeo, moonGeo, moonMat } = useMemo(() => {
+    // A faint blue self-glow keeps the night side reading as a sphere (a
+    // flat black disc looked like a hole in the sky).
     const bodyMat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color("#131f3d"),
-      roughness: 0.95,
+      color: new THREE.Color("#22335f"),
+      emissive: new THREE.Color("#16244f"),
+      emissiveIntensity: 0.6,
+      roughness: 0.9,
       metalness: 0.05,
       transparent: true,
     });
@@ -141,15 +147,23 @@ export function Planet({ pRef }: { pRef: RefObject<number> }) {
     [bodyMat, atmoMat, ringMat, geo, atmoGeo, ringGeo, moonGeo, moonMat]
   );
 
-  useFrame(() => {
+  useFrame((state) => {
     if (!group.current) return;
     const t = orbitTime();
-    // Inclined elliptical orbit around a point just off-frame (the planet never
-    // leaves the upper-left of the view), plus its own axial spin.
+    // Inclined elliptical orbit around a point in the upper left of the view,
+    // pushed out beside the hero copy on wide screens, plus its own axial spin.
     const o = ANCHOR_ORBIT;
     const a = t * o.speed;
+    const centreX = clearOfContentX(
+      state.camera as THREE.PerspectiveCamera,
+      state.size.width,
+      o.z,
+      DecorSide.Left,
+      ANCHOR_EXTENT,
+      o.x
+    );
     group.current.position.set(
-      o.x + Math.cos(a) * o.a,
+      centreX + Math.cos(a) * o.a,
       o.y + Math.sin(a) * o.b * Math.cos(o.tilt),
       o.z + Math.sin(a) * o.b * Math.sin(o.tilt) * 2
     );
@@ -176,7 +190,7 @@ export function Planet({ pRef }: { pRef: RefObject<number> }) {
       </group>
       <mesh ref={moon} geometry={moonGeo} material={moonMat} />
       {/* Luz clave desde arriba-derecha: coherente con el bloom del hero */}
-      <pointLight position={[4, 5, 3]} intensity={12} color="#bcd0ff" />
+      <pointLight position={[4, 5, 3]} intensity={48} color="#bcd0ff" />
       <mesh geometry={atmoGeo} material={atmoMat} scale={1} />
       <mesh geometry={ringGeo} material={ringMat} rotation={[Math.PI / 2.25, 0.2, 0]} />
     </group>

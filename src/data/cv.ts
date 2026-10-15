@@ -48,8 +48,6 @@ export interface CV {
   github: string;
   /** Número de WhatsApp en formato internacional sin signos (para wa.me). */
   whatsapp: string;
-  /** Ruta pública del CV descargable. */
-  cvPdf: string;
   summary: Localized<string>;
   highlights: Highlight[];
   experience: ExperienceItem[];
@@ -72,7 +70,6 @@ export const CV: CV = {
   linkedin: "https://linkedin.com/in/franprzdev",
   github: "https://github.com/FranprzDev",
   whatsapp: "5493815412480",
-  cvPdf: "/cv/FranciscoPerez-AIEngineer.pdf",
 
   summary: {
     es: "Estudiante avanzado de Ingeniería en Sistemas de Información con casi 3 años de experiencia en industria. Evolucioné de full-stack a diseñar soluciones de IA aplicada y automatizaciones: sistemas multi-agente, pipelines RAG y workflows que eliminan trabajo repetitivo. Aporto criterio de producto y pensamiento estratégico, además de experiencia liderando cursos técnicos.",

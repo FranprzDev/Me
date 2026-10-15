@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { CV } from "@/data/cv";
+import { cvLocaleForLang, primaryCvPdfFile, primaryCvPdfPath } from "@/lib/primaryCv";
 import { useI18n } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import { ContactConstellations } from "@/components/ContactConstellations";
@@ -10,29 +11,24 @@ import { GsapHeroName } from "@/components/GsapHeroName";
 import { Magnetic } from "@/components/Magnetic";
 
 export function Hero() {
-  const { t, tl } = useI18n();
+  const { t, tl, lang } = useI18n();
+  // The generated Applied AI CV in the page language, at its current version.
+  const cvLocale = cvLocaleForLang(lang);
   return (
     <section id="top" className="section hero-section">
-      <div className="wrap hero-veil">
+      {/* Open stage: no box, just a feathered scrim behind the copy. The
+          shooting stars steer clear of `data-sky-clear`. */}
+      <div className="wrap hero-stage" data-sky-clear="">
         <Reveal>
-          <span className="eyebrow" style={{ color: "var(--space)", letterSpacing: "0.3em" }}>
-            {tl(CV.location)}
-          </span>
+          <span className="eyebrow hero-eyebrow">{tl(CV.location)}</span>
         </Reveal>
 
         <GsapHeroName text={CV.name} />
 
         <Reveal delay={0.12}>
-          <p
-            style={{
-              fontSize: "clamp(1.2rem, 2.8vw, 1.8rem)",
-              color: "#d7e3ff",
-              margin: 0,
-              fontWeight: 500,
-              textShadow: "0 0 25px rgba(122,162,255,0.4)",
-            }}
-          >
-            AI Applied Engineer {tl({ es: "en Tucumán", en: "in Tucumán" })}
+          <p className="hero-role">
+            <span className="hero-role-title">AI Applied Engineer</span>{" "}
+            <span className="hero-role-place">{tl({ es: "en Tucumán", en: "in Tucumán" })}</span>
           </p>
         </Reveal>
 
@@ -48,7 +44,12 @@ export function Hero() {
         <Reveal delay={0.28}>
           <div className="hero-actions-grid">
             <Magnetic strength={0.3}>
-              <a href={CV.cvPdf} download className="hero-console-btn btn-theme-cv">
+              <a
+                href={primaryCvPdfPath(cvLocale)}
+                download={primaryCvPdfFile(cvLocale)}
+                className="hero-console-btn btn-theme-cv"
+                data-hero-cv=""
+              >
                 <span className="btn-badge">{tl({ es: "CURRICULUM // PDF", en: "RESUME // PDF" })}</span>
                 <span className="btn-text-row">
                   <span className="btn-icon" aria-hidden="true">↓</span>
@@ -60,7 +61,7 @@ export function Hero() {
               <a href={CV.github} target="_blank" rel="noreferrer" className="hero-console-btn btn-theme-github">
                 <span className="btn-badge">{tl({ es: "REPOSITORIOS // DEV", en: "REPOSITORIES // DEV" })}</span>
                 <span className="btn-text-row">
-                  <span className="btn-icon" aria-hidden="true" style={{ display: "inline-flex", alignItems: "center" }}>
+                  <span className="btn-icon" aria-hidden="true">
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
                     </svg>
@@ -74,13 +75,13 @@ export function Hero() {
 
         <Reveal delay={0.34}>
           <div className="hero-proof">
-            <Link href="/hackathons">{tl({ es: "NASA Space Apps · Ganador nacional 2024", en: "NASA Space Apps · National winner 2024" })} ↗</Link>
-            <Link href="/teaching">{tl({ es: "Docente n8n · Poder Judicial de Tucumán", en: "n8n instructor · Tucumán Judiciary" })} ↗</Link>
+            <Link href="/hackathons" className="hero-chip hero-chip-award">{tl({ es: "NASA Space Apps · Ganador nacional 2024", en: "NASA Space Apps · National winner 2024" })} ↗</Link>
+            <Link href="/teaching" className="hero-chip hero-chip-teaching">{tl({ es: "Docente n8n · Poder Judicial de Tucumán", en: "n8n instructor · Tucumán Judiciary" })} ↗</Link>
           </div>
         </Reveal>
 
         <Reveal delay={0.45}>
-          <div className="scroll-cue" aria-hidden style={{ marginTop: "1.8rem" }}>
+          <div className="scroll-cue hero-scroll-cue" aria-hidden>
             <span>⌄</span>
             <span>⌄</span>
             <span>⌄</span>

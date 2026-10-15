@@ -16,7 +16,7 @@ import { getScrollProgress, measuredSectionCenter, bumpWeight } from "@/lib/scro
 import { getConstellations, type Constellation } from "@/data/constellations";
 import { useI18n } from "@/lib/i18n";
 import { Nebula, Planet } from "./Cosmos";
-import { StarShell, WarpField, dampingFactor, smoother } from "./shared";
+import { DecorSide, StarShell, WarpField, clearOfContentX, dampingFactor, smoother } from "./shared";
 
 // Familia de color del nebulón: todo dentro del "espacio" (índigos/violetas
 // oscuros). No son mundos distintos, sólo un leve cambio de humor por profundidad.
@@ -61,7 +61,7 @@ function ConstellationGroup({
           : 24
   );
 
-  const { group, pointsMat, lineMat, haloMat, geo, home, target, phase, count } = useMemo(() => {
+  const { group, pointsMat, lineMat, haloMat, geo, home, target, phase, count, extent } = useMemo(() => {
     const count = data.nodes.length * ppn;
     const home = new Float32Array(count * 3); // posición dispersa
     const target = new Float32Array(count * 3); // posición ensamblada (en el nodo)
@@ -148,7 +148,11 @@ function ConstellationGroup({
     }
     g.add(lines);
     g.add(points);
-    return { group: g, pointsMat: pMat, lineMat: lMat, haloMat: hMat, geo: ptsGeo, home, target, phase, count };
+    // Horizontal half-extent in world units, including the scattered sparks.
+    let maxNodeX = 0;
+    for (const [nx] of data.nodes) maxNodeX = Math.max(maxNodeX, Math.abs(nx));
+    const extent = (maxNodeX + 0.6) * data.world.scale;
+    return { group: g, pointsMat: pMat, lineMat: lMat, haloMat: hMat, geo: ptsGeo, home, target, phase, count, extent };
   }, [data, ppn, hero]);
 
   useEffect(() => {
@@ -167,7 +171,19 @@ function ConstellationGroup({
   // hace falta tocar sus partículas. Evita ese trabajo una vez apagada.
   const sleeping = useRef(false);
 
-  useFrame(() => {
+  useFrame((state) => {
+    // Side decor stays beside the centred copy on any aspect ratio; the
+    // centred "CHARLEMOS" title keeps its own placement.
+    if (!hero) {
+      group.position.x = clearOfContentX(
+        state.camera as THREE.PerspectiveCamera,
+        state.size.width,
+        data.world.z,
+        data.world.x < 0 ? DecorSide.Left : DecorSide.Right,
+        extent,
+        data.world.x
+      );
+    }
     // Ambientales: siempre ensambladas (w = 1). El hero ("CHARLEMOS") tiene
     // curva propia: sube de a poco y QUEDA encendida al final del viaje (no se
     // apaga al pasar su centro como las demás). Resto: peso según scroll.

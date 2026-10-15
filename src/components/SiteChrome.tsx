@@ -9,6 +9,7 @@ import { PROJECTS } from "@/data/projects";
 import { CursorTrail } from "@/components/CursorTrail";
 import { WarpTransition } from "@/components/WarpTransition";
 import { RocketLoader } from "@/components/RocketLoader";
+import { HomeSky } from "@/components/HomeSky";
 import { expireLaunchLoader } from "@/lib/launchLoader";
 import { hasWebGPU } from "@/lib/webgpu";
 import { SceneStatus, setSceneStatus } from "@/lib/sceneStatus";
@@ -113,6 +114,8 @@ export function SiteChrome() {
 
   return (
     <>
+      {/* CSS sky under the 3D layer: first paint and the no-WebGPU path. */}
+      {view.kind === "home" ? <HomeSky /> : null}
       {/* Mounted for every route (paused and hidden where there is no scene),
           so the WebGPU renderer survives a detour through /me or a 404. */}
       {sceneReady && visitedScene ? <Backdrop view={view} /> : null}
