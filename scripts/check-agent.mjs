@@ -93,6 +93,13 @@ async function assertPdf(url) {
   await response.arrayBuffer();
 }
 
+// The profile's CV link is the generated Applied AI PDF at its current manifest version.
+for (const language of ["en", "es"]) {
+  const profile = JSON.parse((await rpc("tools/call", { name: "get_profile", arguments: { language } })).content[0].text);
+  assertVersionedPdfUrl(profile.links.cv_pdf, "applied-ai", language);
+  await assertPdf(profile.links.cv_pdf);
+}
+
 for (const language of ["en", "es"]) {
   const prefix = language === "es" ? "/es" : "";
   const list = await callJson("list_cv_versions", { language });

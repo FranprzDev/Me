@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useI18n } from "@/lib/i18n";
+import { cvLocaleForLang, primaryCvPdfPath } from "@/lib/primaryCv";
 import { ME } from "@/data/me";
 import { MeReveal } from "@/components/me/MeReveal";
 import { MeLayers } from "@/components/me/MeLayers";
@@ -78,7 +79,7 @@ function Hero() {
 }
 
 function Statement() {
-  const { tl } = useI18n();
+  const { tl, lang } = useI18n();
   return (
     <section className="me-paper me-section">
       <div className="me-wrap me-split">
@@ -90,7 +91,7 @@ function Statement() {
             <p className="me-copy">{tl(ME.statement.body)}</p>
           </MeReveal>
           <MeReveal delay={180}>
-            <a className="me-pill me-pill-dark" href={ME.cvPdf} target="_blank" rel="noopener noreferrer">
+            <a className="me-pill me-pill-dark" href={primaryCvPdfPath(cvLocaleForLang(lang))} target="_blank" rel="noopener noreferrer">
               {tl(ME.statement.cta)}
             </a>
           </MeReveal>

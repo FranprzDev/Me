@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { CV } from "@/data/cv";
+import { cvLocaleForLang, primaryCvPdfFile, primaryCvPdfPath } from "@/lib/primaryCv";
 import { useI18n } from "@/lib/i18n";
 import { Reveal } from "@/components/Reveal";
 import { ContactConstellations } from "@/components/ContactConstellations";
@@ -10,7 +11,9 @@ import { GsapHeroName } from "@/components/GsapHeroName";
 import { Magnetic } from "@/components/Magnetic";
 
 export function Hero() {
-  const { t, tl } = useI18n();
+  const { t, tl, lang } = useI18n();
+  // The generated Applied AI CV in the page language, at its current version.
+  const cvLocale = cvLocaleForLang(lang);
   return (
     <section id="top" className="section hero-section">
       {/* Open stage: no box, just a feathered scrim behind the copy. The
@@ -41,7 +44,12 @@ export function Hero() {
         <Reveal delay={0.28}>
           <div className="hero-actions-grid">
             <Magnetic strength={0.3}>
-              <a href={CV.cvPdf} download className="hero-console-btn btn-theme-cv">
+              <a
+                href={primaryCvPdfPath(cvLocale)}
+                download={primaryCvPdfFile(cvLocale)}
+                className="hero-console-btn btn-theme-cv"
+                data-hero-cv=""
+              >
                 <span className="btn-badge">{tl({ es: "CURRICULUM // PDF", en: "RESUME // PDF" })}</span>
                 <span className="btn-text-row">
                   <span className="btn-icon" aria-hidden="true">↓</span>

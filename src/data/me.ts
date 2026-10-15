@@ -36,7 +36,6 @@ export const ME = {
   email: CV.email,
   linkedin: CV.linkedin,
   github: CV.github,
-  cvPdf: CV.cvPdf,
 
   hero: {
     title: {

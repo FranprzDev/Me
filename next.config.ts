@@ -26,6 +26,13 @@ const nextConfig: NextConfig = {
       { source: "/university", destination: "/education", permanent: true },
       // The in-browser recruiter model was replaced by the MCP server.
       { source: "/for-recruiters", destination: "/me", permanent: true },
+      // The old hand-committed CV PDF: shared links land on the generated
+      // Applied AI CV (bare URL, so it always revalidates to the current file).
+      {
+        source: "/cv/FranciscoPerez-AIEngineer.pdf",
+        destination: "/cv/files/francisco-perez-cv-applied-ai-en.pdf",
+        permanent: true,
+      },
     ];
   },
   // /_next/static is already served immutable by Next. Files in /public are
@@ -49,10 +56,6 @@ const nextConfig: NextConfig = {
         source: "/cv/files/:file*",
         has: [{ type: "query", key: "v" }],
         headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
-      },
-      {
-        source: "/cv/FranciscoPerez-AIEngineer.pdf",
-        headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
       },
     ];
   },
