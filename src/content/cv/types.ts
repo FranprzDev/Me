@@ -39,7 +39,8 @@ export type SkillRow = {
 
 export type ExperienceEntry = {
   role: Localized;
-  org: string;
+  /** Localized so a client described generically (never named) reads naturally in each language. */
+  org: Localized;
   /** City or work mode shown after the period, when the source CV gives one. */
   place?: Localized;
   period: Localized;

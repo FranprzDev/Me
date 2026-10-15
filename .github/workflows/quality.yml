@@ -28,6 +28,8 @@ jobs:
         env:
           NEXT_PUBLIC_SITE_URL: https://franprzdev.github.io
       - run: pnpm exec playwright install --with-deps chromium
+      # pdftotext: check:portfolio reads the committed CV PDFs' text for private client names.
+      - run: sudo apt-get update && sudo apt-get install -y poppler-utils
       - name: Browser and accessibility checks
         run: |
           pnpm start > /tmp/portfolio-server.log 2>&1 &

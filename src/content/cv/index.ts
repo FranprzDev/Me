@@ -34,7 +34,7 @@ export function getCv(variant: CvVariant, locale: CvLocale): ResolvedCv {
     skills: def.skills.map((row) => ({ label: row.label[locale], value: row.value[locale] })),
     experience: def.experience.map((entry) => ({
       role: entry.role[locale],
-      org: entry.org,
+      org: entry.org[locale],
       meta: entry.place ? `${entry.period[locale]} · ${entry.place[locale]}` : entry.period[locale],
       bullets: entry.bullets.map((bullet) => bullet[locale]),
     })),

@@ -13,16 +13,18 @@ import { CvSection, CvVariant, type CvDefinition, type ExperienceEntry, type Loc
  * rest. Shortened text only trims words, never changes a fact.
  */
 
-const lvc: ExperienceEntry = {
+const accountingClient: ExperienceEntry = {
   role: F.ROLE_FREELANCE,
-  org: F.LA_VISTA_CASAL.org,
-  place: F.LA_VISTA_CASAL.place,
-  period: F.LA_VISTA_CASAL.period,
-  bullets: [F.B_LVC_PLATFORM],
+  org: F.ACCOUNTING_FIRM_CLIENT.org,
+  period: F.ACCOUNTING_FIRM_CLIENT.period,
+  bullets: [F.B_ACCOUNTING_PLATFORM],
 };
 
 /** FDE keeps the handover: client delivery is the point of that variant. */
-const lvcWithHandover: ExperienceEntry = { ...lvc, bullets: [F.B_LVC_PLATFORM, F.B_LVC_HANDOVER] };
+const accountingClientWithHandover: ExperienceEntry = {
+  ...accountingClient,
+  bullets: [F.B_ACCOUNTING_PLATFORM, F.B_ACCOUNTING_HANDOVER],
+};
 
 const fla: ExperienceEntry = { role: F.ROLE_FLA, org: F.FLA.org, period: F.FLA.period, bullets: [F.B_FLA] };
 
@@ -96,7 +98,7 @@ const fullstack: CvDefinition = {
   ],
   experience: [
     repuestoGeneral,
-    lvc,
+    accountingClient,
     studio({
       en: "Shipped frontend and backend features for client web projects in React, Next.js and Node.js.",
       es: "Desarrollé funcionalidades de frontend y backend para proyectos web de clientes en React, Next.js y Node.js.",
@@ -136,7 +138,7 @@ const backend: CvDefinition = {
   ],
   experience: [
     repuestoGeneral,
-    lvc,
+    accountingClient,
     studio({
       en: "Built backend features and APIs in Node.js for client web projects, plus the matching React/Next.js frontends.",
       es: "Desarrollé funcionalidades de backend y APIs en Node.js para proyectos web de clientes, junto con sus frontends en React/Next.js.",
@@ -188,7 +190,7 @@ const frontend: CvDefinition = {
     }),
     fla,
     repuestoGeneral,
-    lvc,
+    accountingClient,
     judiciary,
   ],
   projects: [F.PROJECT_PROOFY, F.PROJECT_NASA],
@@ -264,7 +266,7 @@ const appliedAi: CvDefinition = {
         },
       ],
     },
-    lvc,
+    accountingClient,
     judiciary,
     studio({
       en: "Built frontend and backend features for client web projects; introduced n8n automations and explored practical AI tools through working POCs.",
@@ -329,7 +331,7 @@ const fde: CvDefinition = {
   ],
   // Client-facing delivery first, then the rest by date.
   experience: [
-    lvcWithHandover,
+    accountingClientWithHandover,
     {
       role: F.ROLE_AI,
       org: F.REPUESTOSHOP.org,
