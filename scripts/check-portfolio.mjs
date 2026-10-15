@@ -130,6 +130,28 @@ async function checkCvPages(browser) {
         await page.emulateMedia({ media: "screen" });
       } else {
         assert.equal(await page.locator(".cv-card").count(), CV_VARIANTS.length, `${route}: index lists every version`);
+        // Each card is one action: the whole tile downloads that version's PDF, with no inner buttons.
+        const cards = await page.locator(".cv-card").evaluateAll((els) =>
+          els.map((el) => ({
+            tag: el.tagName,
+            href: el.getAttribute("href"),
+            download: el.hasAttribute("download"),
+            label: el.getAttribute("aria-label") ?? "",
+            inner: el.querySelectorAll("a, button").length,
+          })),
+        );
+        assert.deepEqual(
+          cards.map(({ href }) => href),
+          CV_VARIANTS.map((variant) => `/cv/files/${cvPdfFile(variant, locale)}`),
+          `${route}: cards link to the PDFs`,
+        );
+        for (const card of cards) {
+          assert.equal(card.tag, "A", `${route}: card is a link`);
+          assert.equal(card.download, true, `${route}: card downloads`);
+          assert.match(card.label, locale === "es" ? /^Descargar el CV .+ \(PDF\)$/ : /^Download .+ CV \(PDF\)$/, `${route}: card label`);
+          assert.equal(card.inner, 0, `${route}: no nested links or buttons in a card`);
+        }
+        assert.equal(/R[ée]sum[ée]/.test(await page.locator(".cv-root").innerText()), false, `${route}: CV wording, no "Résumé"`);
       }
       if (name === "cv-mobile") {
         // Let the entrance motion settle so contrast is measured on the final frame.
@@ -146,10 +168,15 @@ async function checkCvPages(browser) {
     await Promise.all([page.waitForURL("**/es/cv/backend"), page.locator(".site-nav [data-lang-switch]").click()]);
     await page.waitForFunction(() => document.documentElement.lang === "es");
     assert.equal(await page.locator("h2#cv-experience").textContent(), "Experiencia");
-    // Leaving the CV gives the portfolio back its own language choice.
+    // Clicking an index card downloads that version's PDF.
+    await page.goto(`${baseURL}/cv`);
+    const [download] = await Promise.all([page.waitForEvent("download"), page.locator(".cv-card").first().click()]);
+    assert.equal(download.suggestedFilename(), cvPdfFile(CV_VARIANTS[0], "en"), `${name}: index card downloads its PDF`);
+    // The site nav keeps three section links; the CV is reached from the hero CTA and /cv, not the nav.
     await page.goto(baseURL);
-    const cvLink = page.locator(`a[href="/es/cv"]`);
-    assert.equal(await cvLink.count() >= 1, true, "Nav links to the CV index");
+    const navHrefs = [...new Set(await page.locator(".site-nav a.link-underline").evaluateAll((links) => links.map((l) => l.getAttribute("href"))))];
+    assert.deepEqual(navHrefs, ["/#experience", "/#projects", "/#contact"], `${name}: nav links (no CV item)`);
+    assert.equal(await page.locator(`.site-nav a[href="/cv"], .site-nav a[href="/es/cv"]`).count(), 0, `${name}: no CV link in the nav`);
     assert.deepEqual(errors, [], `${name}: browser errors on CV pages`);
     await context.close();
     console.log(`PASS ${name} CV pages (${pages.length} routes)`);
