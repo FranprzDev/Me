@@ -21,7 +21,6 @@ const UI = {
   nav_education: { es: "Educación", en: "Education" },
   nav_projects: { es: "Proyectos", en: "Projects" },
   nav_contact: { es: "Contacto", en: "Contact" },
-  nav_cv: { es: "CV", en: "CV" },
 
   hero_cta_cv: { es: "Descargar CV", en: "Download Resume" },
 
