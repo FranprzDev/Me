@@ -74,6 +74,18 @@ assert.ok(sourceVariants.length > 0, "CvVariant has members");
 
 const callJson = async (name, args) => JSON.parse((await rpc("tools/call", { name, arguments: args })).content[0].text);
 
+const pdfManifest = JSON.parse(await readFile(new URL("../public/cv/files/manifest.json", import.meta.url), "utf8"));
+
+/** pdf_url must carry the current manifest version, so agents never hand out a cached old PDF. */
+function assertVersionedPdfUrl(url, id, language) {
+  const parsed = new URL(url);
+  const file = `francisco-perez-cv-${id}-${language}.pdf`;
+  const entry = pdfManifest.files.find((item) => item.file === file);
+  assert.ok(entry, `${file} is in the manifest`);
+  assert.equal(parsed.pathname, `/cv/files/${file}`, `${id} (${language}) pdf_url path`);
+  assert.equal(parsed.searchParams.get("v"), entry.version, `${id} (${language}) pdf_url carries the manifest version`);
+}
+
 async function assertPdf(url) {
   const response = await fetch(url);
   assert.equal(response.status, 200, `${url} answers 200`);
@@ -95,6 +107,7 @@ for (const language of ["en", "es"]) {
     const doc = await callJson("get_cv", { language, version: version.id });
     assert.equal(doc.version.id, version.id, `get_cv returns ${version.id} (${language})`);
     assert.equal(doc.version.pdf_url, version.pdf_url);
+    assertVersionedPdfUrl(doc.version.pdf_url, version.id, language);
     assert.ok(doc.sections.length > 0 && doc.sections.every((section) => section.title), `${version.id} (${language}) has titled sections`);
     await assertPdf(doc.version.pdf_url);
   }

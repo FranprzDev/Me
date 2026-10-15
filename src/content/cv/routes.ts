@@ -1,3 +1,4 @@
+import pdfManifest from "../../../public/cv/files/manifest.json";
 import { CvLocale, CvVariant } from "./types";
 
 /*
@@ -27,9 +28,25 @@ export function cvPath(variant: CvVariant, locale: CvLocale): string {
   return `${cvIndexPath(locale)}/${variant}`;
 }
 
-/** Committed PDF rendered from the page by `pnpm cv:pdf`. */
+/** File name of the committed PDF; also the name a download is saved under. */
+export function cvPdfFile(variant: CvVariant, locale: CvLocale): string {
+  return `francisco-perez-cv-${variant}-${locale}.pdf`;
+}
+
+type CvPdfManifestEntry = { route: string; file: string; pages: number; version: string };
+
+const PDF_ENTRIES: CvPdfManifestEntry[] = pdfManifest.files;
+
+/**
+ * Committed PDF rendered from the page by `pnpm cv:pdf`, versioned with the
+ * content hash `pnpm cv:pdf` records for that file in the manifest. Every
+ * regeneration changes the URL, so no browser or CDN can hand out an old CV.
+ */
 export function cvPdfPath(variant: CvVariant, locale: CvLocale): string {
-  return `/cv/files/francisco-perez-cv-${variant}-${locale}.pdf`;
+  const file = cvPdfFile(variant, locale);
+  const entry = PDF_ENTRIES.find((item) => item.file === file);
+  if (!entry) throw new Error(`${file} is missing from public/cv/files/manifest.json: run \`pnpm cv:pdf\``);
+  return `/cv/files/${file}?v=${entry.version}`;
 }
 
 /** Locale a CV route is written in, or null when the path is not a CV route. */
