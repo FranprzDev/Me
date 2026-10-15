@@ -1,13 +1,16 @@
-import Link from "next/link";
-import { CV_NAME, CV_VARIANTS, cvHeadline, cvLabel, cvPath, cvPdfPath, type CvLocale } from "@/content/cv";
-import { CV_UI } from "@/content/cv/ui";
+import { CV_NAME, CV_VARIANTS, cvHeadline, cvLabel, cvPdfPath, type CvLocale } from "@/content/cv";
+import { CV_UI, cvDownloadLabel } from "@/content/cv/ui";
 import { CvBar } from "./CvBar";
 import { CvCosmos } from "./CvCosmos";
 import { cvFontClassName } from "./fonts";
 import { riseStyle } from "./motion";
 import "./cv.css";
 
-/** /cv and /es/cv: the five versions as portfolio cards, each with its page and its PDF. */
+/**
+ * /cv and /es/cv: the five versions as glass tiles. Each tile is a single
+ * action that downloads that version's PDF; the /cv/<variant> pages stay
+ * available from the version switcher and search.
+ */
 export function CvIndex({ locale }: { locale: CvLocale }) {
   return (
     <div className={`cv-root ${cvFontClassName}`} lang={locale}>
@@ -21,28 +24,17 @@ export function CvIndex({ locale }: { locale: CvLocale }) {
         </header>
         <ul className="cv-index__list">
           {CV_VARIANTS.map((variant, index) => (
-            <li key={variant} className="cv-card cv-rise" style={riseStyle(index + 2)}>
-              <h2 className="cv-card__title">
-                <Link href={cvPath(variant, locale)}>{cvLabel(variant, locale)}</Link>
-              </h2>
-              <p className="cv-card__headline">{cvHeadline(variant, locale)}</p>
-              <p className="cv-card__links">
-                <Link
-                  href={cvPath(variant, locale)}
-                  className="cv-card__read"
-                  aria-label={`${CV_UI.read[locale]}: ${cvLabel(variant, locale)}`}
-                >
-                  {CV_UI.read[locale]} <span aria-hidden="true">→</span>
-                </Link>
-                <a
-                  href={cvPdfPath(variant, locale)}
-                  className="cv-card__pdf"
-                  download
-                  aria-label={`${CV_UI.download[locale]}: ${cvLabel(variant, locale)}`}
-                >
-                  <span aria-hidden="true">↓</span> {CV_UI.pdfShort[locale]}
-                </a>
-              </p>
+            <li key={variant} className="cv-index__item cv-rise" style={riseStyle(index + 2)}>
+              <a
+                href={cvPdfPath(variant, locale)}
+                className="cv-card"
+                download
+                data-cv-card-pdf
+                aria-label={cvDownloadLabel(cvLabel(variant, locale), locale)}
+              >
+                <h2 className="cv-card__title">{cvLabel(variant, locale)}</h2>
+                <p className="cv-card__headline">{cvHeadline(variant, locale)}</p>
+              </a>
             </li>
           ))}
         </ul>

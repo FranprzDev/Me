@@ -39,7 +39,7 @@ html:has(.cv-root) {
     --cv-line: rgba(255, 255, 255, 0.08);
     --cv-display: Georgia, Cambria, "Times New Roman", serif;
     --cv-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    --cv-panel-tint: rgba(7, 10, 24, 0.82);
+    --cv-panel-tint: rgba(7, 10, 24, 0.72);
 
     position: relative;
     min-height: 100vh;
@@ -58,7 +58,7 @@ html:has(.cv-root) {
     color: #fff;
   }
 
-  /* ---------- Backdrop: nebula glow + drifting starfield ---------- */
+  /* ---------- Backdrop: layered nebula, aurora, two star depths ---------- */
 
   .cv-cosmos {
     position: fixed;
@@ -66,29 +66,70 @@ html:has(.cv-root) {
     z-index: 0;
     overflow: hidden;
     pointer-events: none;
+    background: var(--scene-bg, #040612);
+  }
+  .cv-cosmos > div {
+    position: absolute;
+    pointer-events: none;
+  }
+  /* Nebula: deep blue upper right, violet lower left, a warm gold haze low. */
+  .cv-cosmos__nebula {
+    inset: -10%;
     background:
-      radial-gradient(ellipse 70% 55% at 86% 10%, rgba(91, 140, 255, 0.17), transparent 62%),
-      radial-gradient(ellipse 60% 50% at 8% 88%, rgba(155, 123, 255, 0.15), transparent 60%),
-      radial-gradient(ellipse 90% 55% at 50% 108%, rgba(233, 194, 112, 0.07), transparent 55%),
-      var(--scene-bg, #040612);
+      radial-gradient(ellipse 48% 40% at 82% 14%, rgba(91, 140, 255, 0.32), transparent 70%),
+      radial-gradient(ellipse 34% 30% at 66% 30%, rgba(155, 123, 255, 0.2), transparent 70%),
+      radial-gradient(ellipse 46% 42% at 10% 82%, rgba(155, 123, 255, 0.3), transparent 70%),
+      radial-gradient(ellipse 30% 26% at 26% 64%, rgba(91, 140, 255, 0.12), transparent 70%),
+      radial-gradient(ellipse 60% 30% at 58% 100%, rgba(233, 194, 112, 0.16), transparent 70%),
+      radial-gradient(ellipse 22% 18% at 40% 18%, rgba(201, 184, 255, 0.07), transparent 70%);
+    filter: saturate(115%);
+  }
+  /* Aurora: a soft diagonal ribbon of light across the sky. */
+  .cv-cosmos__aurora {
+    inset: -20% -10%;
+    opacity: 0.75;
+    background:
+      linear-gradient(
+        118deg,
+        transparent 30%,
+        rgba(91, 140, 255, 0.1) 40%,
+        rgba(155, 123, 255, 0.14) 47%,
+        rgba(233, 194, 112, 0.06) 53%,
+        transparent 62%
+      );
+    filter: blur(42px);
+    transform-origin: 50% 50%;
   }
   .cv-cosmos__stars {
-    position: absolute;
     inset: -480px 0 0;
-    opacity: 0.7;
+    opacity: 0.75;
     background-image:
       radial-gradient(1px 1px at 24px 36px, rgba(255, 255, 255, 0.85), transparent 70%),
       radial-gradient(1px 1px at 132px 88px, rgba(200, 214, 255, 0.7), transparent 70%),
-      radial-gradient(1.4px 1.4px at 196px 172px, rgba(255, 255, 255, 0.9), transparent 70%),
+      radial-gradient(1px 1px at 196px 172px, rgba(255, 255, 255, 0.8), transparent 70%),
       radial-gradient(1px 1px at 78px 204px, rgba(201, 184, 255, 0.7), transparent 70%),
       radial-gradient(1px 1px at 168px 18px, rgba(255, 255, 255, 0.6), transparent 70%),
-      radial-gradient(1.8px 1.8px at 90px 120px, rgba(233, 194, 112, 0.9), transparent 70%),
-      radial-gradient(1.5px 1.5px at 380px 300px, rgba(159, 184, 255, 0.9), transparent 70%),
-      radial-gradient(1.2px 1.2px at 300px 420px, rgba(255, 255, 255, 0.8), transparent 70%),
-      radial-gradient(2px 2px at 430px 60px, rgba(255, 255, 255, 0.75), transparent 70%);
-    background-size:
-      240px 240px, 240px 240px, 240px 240px, 240px 240px, 240px 240px,
-      480px 480px, 480px 480px, 480px 480px, 480px 480px;
+      radial-gradient(1px 1px at 218px 120px, rgba(255, 255, 255, 0.5), transparent 70%),
+      radial-gradient(1px 1px at 52px 140px, rgba(255, 255, 255, 0.55), transparent 70%),
+      radial-gradient(1px 1px at 150px 226px, rgba(200, 214, 255, 0.6), transparent 70%),
+      radial-gradient(1px 1px at 110px 60px, rgba(255, 255, 255, 0.45), transparent 70%);
+    background-size: 240px 240px;
+  }
+  /* Near stars: fewer, larger, tinted, and they twinkle. */
+  .cv-cosmos__stars--near {
+    opacity: 0.85;
+    background-image:
+      radial-gradient(1.8px 1.8px at 90px 120px, rgba(233, 194, 112, 0.95), transparent 70%),
+      radial-gradient(1.6px 1.6px at 380px 300px, rgba(159, 184, 255, 0.95), transparent 70%),
+      radial-gradient(1.3px 1.3px at 300px 430px, rgba(255, 255, 255, 0.9), transparent 70%),
+      radial-gradient(2.2px 2.2px at 440px 64px, rgba(255, 255, 255, 0.85), transparent 70%),
+      radial-gradient(1.5px 1.5px at 200px 250px, rgba(201, 184, 255, 0.9), transparent 70%);
+    background-size: 520px 520px;
+    background-position: 60px 40px;
+  }
+  .cv-cosmos__vignette {
+    inset: 0;
+    background: radial-gradient(ellipse 120% 90% at 50% 40%, transparent 55%, rgba(2, 3, 10, 0.6) 100%);
   }
 
   /* ---------- Page frame ---------- */
@@ -107,32 +148,32 @@ html:has(.cv-root) {
     outline: none;
   }
 
-  /* Glass surfaces: the same tint, sheen, edge and glow as the world pages. */
+  /* Glass surfaces: mostly see-through, blurred behind, a thin luminous
+     edge. Without backdrop-filter the tint rises so text stays readable. */
   .cv-head,
   .cv-section,
   .cv-card {
     position: relative;
-    border: 1px solid var(--glass-edge, rgba(255, 255, 255, 0.13));
+    border: 1px solid rgba(178, 196, 255, 0.16);
     border-radius: 1.15rem;
     background:
-      var(--glass-sheen, none),
-      radial-gradient(120% 90% at 0% 0%, rgba(91, 140, 255, 0.12), transparent 60%),
+      linear-gradient(155deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01) 40%, transparent 70%),
+      radial-gradient(120% 90% at 0% 0%, rgba(91, 140, 255, 0.08), transparent 60%),
       var(--cv-panel-tint);
     box-shadow:
-      var(--glass-shadow, 0 18px 48px rgba(0, 0, 0, 0.38)),
-      0 0 42px rgba(91, 140, 255, 0.08);
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 18px 48px rgba(0, 0, 0, 0.28),
+      0 0 36px rgba(91, 140, 255, 0.06);
   }
-  @media (hover: hover) and (min-width: 768px) {
-    @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-      .cv-root {
-        --cv-panel-tint: rgba(7, 10, 24, 0.62);
-      }
-      .cv-head,
-      .cv-section,
-      .cv-card {
-        -webkit-backdrop-filter: var(--glass-blur, blur(16px));
-        backdrop-filter: var(--glass-blur, blur(16px));
-      }
+  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .cv-root {
+      --cv-panel-tint: rgba(8, 12, 30, 0.3);
+    }
+    .cv-head,
+    .cv-section,
+    .cv-card {
+      -webkit-backdrop-filter: blur(14px) saturate(150%);
+      backdrop-filter: blur(14px) saturate(150%);
     }
   }
 
@@ -479,15 +520,24 @@ html:has(.cv-root) {
     color: var(--cv-text);
   }
   .cv-index__list {
-    margin-top: 2.4rem;
+    margin-top: 2.6rem;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr));
-    gap: 1rem;
+    gap: 1.1rem;
   }
-  .cv-card {
+  .cv-index__item {
+    display: flex;
+  }
+  /* Each tile is one link: the whole surface downloads that version's PDF. */
+  .cv-root .cv-card {
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
-    padding: 1.45rem 1.5rem 1.3rem;
+    min-height: 11.5rem;
+    padding: 1.5rem 1.55rem 1.45rem;
+    color: inherit;
+    overflow: hidden;
+    isolation: isolate;
   }
   .cv-card::before {
     counter-increment: cv-card;
@@ -497,57 +547,52 @@ html:has(.cv-root) {
     letter-spacing: 0.2em;
     color: var(--cv-gold);
   }
-  .cv-card__title {
-    margin-top: 0.7rem;
-    font: 400 1.65rem/1.15 var(--cv-display);
-    letter-spacing: -0.01em;
+  /* Glow that wakes up on hover and focus. */
+  .cv-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(80% 70% at 100% 0%, rgba(155, 123, 255, 0.2), transparent 70%);
+    opacity: 0;
   }
-  .cv-root .cv-card__title a {
+  .cv-card__title {
+    margin-top: 0.8rem;
+    font: 400 1.7rem/1.15 var(--cv-display);
+    letter-spacing: -0.01em;
     color: #fff;
   }
   .cv-card__headline {
-    margin-top: 0.6rem;
-    flex: 1 1 auto;
+    margin-top: 0.65rem;
     font-size: 0.88rem;
     line-height: 1.65;
     color: var(--cv-mute);
   }
-  .cv-card__links {
-    margin-top: 1.2rem;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.75rem;
+  .cv-root .cv-card:hover,
+  .cv-root .cv-card:focus-visible {
+    color: inherit;
+    border-color: rgba(178, 196, 255, 0.42);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.16),
+      0 16px 44px rgba(0, 0, 0, 0.34),
+      0 0 32px rgba(91, 140, 255, 0.18);
   }
-  .cv-root .cv-card__read {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    min-height: 2.5rem;
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: var(--cv-blue);
+  .cv-card:hover::after,
+  .cv-card:focus-visible::after {
+    opacity: 1;
   }
-  .cv-root .cv-card__pdf {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    min-height: 2.5rem;
-    padding: 0.3rem 0.9rem;
-    border: 1px solid rgba(233, 194, 112, 0.38);
-    border-radius: 999px;
-    color: #f3dfae;
-    font: 600 0.74rem/1.4 var(--cv-mono);
-    letter-spacing: 0.1em;
-  }
-  .cv-root .cv-card__pdf:hover {
-    color: #fff;
-    border-color: var(--cv-gold);
+  .cv-root .cv-card:focus-visible {
+    outline: 2px solid var(--cv-gold);
+    outline-offset: 3px;
   }
 
   /* ---------- Small screens ---------- */
 
   @media (max-width: 640px) {
+    .cv-root .cv-card {
+      min-height: 0;
+    }
     .cv-sheet,
     .cv-index {
       padding-top: 5.5rem;
@@ -605,10 +650,22 @@ html:has(.cv-root) {
     .cv-cosmos__stars {
       animation: cv-drift 160s linear infinite;
     }
+    .cv-cosmos__stars--near {
+      animation:
+        cv-drift 110s linear infinite,
+        cv-twinkle 5.5s ease-in-out infinite alternate;
+    }
+    .cv-cosmos__nebula {
+      animation: cv-breathe 26s ease-in-out infinite alternate;
+    }
+    .cv-cosmos__aurora {
+      animation: cv-aurora 34s ease-in-out infinite alternate;
+    }
+    .cv-card::after {
+      transition: opacity 260ms ease;
+    }
     .cv-root .cv-bar__versions a,
-    .cv-root .cv-head__contacts a,
-    .cv-root .cv-card__pdf,
-    .cv-root .cv-card__read {
+    .cv-root .cv-head__contacts a {
       transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease, gap 160ms ease;
     }
     .cv-root .cv-bar__pdf,
@@ -623,11 +680,6 @@ html:has(.cv-root) {
       }
       .cv-card:hover {
         transform: translateY(-4px);
-        border-color: rgba(122, 162, 255, 0.4);
-        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4), 0 0 28px rgba(91, 140, 255, 0.16);
-      }
-      .cv-root .cv-card__read:hover {
-        gap: 0.6rem;
       }
     }
   }
@@ -647,6 +699,35 @@ html:has(.cv-root) {
 @keyframes cv-drift {
   to {
     transform: translateY(480px);
+  }
+}
+
+@keyframes cv-twinkle {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 0.95;
+  }
+}
+
+@keyframes cv-breathe {
+  from {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes cv-aurora {
+  from {
+    transform: translate3d(-4%, 2%, 0) rotate(-2deg);
+  }
+  to {
+    transform: translate3d(4%, -2%, 0) rotate(2deg);
   }
 }
 
@@ -896,23 +977,15 @@ html:has(.cv-root) {
     font-size: 1.35rem;
     color: var(--cv-ink);
   }
-  .cv-root .cv-card__title a {
-    color: var(--cv-ink);
+  .cv-root .cv-card {
+    display: block;
+    color: inherit;
     text-decoration: none;
-  }
-  .cv-root .cv-card__title a:hover {
-    text-decoration: underline;
   }
   .cv-card__headline {
     margin-top: 0.3rem;
     font-size: 0.92rem;
     color: var(--cv-mute);
-  }
-  .cv-card__links {
-    margin-top: 0.6rem;
-    display: flex;
-    gap: 1.2rem;
-    font-weight: 500;
   }
 
 
