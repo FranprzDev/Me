@@ -97,7 +97,7 @@ export function Nav() {
               hrefLang={lang === "es" ? "en" : "es"}
               className="chip chip--control"
               style={{ color: "var(--fg)", background: "rgba(255,255,255,0.05)" }}
-              aria-label={tl({ es: "Cambiar a inglés", en: "Switch to Spanish" })}
+              aria-label={tl({ es: "ES: cambiar a inglés", en: "EN: switch to Spanish" })}
               data-lang-switch
             >
               {lang === "es" ? "ES" : "EN"}
@@ -107,7 +107,7 @@ export function Nav() {
               onClick={toggle}
               className="chip"
               style={{ cursor: "pointer", color: "var(--fg)", background: "rgba(255,255,255,0.05)" }}
-              aria-label={tl({ es: "Cambiar a inglés", en: "Switch to Spanish" })}
+              aria-label={tl({ es: "ES: cambiar a inglés", en: "EN: switch to Spanish" })}
             >
               {lang === "es" ? "ES" : "EN"}
             </button>

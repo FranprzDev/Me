@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CV_VARIANTS, CvLocale, cvIndexPath, cvLabel, cvPath, cvPdfPath, type CvVariant } from "@/content/cv";
+import { CV_VARIANTS, CvLocale, cvIndexPath, cvLabel, cvPath, cvPdfFile, cvPdfPath, type CvVariant } from "@/content/cv";
 import { CV_UI } from "@/content/cv/ui";
 import { riseStyle } from "./motion";
 
@@ -40,7 +40,7 @@ export function CvBar({ locale, variant }: CvBarProps) {
           <span>{CV_UI.backHome[locale]}</span>
         </Link>
         {variant ? (
-          <a href={cvPdfPath(variant, locale)} className="cv-bar__pdf" download data-cv-pdf>
+          <a href={cvPdfPath(variant, locale)} className="cv-bar__pdf" download={cvPdfFile(variant, locale)} data-cv-pdf>
             <span className="cv-bar__pdf-badge" aria-hidden="true">
               {CV_UI.pdfBadge[locale]}
             </span>

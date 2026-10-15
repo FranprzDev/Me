@@ -13,7 +13,7 @@ export function cvRoute(variant, locale) {
   return `${locale === "es" ? "/es" : ""}/cv/${variant}`;
 }
 
-/** Mirrors cvPdfPath() in src/content/cv/routes.ts. */
+/** Mirrors cvPdfFile() in src/content/cv/routes.ts. */
 export function cvPdfFile(variant, locale) {
   return `francisco-perez-cv-${variant}-${locale}.pdf`;
 }
@@ -32,6 +32,11 @@ export async function cvSourceHash() {
     }
   }
   return hash.digest("hex");
+}
+
+/** Content version of a PDF: the `?v=` cvPdfPath() appends, recorded per file in the manifest. */
+export function pdfVersion(bytes) {
+  return createHash("sha256").update(bytes).digest("hex").slice(0, 12);
 }
 
 /** Page count of a Chromium-generated PDF. */

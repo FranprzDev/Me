@@ -1,4 +1,4 @@
-import { CV_NAME, CV_VARIANTS, cvHeadline, cvLabel, cvPdfPath, type CvLocale } from "@/content/cv";
+import { CV_NAME, CV_VARIANTS, cvHeadline, cvLabel, cvPdfFile, cvPdfPath, type CvLocale } from "@/content/cv";
 import { CV_UI, cvDownloadLabel } from "@/content/cv/ui";
 import { CvBar } from "./CvBar";
 import { CvCosmos } from "./CvCosmos";
@@ -28,7 +28,7 @@ export function CvIndex({ locale }: { locale: CvLocale }) {
               <a
                 href={cvPdfPath(variant, locale)}
                 className="cv-card"
-                download
+                download={cvPdfFile(variant, locale)}
                 data-cv-card-pdf
                 aria-label={cvDownloadLabel(cvLabel(variant, locale), locale)}
               >

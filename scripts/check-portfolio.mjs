@@ -3,7 +3,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import { chromium, devices } from "playwright";
 import AxeBuilder from "@axe-core/playwright";
 import ts from "typescript";
-import { CV_LOCALES, CV_VARIANTS, MANIFEST, PDF_DIR, cvPdfFile, cvRoute, cvSourceHash, pdfPageCount } from "./cv-pdf-shared.mjs";
+import { CV_LOCALES, CV_VARIANTS, MANIFEST, PDF_DIR, cvPdfFile, cvRoute, cvSourceHash, pdfPageCount, pdfVersion } from "./cv-pdf-shared.mjs";
 
 const baseURL = process.env.PORTFOLIO_URL || "http://localhost:3000";
 const output = `artifacts/portfolio-quality/${process.env.HEADFUL === "1" ? "headful" : "headless"}`;
@@ -58,11 +58,33 @@ async function checkCvPages(browser) {
   const manifest = JSON.parse(await readFile(MANIFEST, "utf8"));
   assert.equal(manifest.sourceHash, await cvSourceHash(), "CV PDFs are stale: run `pnpm cv:pdf` against a fresh build and commit public/cv/files");
   // One A4 page per résumé, for the committed PDFs and the live print layout.
+  // Each manifest entry records the content version the site appends as ?v=.
+  const versions = new Map();
   for (const locale of CV_LOCALES) {
     for (const variant of CV_VARIANTS) {
       const file = cvPdfFile(variant, locale);
-      assert.equal(pdfPageCount(await readFile(`${PDF_DIR}/${file}`)), 1, `${file}: one page`);
+      const bytes = await readFile(`${PDF_DIR}/${file}`);
+      assert.equal(pdfPageCount(bytes), 1, `${file}: one page`);
+      const entry = manifest.files.find((item) => item.file === file);
+      assert.ok(entry, `${file}: listed in the manifest`);
+      assert.equal(entry.version, pdfVersion(bytes), `${file}: manifest version matches the committed PDF (run \`pnpm cv:pdf\`)`);
+      versions.set(file, entry.version);
     }
+  }
+  /** The URL the site must link: the file plus its current manifest version, so a regenerated PDF is never served from cache. */
+  const versionedPdf = (variant, locale) => {
+    const file = cvPdfFile(variant, locale);
+    return `/cv/files/${file}?v=${versions.get(file)}`;
+  };
+  // Versioned URLs are content-addressed and cached for good; a bare URL always revalidates.
+  {
+    const file = cvPdfFile(CV_VARIANTS[0], "en");
+    const versioned = await fetch(`${baseURL}${versionedPdf(CV_VARIANTS[0], "en")}`);
+    assert.match(versioned.headers.get("cache-control") ?? "", /immutable/, `${file}?v=: immutable cache`);
+    await versioned.arrayBuffer();
+    const bare = await fetch(`${baseURL}/cv/files/${file}`);
+    assert.match(bare.headers.get("cache-control") ?? "", /must-revalidate/, `${file}: bare URL revalidates`);
+    await bare.arrayBuffer();
   }
   const pages = CV_LOCALES.flatMap((locale) => [
     { route: locale === "es" ? "/es/cv" : "/cv", locale, variant: null },
@@ -90,6 +112,13 @@ async function checkCvPages(browser) {
       assert.equal(await page.locator(".site-nav").count(), 1, `${route}: portfolio nav`);
       assert.equal(await page.locator(".cv-cosmos").count(), 1, `${route}: night-sky backdrop`);
       assert.equal(await page.locator("[data-scene-root]").count(), 0, `${route}: no 3D layer`);
+      // The backdrop is static: nothing may loop under the glass panels (no CSS loops, no shooting stars).
+      assert.equal(
+        await page.evaluate(() => document.getAnimations().filter((a) => a.effect?.getComputedTiming().iterations === Infinity).length),
+        0,
+        `${route}: no infinite animations`,
+      );
+      assert.equal(await page.locator(".star-aura-layer").count(), 0, `${route}: no shooting stars`);
       if (options.reducedMotion === "reduce") {
         assert.equal(await page.evaluate(() => document.getAnimations().filter((a) => a.animationName === "cv-rise").length), 0, `${route}: no entrance motion with reduced motion`);
       }
@@ -107,7 +136,8 @@ async function checkCvPages(browser) {
       assert.equal(await toggle.getAttribute("href"), locale === "es" ? enRoute : `/es${enRoute}`, `${route}: EN/ES toggle`);
       if (variant) {
         const pdf = await page.locator("a[data-cv-pdf]").getAttribute("href");
-        assert.equal(pdf, `/cv/files/${cvPdfFile(variant, locale)}`);
+        assert.equal(pdf, versionedPdf(variant, locale), `${route}: PDF button links the current manifest version`);
+        assert.equal(await page.locator("a[data-cv-pdf]").getAttribute("download"), cvPdfFile(variant, locale), `${route}: clean download filename`);
         const file = await page.request.get(`${baseURL}${pdf}`);
         assert.equal(file.status(), 200, `${route}: PDF ${pdf}`);
         assert.match(file.headers()["content-type"], /pdf/);
@@ -142,8 +172,8 @@ async function checkCvPages(browser) {
         );
         assert.deepEqual(
           cards.map(({ href }) => href),
-          CV_VARIANTS.map((variant) => `/cv/files/${cvPdfFile(variant, locale)}`),
-          `${route}: cards link to the PDFs`,
+          CV_VARIANTS.map((variant) => versionedPdf(variant, locale)),
+          `${route}: cards link to the current manifest version of each PDF`,
         );
         for (const card of cards) {
           assert.equal(card.tag, "A", `${route}: card is a link`);

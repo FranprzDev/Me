@@ -58,7 +58,10 @@ html:has(.cv-root) {
     color: #fff;
   }
 
-  /* ---------- Backdrop: layered nebula, aurora, two star depths ---------- */
+  /* ---------- Backdrop: layered nebula, aurora, two star depths ----------
+     Deliberately static: any continuous motion under the glass panels makes
+     the browser re-raster the viewport and re-blur every backdrop-filter
+     panel on every frame (prod audit 2026-10-14: 12-23 fps idle on desktop). */
 
   .cv-cosmos {
     position: fixed;
@@ -97,11 +100,9 @@ html:has(.cv-root) {
         rgba(233, 194, 112, 0.06) 53%,
         transparent 62%
       );
-    filter: blur(42px);
-    transform-origin: 50% 50%;
   }
   .cv-cosmos__stars {
-    inset: -480px 0 0;
+    inset: 0;
     opacity: 0.75;
     background-image:
       radial-gradient(1px 1px at 24px 36px, rgba(255, 255, 255, 0.85), transparent 70%),
@@ -115,7 +116,7 @@ html:has(.cv-root) {
       radial-gradient(1px 1px at 110px 60px, rgba(255, 255, 255, 0.45), transparent 70%);
     background-size: 240px 240px;
   }
-  /* Near stars: fewer, larger, tinted, and they twinkle. */
+  /* Near stars: fewer, larger, tinted. */
   .cv-cosmos__stars--near {
     opacity: 0.85;
     background-image:
@@ -125,7 +126,7 @@ html:has(.cv-root) {
       radial-gradient(2.2px 2.2px at 440px 64px, rgba(255, 255, 255, 0.85), transparent 70%),
       radial-gradient(1.5px 1.5px at 200px 250px, rgba(201, 184, 255, 0.9), transparent 70%);
     background-size: 520px 520px;
-    background-position: 60px 40px;
+    background-position: 60px 80px;
   }
   .cv-cosmos__vignette {
     inset: 0;
@@ -647,20 +648,6 @@ html:has(.cv-root) {
       animation: cv-rise 680ms cubic-bezier(0.22, 1, 0.36, 1) both;
       animation-delay: calc(min(var(--cv-rise-index, 0), 8) * 65ms);
     }
-    .cv-cosmos__stars {
-      animation: cv-drift 160s linear infinite;
-    }
-    .cv-cosmos__stars--near {
-      animation:
-        cv-drift 110s linear infinite,
-        cv-twinkle 5.5s ease-in-out infinite alternate;
-    }
-    .cv-cosmos__nebula {
-      animation: cv-breathe 26s ease-in-out infinite alternate;
-    }
-    .cv-cosmos__aurora {
-      animation: cv-aurora 34s ease-in-out infinite alternate;
-    }
     .cv-card::after {
       transition: opacity 260ms ease;
     }
@@ -693,41 +680,6 @@ html:has(.cv-root) {
   to {
     opacity: 1;
     transform: none;
-  }
-}
-
-@keyframes cv-drift {
-  to {
-    transform: translateY(480px);
-  }
-}
-
-@keyframes cv-twinkle {
-  from {
-    opacity: 0.45;
-  }
-  to {
-    opacity: 0.95;
-  }
-}
-
-@keyframes cv-breathe {
-  from {
-    opacity: 0.85;
-    transform: scale(1);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1.06);
-  }
-}
-
-@keyframes cv-aurora {
-  from {
-    transform: translate3d(-4%, 2%, 0) rotate(-2deg);
-  }
-  to {
-    transform: translate3d(4%, -2%, 0) rotate(2deg);
   }
 }
 

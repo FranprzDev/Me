@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { chromium } from "playwright";
-import { CV_LOCALES, CV_VARIANTS, MANIFEST, PDF_DIR, cvPdfFile, cvRoute, cvSourceHash, pdfPageCount } from "./cv-pdf-shared.mjs";
+import { CV_LOCALES, CV_VARIANTS, MANIFEST, PDF_DIR, cvPdfFile, cvRoute, cvSourceHash, pdfPageCount, pdfVersion } from "./cv-pdf-shared.mjs";
 
 /**
  * Renders every /cv page to the PDF behind its "Download PDF" button.
@@ -43,9 +43,10 @@ async function main() {
         const file = cvPdfFile(variant, locale);
         await page.pdf({ path: `${PDF_DIR}/${file}`, format: "A4", printBackground: true, preferCSSPageSize: true });
         await page.emulateMedia({ media: "screen" });
-        const pages = pdfPageCount(await readFile(`${PDF_DIR}/${file}`));
+        const bytes = await readFile(`${PDF_DIR}/${file}`);
+        const pages = pdfPageCount(bytes);
         assert.ok(pages >= 1 && pages <= MAX_PAGES, `${route}: ${pages} pages (max ${MAX_PAGES})`);
-        files.push({ route, file, pages });
+        files.push({ route, file, pages, version: pdfVersion(bytes) });
         console.log(`PDF ${route} -> ${PDF_DIR}/${file} (${pages} page${pages === 1 ? "" : "s"})`);
       }
     }

@@ -37,9 +37,18 @@ const nextConfig: NextConfig = {
         headers: [{ key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" }],
       },
       // Only the PDFs: /cv/<variant> are pages and keep Next's own caching.
+      // The site links them as ?v=<content hash> (cvPdfPath), so a versioned
+      // URL never changes content and can be cached for good. A bare URL
+      // (old shares, typed links) always revalidates, so a regenerated CV
+      // reaches everyone on the next request.
       {
         source: "/cv/files/:file*",
-        headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
+        headers: [{ key: "Cache-Control", value: "public, max-age=0, must-revalidate" }],
+      },
+      {
+        source: "/cv/files/:file*",
+        has: [{ type: "query", key: "v" }],
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
       },
       {
         source: "/cv/FranciscoPerez-AIEngineer.pdf",
