@@ -40,7 +40,6 @@ export interface Highlight {
 
 export interface CV {
   name: string;
-  title: Localized<string>;
   location: Localized<string>;
   timezone: string;
   email: string;
@@ -57,10 +56,6 @@ export interface CV {
 
 export const CV: CV = {
     name: "Francisco Perez",
-  title: {
-    es: "Ing. en Sistemas de Información",
-    en: "Information Systems Engineer",
-  },
   location: {
     es: "Tucumán, Argentina",
     en: "Tucumán, Argentina",

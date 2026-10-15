@@ -133,5 +133,102 @@ assert.match(agentsHtml, /list_cv_versions/, "/for-agents lists list_cv_versions
 
 const get = await fetch(`${baseUrl}/api/mcp`);
 assert.equal(get.status, 405, "Stateless server has no GET stream");
+const del = await fetch(`${baseUrl}/api/mcp`, { method: "DELETE" });
+assert.equal(del.status, 405, "Stateless server has no session to delete");
+
+// Hardening (agent/mcp-hardening): capabilities, facts from src/content/cv, invalid args,
+// CORS, lenient Accept, body cap, llms.txt and the copy-paste configs.
+assert.equal(init.capabilities.tools?.listChanged, false, "A fixed, stateless tool set does not advertise listChanged");
+
+for (const language of ["en", "es"]) {
+  const profile = await callJson("get_profile", { language });
+  const list = await callJson("list_cv_versions", { language });
+  const primary = list.versions.find((version) => version.id === "applied-ai");
+  assert.ok(primary.headline.startsWith(profile.title), `get_profile title (${language}) is the primary CV headline's role`);
+  const full = await callJson("get_cv", { language });
+  const primaryDoc = await callJson("get_cv", { language, version: "applied-ai" });
+  const cvEducation = primaryDoc.sections.find((section) => section.id === "education").entries;
+  assert.deepEqual(
+    full.education.map((entry) => entry.period),
+    cvEducation.map((entry) => entry.period),
+    `get_cv education (${language}) matches src/content/cv`,
+  );
+}
+
+for (const args of [{ slug: "not-a-world" }, {}]) {
+  const result = await rpc("tools/call", { name: "get_project", arguments: args });
+  assert.equal(result.isError, true, `get_project rejects ${JSON.stringify(args)}`);
+}
+const unknownTool = await rpc("tools/call", { name: "not_a_tool", arguments: {} });
+assert.equal(unknownTool.isError, true, "Unknown tools answer an error result");
+
+const browserOrigin = "https://inspector.example";
+const preflight = await fetch(`${baseUrl}/api/mcp`, {
+  method: "OPTIONS",
+  headers: {
+    origin: browserOrigin,
+    "access-control-request-method": "POST",
+    "access-control-request-headers": "content-type, accept, mcp-protocol-version",
+  },
+});
+assert.equal(preflight.status, 204, "CORS preflight answers 204");
+assert.equal(preflight.headers.get("access-control-allow-origin"), "*");
+assert.match(preflight.headers.get("access-control-allow-headers") ?? "", /Mcp-Protocol-Version/i);
+assert.match(preflight.headers.get("access-control-allow-methods") ?? "", /POST/);
+
+async function post(body, headers) {
+  return fetch(`${baseUrl}/api/mcp`, {
+    method: "POST",
+    headers: { "content-type": "application/json", ...headers },
+    body: typeof body === "string" ? body : JSON.stringify(body),
+  });
+}
+const ping = { jsonrpc: "2.0", id: 99, method: "ping" };
+
+const corsPost = await post(ping, { origin: browserOrigin, accept: "application/json, text/event-stream" });
+assert.equal(corsPost.status, 200);
+assert.equal(corsPost.headers.get("access-control-allow-origin"), "*", "MCP responses carry CORS headers");
+await corsPost.arrayBuffer();
+
+for (const accept of ["application/json", "*/*", undefined]) {
+  const response = await post(ping, accept ? { accept } : {});
+  assert.equal(response.status, 200, `Accept ${accept ?? "(none)"} is served`);
+  assert.deepEqual((await response.json()).result, {}, `ping with Accept ${accept ?? "(none)"}`);
+}
+
+const oversized = await post({ ...ping, params: { padding: "x".repeat(70 * 1024) } }, { accept: "application/json, text/event-stream" });
+assert.equal(oversized.status, 413, "Bodies over 64 KiB are rejected");
+await oversized.arrayBuffer();
+
+const malformed = await post("{not json", { accept: "application/json, text/event-stream" });
+assert.equal(malformed.status, 400, "Malformed JSON is a 400");
+assert.equal((await malformed.json()).error.code, -32700, "Malformed JSON is a JSON-RPC parse error");
+
+assert.equal(card.mcp.endpoint, `${baseUrl}/api/mcp`);
+assert.deepEqual([...card.mcp.tools].sort(), names, "Agent card lists the same tools as tools/list");
+assert.equal(card.mcp.serverInfo.version, init.serverInfo.version, "Agent card and initialize report the same server version");
+
+const llms = await fetch(`${baseUrl}/llms.txt`);
+assert.equal(llms.status, 200, "llms.txt is served");
+assert.match(llms.headers.get("content-type") ?? "", /^text\/plain/);
+const llmsText = await llms.text();
+assert.ok(llmsText.includes(`${baseUrl}/api/mcp`), "llms.txt points to the MCP endpoint");
+for (const name of names) assert.ok(llmsText.includes(`- ${name}:`), `llms.txt lists ${name}`);
+for (const version of (await callJson("list_cv_versions", { language: "en" })).versions) {
+  assert.ok(llmsText.includes(version.pdf_url), `llms.txt links the ${version.id} PDF`);
+}
+
+const endpoint = `${baseUrl}/api/mcp`;
+const decode = (html) => html.replace(/&quot;/g, '"').replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#x27;/g, "'");
+const codeBlocks = [...agentsHtml.matchAll(/<code>([\s\S]*?)<\/code>/g)].map((match) => decode(match[1].replace(/<[^>]+>/g, "")));
+const configs = codeBlocks.filter((block) => block.trim().startsWith("{")).map((block) => JSON.parse(block));
+assert.deepEqual(configs.find((config) => config.mcpServers)?.mcpServers["francisco-perez"], { type: "http", url: endpoint }, "mcpServers config");
+assert.deepEqual(configs.find((config) => config.servers)?.servers["francisco-perez"], { type: "http", url: endpoint }, "VS Code mcp.json config");
+assert.ok(codeBlocks.includes(`claude mcp add --transport http francisco-perez ${endpoint}`), "Claude Code command uses this deployment");
+assert.ok(
+  codeBlocks.includes(`npx @modelcontextprotocol/inspector --cli ${endpoint} --transport http --method tools/list`),
+  "Inspector command uses this deployment",
+);
+assert.doesNotMatch(codeBlocks.join("\n"), /github\.io/, "Configs never point to the old GitHub Pages host");
 
 console.log(`Agent card, /for-agents and MCP tools/list + tools/call passed (CV versions: ${sourceVariants.join(", ")}).`);

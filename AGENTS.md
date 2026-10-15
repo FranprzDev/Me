@@ -22,6 +22,13 @@ Guidance for coding agents working on this repo (Francisco Perez's portfolio, Ne
 - PDFs: committed in `public/cv/files/`, rendered from the pages with Playwright. After changing anything in `src/content/cv/` or `src/components/cv/`, rebuild, start the server and run `PORTFOLIO_URL=http://localhost:3000 pnpm cv:pdf`, then commit `public/cv/files/`. They are not generated during `next build` because the build host (Vercel) has no browser. `check:portfolio` fails when `manifest.json`'s source hash no longer matches, so a stale PDF cannot ship. The manifest also records each file's content version; `cvPdfPath()` links `?v=<version>` everywhere (index cards, Download PDF button, MCP `pdf_url`) with a clean `download` filename, versioned URLs are cached `immutable` and bare URLs revalidate (`next.config.ts`), so a regenerated PDF is never served from cache.
 - Language: the root layout renders `<html lang="es">`; on CV routes the content root carries the route's `lang` and the i18n provider sets `document.documentElement.lang` from the URL after hydration.
 
+## MCP server and agent discovery (/api/mcp, /for-agents, agent card, llms.txt)
+
+- `src/lib/mcp/tools.ts` is the single source of the tool names, summaries, server name/version and endpoint path; the route, the agent card, `/for-agents`, `/llms.txt` and the assistant prompt all read it. CV versions always come from `src/content/cv` (`CvVariant`); the profile title (role part of the primary CV headline) and the full CV's education come from there too, so the MCP never states a fact the published CV does not.
+- The server is stateless Streamable HTTP with JSON responses. Keep the hardening in `src/app/api/mcp/route.ts`: CORS `*` on every response plus an `OPTIONS` preflight (`src/lib/mcp/http.ts`; public, read-only, no credentials), lenient `Accept` (JSON-only or missing is served), a 64 KiB body cap, `tools.listChanged: false`, `GET`/`DELETE` answer 405.
+- Copy-paste configs on `/for-agents` (Claude Code command, `mcpServers` JSON, VS Code `servers` JSON, Inspector CLI) are built from the request host and checked by `check:agent`; never hard-code another host.
+- Test with a real client before and after changes: `npx @modelcontextprotocol/inspector --cli <url>/api/mcp --transport http --method tools/list`, and `pnpm check:agent` (covers capabilities, invalid args, CORS, Accept, body cap, llms.txt and the configs).
+
 ## Workflow
 
 - Never push to `main`. Work on `feat/`, `fix/`, `chore/` or `agent/` branches and open a PR with What changes / Why / Impact / Validation.

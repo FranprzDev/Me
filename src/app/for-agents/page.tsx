@@ -3,7 +3,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { AskAssistant } from "@/components/agents/AskAssistant";
 import { LunarScene } from "@/components/agents/LunarScene";
-import { MCP_TOOLS, MCP_TOOL_SUMMARIES } from "@/lib/mcp/tools";
+import { MCP_ENDPOINT_PATH, MCP_TOOLS, MCP_TOOL_SUMMARIES } from "@/lib/mcp/tools";
 import "./for-agents.css";
 
 export const metadata: Metadata = {
@@ -13,10 +13,13 @@ export const metadata: Metadata = {
 
 const TOOLS = MCP_TOOLS.map((name) => [name, MCP_TOOL_SUMMARIES[name]] as const);
 
+/** Name the copy-paste configs register the server under. */
+const SERVER_KEY = "francisco-perez";
+
 export default async function ForAgentsPage() {
   const host = (await headers()).get("host") ?? "me-pink-ten.vercel.app";
   const protocol = host.startsWith("localhost") ? "http" : "https";
-  const endpoint = `${protocol}://${host}/api/mcp`;
+  const endpoint = `${protocol}://${host}${MCP_ENDPOINT_PATH}`;
 
   return (
     <main id="main-content" tabIndex={-1} className="content-layer agents-page moon">
@@ -64,15 +67,33 @@ export default async function ForAgentsPage() {
           <h3>Claude</h3>
           <p>Claude.ai or Claude Desktop: Settings → Connectors → Add custom connector, and paste the endpoint. Claude Code:</p>
           <pre tabIndex={0}>
-            <code>{`claude mcp add --transport http francisco-perez ${endpoint}`}</code>
+            <code>{`claude mcp add --transport http ${SERVER_KEY} ${endpoint}`}</code>
           </pre>
 
           <h3>ChatGPT</h3>
           <p>Settings → Connectors (developer mode) → Create, choose MCP server URL, paste the endpoint, no authentication.</p>
 
-          <h3>Any MCP client (JSON config)</h3>
+          <h3>Cursor, Claude Code and other mcpServers configs</h3>
+          <p>
+            Add to <code>~/.cursor/mcp.json</code>, a project <code>.mcp.json</code> or any client that reads an{" "}
+            <code>mcpServers</code> map:
+          </p>
           <pre tabIndex={0}>
-            <code>{JSON.stringify({ mcpServers: { "francisco-perez": { type: "http", url: endpoint } } }, null, 2)}</code>
+            <code>{JSON.stringify({ mcpServers: { [SERVER_KEY]: { type: "http", url: endpoint } } }, null, 2)}</code>
+          </pre>
+
+          <h3>VS Code</h3>
+          <p>
+            Add to <code>.vscode/mcp.json</code> (or run MCP: Add Server → HTTP):
+          </p>
+          <pre tabIndex={0}>
+            <code>{JSON.stringify({ servers: { [SERVER_KEY]: { type: "http", url: endpoint } } }, null, 2)}</code>
+          </pre>
+
+          <h3>Try it from a terminal</h3>
+          <p>The official MCP Inspector lists the tools without installing anything:</p>
+          <pre tabIndex={0}>
+            <code>{`npx @modelcontextprotocol/inspector --cli ${endpoint} --transport http --method tools/list`}</code>
           </pre>
         </section>
 
