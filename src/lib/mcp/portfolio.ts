@@ -3,19 +3,22 @@ import {
   CvLocale,
   CvSection,
   CvVariant,
+  cvHeadline,
   cvPath,
   cvPdfPath,
   getCv,
   type ResolvedCv,
 } from "@/content/cv";
+import { EDUCATION } from "@/content/cv/facts";
 import { CV_UI } from "@/content/cv/ui";
-import { primaryCvPdfPath } from "@/lib/primaryCv";
+import { PRIMARY_CV_VARIANT, primaryCvPdfPath } from "@/lib/primaryCv";
 import { CV, type Lang } from "@/data/cv";
 import { PROJECTS, type Project } from "@/data/projects";
 
 /**
  * Read-only views of the portfolio data for the MCP server. Everything comes
- * from src/data (the same source the site renders); nothing is generated.
+ * from src/data (the same source the site renders) and src/content/cv (the
+ * CV pages and PDFs: versions, title, education); nothing is generated.
  */
 
 export enum Language {
@@ -40,11 +43,22 @@ function absolute(origin: string, path: string) {
   return new URL(path, origin).toString();
 }
 
+/** Separator between the role and the focus areas in a CV headline. */
+const HEADLINE_SEPARATOR = " | ";
+
+/**
+ * Professional title: the role part of the primary CV's headline in
+ * src/content/cv, so the MCP never claims a title the published CV does not.
+ */
+export function primaryTitle(language: Language): string {
+  return cvHeadline(PRIMARY_CV_VARIANT, cvLocale(language)).split(HEADLINE_SEPARATOR)[0];
+}
+
 export function profile(language: Language, origin: string) {
   const l = lang(language);
   return {
     name: CV.name,
-    title: CV.title[l],
+    title: primaryTitle(language),
     location: CV.location[l],
     timezone: CV.timezone,
     summary: CV.summary[l],
@@ -87,7 +101,12 @@ export function cv(language: Language, origin: string) {
     ...profile(language, origin),
     versions: listCvVersions(language, origin).versions,
     experience: experience(language),
-    education: CV.education.map((item) => ({ institution: item.institution, degree: item.degree[l], period: item.period[l] })),
+    // Education comes from the CV source, which carries the expected graduation date.
+    education: EDUCATION.map((item) => ({
+      institution: item.institution,
+      degree: item.degree[cvLocale(language)],
+      period: item.period[cvLocale(language)],
+    })),
     certifications: CV.certifications.map((item) => ({
       name: item.name[l],
       school: item.school,
