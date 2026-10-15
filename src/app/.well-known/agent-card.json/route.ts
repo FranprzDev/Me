@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { MCP_TOOLS, McpTool } from "@/lib/mcp/tools";
 
 /**
  * Discovery card. The portfolio's agent interface is a read-only MCP server
@@ -11,7 +12,7 @@ export function GET(request: Request) {
     protocolVersion: "0.3.0",
     name: "Francisco Perez Portfolio",
     description:
-      "Read-only MCP server (Streamable HTTP) with Francisco Perez's public portfolio data: profile, experience, CV, projects and contact. No LLM, no authentication.",
+      "Read-only MCP server (Streamable HTTP) with Francisco Perez's public portfolio data: profile, experience, CV (every published version, one per kind of role, with PDF links), projects and contact. No LLM, no authentication.",
     url: endpoint,
     preferredTransport: "MCP",
     documentationUrl: new URL("/for-agents", request.url).toString(),
@@ -23,9 +24,14 @@ export function GET(request: Request) {
       {
         id: "portfolio-mcp",
         name: "Portfolio MCP tools",
-        description: "Tools: get_profile, get_contact, get_experience, get_cv, list_projects, get_project(slug).",
-        tags: ["mcp", "hiring", "software development", "AI engineering", "Tucumán"],
-        examples: ["tools/call get_experience", "tools/call get_project {\"slug\":\"hackathons\"}"],
+        description: `Tools: ${MCP_TOOLS.join(", ")}. Call ${McpTool.ListCvVersions} to pick the CV version that fits a role, then ${McpTool.GetCv} with that version for its content and PDF.`,
+        tags: ["mcp", "hiring", "cv", "software development", "AI engineering", "Tucumán"],
+        examples: [
+          `tools/call ${McpTool.GetExperience}`,
+          `tools/call ${McpTool.ListCvVersions}`,
+          `tools/call ${McpTool.GetCv} {"version":"<id from ${McpTool.ListCvVersions}>"}`,
+          `tools/call ${McpTool.GetProject} {"slug":"hackathons"}`,
+        ],
         inputModes: ["application/json"],
         outputModes: ["application/json"],
       },

@@ -1,21 +1,25 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { z } from "zod";
+import { CV_VARIANTS, CvVariant } from "@/content/cv";
 import {
   Language,
   PROJECT_SLUGS,
   contact,
   cv,
+  cvVersion,
   experience,
+  listCvVersions,
   listProjects,
   profile,
   projectBySlug,
 } from "@/lib/mcp/portfolio";
+import { McpTool } from "@/lib/mcp/tools";
 
 /**
  * Public, read-only MCP server (Streamable HTTP) for Francisco Perez's
  * portfolio. Stateless: every POST builds a fresh server over the static data
- * in src/data, answers with plain JSON and keeps no session. No LLM, no
+ * in src/data and src/content/cv (the CV versions the site publishes), answers with plain JSON and keeps no session. No LLM, no
  * secrets, no writes.
  */
 
@@ -25,6 +29,9 @@ const languageInput = {
   language: z.enum(Language).default(Language.En).describe("Response language: 'en' (default) or 'es'."),
 };
 
+/** Version ids come from CvVariant, so the schema follows src/content/cv. */
+const cvVersionIds = CV_VARIANTS.join(", ");
+
 const readOnly = { readOnlyHint: true, openWorldHint: false, idempotentHint: true } as const;
 
 function json(data: unknown) {
@@ -33,15 +40,15 @@ function json(data: unknown) {
 
 function buildServer(origin: string) {
   const server = new McpServer(
-    { name: "francisco-perez-portfolio", version: "1.0.0" },
+    { name: "francisco-perez-portfolio", version: "1.1.0" },
     {
       instructions:
-        "Read-only facts about Francisco Perez (AI Applied Engineer, Tucumán, Argentina) taken from his portfolio. Use these tools instead of guessing; availability, salary and rankings are not part of the data.",
+        `Read-only facts about Francisco Perez (AI Applied Engineer, Tucumán, Argentina) taken from his portfolio. Use these tools instead of guessing; availability, salary and rankings are not part of the data. His CV is published in several versions, one per kind of role: call ${McpTool.ListCvVersions} to pick the one that fits a role, then ${McpTool.GetCv} with that version for its content and PDF.`,
     }
   );
 
   server.registerTool(
-    "get_profile",
+    McpTool.GetProfile,
     {
       title: "Profile",
       description: "Name, title, location, summary, highlights and main links.",
@@ -52,7 +59,7 @@ function buildServer(origin: string) {
   );
 
   server.registerTool(
-    "get_contact",
+    McpTool.GetContact,
     {
       title: "Contact",
       description: "Public contact channels: email, LinkedIn, GitHub and WhatsApp.",
@@ -62,7 +69,7 @@ function buildServer(origin: string) {
   );
 
   server.registerTool(
-    "get_experience",
+    McpTool.GetExperience,
     {
       title: "Work experience",
       description: "Roles, organizations, periods, descriptions and stack, newest first.",
@@ -73,18 +80,35 @@ function buildServer(origin: string) {
   );
 
   server.registerTool(
-    "get_cv",
+    McpTool.ListCvVersions,
     {
-      title: "Full CV",
-      description: "Profile, experience, education and certifications in one document, plus the PDF link.",
+      title: "CV versions",
+      description: `The CV versions published on the site, one per kind of role (ids: ${cvVersionIds}). Each has its name, headline, web page URL and PDF URL. Call this first to choose the version that fits a role, then ${McpTool.GetCv} with its id.`,
       inputSchema: languageInput,
       annotations: readOnly,
     },
-    async ({ language }) => json(cv(language, origin))
+    async ({ language }) => json(listCvVersions(language, origin))
   );
 
   server.registerTool(
-    "list_projects",
+    McpTool.GetCv,
+    {
+      title: "Full CV",
+      description: `Without version: profile, experience, education and certifications in one document, the PDF link, and the available CV versions with their PDF links. With version (an id from ${McpTool.ListCvVersions}): that version's content, section by section as its CV page shows it, plus its page URL and PDF URL.`,
+      inputSchema: {
+        ...languageInput,
+        version: z
+          .enum(CvVariant)
+          .optional()
+          .describe(`Optional CV version id, one of: ${cvVersionIds}. Use ${McpTool.ListCvVersions} to choose by role.`),
+      },
+      annotations: readOnly,
+    },
+    async ({ language, version }) => json(version ? cvVersion(version, language, origin) : cv(language, origin))
+  );
+
+  server.registerTool(
+    McpTool.ListProjects,
     {
       title: "Portfolio worlds",
       description: `The portfolio's project areas (worlds) with slug, tagline and page URL. Slugs: ${PROJECT_SLUGS.join(", ")}.`,
@@ -95,7 +119,7 @@ function buildServer(origin: string) {
   );
 
   server.registerTool(
-    "get_project",
+    McpTool.GetProject,
     {
       title: "Project world details",
       description: "Every entry of one portfolio world (hackathons, courses, personal projects, education) with years, descriptions, stack and links.",
