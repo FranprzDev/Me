@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { privateClientMentions } from "./client-privacy.mjs";
 
 /**
  * Agent-facing surface: the home links to /for-agents, the old recruiter page
@@ -112,6 +113,7 @@ for (const language of ["en", "es"]) {
     await page.arrayBuffer();
 
     const doc = await callJson("get_cv", { language, version: version.id });
+    assert.equal(privateClientMentions(JSON.stringify(doc)), 0, `get_cv ${version.id} (${language}) names no private client`);
     assert.equal(doc.version.id, version.id, `get_cv returns ${version.id} (${language})`);
     assert.equal(doc.version.pdf_url, version.pdf_url);
     assertVersionedPdfUrl(doc.version.pdf_url, version.id, language);
@@ -120,6 +122,9 @@ for (const language of ["en", "es"]) {
   }
 
   const full = await callJson("get_cv", { language });
+  assert.equal(privateClientMentions(JSON.stringify(full)), 0, `get_cv (${language}) names no private client`);
+  const experience = await callJson("get_experience", { language });
+  assert.equal(privateClientMentions(JSON.stringify(experience)), 0, `get_experience (${language}) names no private client`);
   assert.ok(Array.isArray(full.experience) && full.experience.length > 0, `get_cv without version keeps the full CV (${language})`);
   assert.deepEqual(full.versions.map((version) => version.id), sourceVariants, `get_cv without version lists the versions (${language})`);
 }
@@ -216,6 +221,10 @@ assert.ok(llmsText.includes(`${baseUrl}/api/mcp`), "llms.txt points to the MCP e
 for (const name of names) assert.ok(llmsText.includes(`- ${name}:`), `llms.txt lists ${name}`);
 for (const version of (await callJson("list_cv_versions", { language: "en" })).versions) {
   assert.ok(llmsText.includes(version.pdf_url), `llms.txt links the ${version.id} PDF`);
+}
+
+for (const [surface, text] of [["home", home], ["/for-agents", agentsHtml], ["agent card", JSON.stringify(card)], ["llms.txt", llmsText]]) {
+  assert.equal(privateClientMentions(text), 0, `${surface} names no private client`);
 }
 
 const endpoint = `${baseUrl}/api/mcp`;

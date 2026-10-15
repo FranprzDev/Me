@@ -94,29 +94,29 @@ export const PROJECT_PROOFY: ProjectEntry = {
 /* Experience periods and organisations, shared by every variant. */
 
 export const REPUESTOSHOP = {
-  org: "RepuestoShop",
+  org: { en: "RepuestoShop", es: "RepuestoShop" },
   period: { en: "Dec 2025 – Present", es: "dic 2025 – actualidad" },
   place: { en: "Remote", es: "Remoto" },
 } as const;
 
-export const LA_VISTA_CASAL = {
-  org: "La Vista Casal",
+/** A private client: never named publicly, only described by what it is. */
+export const ACCOUNTING_FIRM_CLIENT = {
+  org: { en: "Private client (accounting firm)", es: "Cliente privado (estudio contable)" },
   period: { en: "Nov 2025 – Aug 2026", es: "nov 2025 – ago 2026" },
-  place: { en: "Buenos Aires", es: "CABA" },
 } as const;
 
 export const ROLLINGCODE_STUDIO = {
-  org: "RollingCode Studio",
+  org: { en: "RollingCode Studio", es: "RollingCode Studio" },
   period: { en: "Oct 2024 – Dec 2025", es: "oct 2024 – dic 2025" },
 } as const;
 
 export const FLA = {
-  org: "Fundación Líderes de Ansenuza",
+  org: { en: "Fundación Líderes de Ansenuza", es: "Fundación Líderes de Ansenuza" },
   period: { en: "Apr 2025 – Present", es: "abr 2025 – actualidad" },
 } as const;
 
 export const JUDICIARY = {
-  org: "Poder Judicial de Tucumán",
+  org: { en: "Poder Judicial de Tucumán", es: "Poder Judicial de Tucumán" },
   period: { en: "Sep 2025 – Oct 2025", es: "sep 2025 – oct 2025" },
 } as const;
 
@@ -141,11 +141,11 @@ export const B_REPUESTO_AGENT: Localized = {
   es: "Diseñé un asistente multiagente (LangGraph) con RAG sobre el catálogo para responder consultas de clientes.",
 };
 
-export const B_LVC_PLATFORM: Localized = {
-  en: "Co-built a tax-deadline management platform for an accounting firm: approval flows, change history and Google Calendar/Gmail integration. Running in production.",
-  es: "Co-desarrollé una plataforma de gestión de vencimientos impositivos para un estudio contable: flujos de aprobación, historial de cambios e integración con Google Calendar y Gmail. En producción.",
+export const B_ACCOUNTING_PLATFORM: Localized = {
+  en: "Co-built a tax-deadline management platform for the firm: approval flows, change history and Google Calendar/Gmail integration. Running in production.",
+  es: "Co-desarrollé una plataforma de gestión de vencimientos impositivos para el estudio: flujos de aprobación, historial de cambios e integración con Google Calendar y Gmail. En producción.",
 };
-export const B_LVC_HANDOVER: Localized = {
+export const B_ACCOUNTING_HANDOVER: Localized = {
   en: "Delivered full handover: technical report, executive summary and user guide.",
   es: "Entregué documentación completa: informe técnico, resumen ejecutivo y guía de usuario.",
 };

@@ -3,6 +3,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import { chromium, devices } from "playwright";
 import AxeBuilder from "@axe-core/playwright";
 import ts from "typescript";
+import { privateClientLeaks, privateClientMentions, privateClientPdfLeaks } from "./client-privacy.mjs";
 import { CV_LOCALES, CV_VARIANTS, MANIFEST, PDF_DIR, cvPdfFile, cvRoute, cvSourceHash, pdfPageCount, pdfVersion } from "./cv-pdf-shared.mjs";
 
 const baseURL = process.env.PORTFOLIO_URL || "http://localhost:3000";
@@ -57,6 +58,9 @@ async function checkPage(page, route, name) {
 async function checkCvPages(browser) {
   const manifest = JSON.parse(await readFile(MANIFEST, "utf8"));
   assert.equal(manifest.sourceHash, await cvSourceHash(), "CV PDFs are stale: run `pnpm cv:pdf` against a fresh build and commit public/cv/files");
+  // Private clients are described generically, never named: in the sources, the public files or the committed PDFs.
+  assert.deepEqual(await privateClientLeaks(["src", "public"]), [], "No private client named in src/ or public/");
+  assert.deepEqual(await privateClientPdfLeaks(PDF_DIR), [], "No private client named in the committed CV PDFs");
   // One A4 page per résumé, for the committed PDFs and the live print layout.
   // Each manifest entry records the content version the site appends as ?v=.
   const versions = new Map();
@@ -126,6 +130,7 @@ async function checkCvPages(browser) {
       const html = await page.content();
       assert.equal(/planet/i.test(await page.locator(".cv-root").evaluate((el) => el.outerHTML)), false, `${route}: no 'planet' wording`);
       assert.equal(/541[-\s]?2480|5493815412480|Delf[ií]n Gallo|Cruz Alta/i.test(html), false, `${route}: no phone number or home address`);
+      assert.equal(privateClientMentions(html), 0, `${route}: no private client named`);
       assert.equal(new URL(await page.locator("link[rel='canonical']").getAttribute("href")).pathname, route, `${route}: canonical`);
       const alternates = Object.fromEntries(
         await page.locator("link[rel='alternate'][hreflang]").evaluateAll((links) => links.map((l) => [l.getAttribute("hreflang"), new URL(l.href).pathname])),
