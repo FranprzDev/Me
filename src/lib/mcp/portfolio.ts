@@ -86,7 +86,7 @@ export function experience(language: Language) {
   const l = lang(language);
   return CV.experience.map((item) => ({
     role: item.role[l],
-    organization: item.org,
+    organization: item.org[l],
     period: item.period[l],
     start: item.start,
     current: item.current,

@@ -107,7 +107,7 @@ export function Experience() {
         </Reveal>
         <div className="timeline-container">
           {CV.experience.map((e, i) => (
-            <Reveal key={e.org + i} delay={i * 0.05}>
+            <Reveal key={e.start + i} delay={i * 0.05}>
               <article
                 className="glass tilt-card"
                 style={{
@@ -121,7 +121,7 @@ export function Experience() {
                     {tl(e.period)}
                   </span>
                 </div>
-                <p className="accent-japan" style={{ margin: "0.3rem 0 0.7rem", fontWeight: 600 }}>{e.org}</p>
+                <p className="accent-japan" style={{ margin: "0.3rem 0 0.7rem", fontWeight: 600 }}>{tl(e.org)}</p>
                 <p style={{ margin: 0, color: "var(--muted)", lineHeight: 1.7 }}>{tl(e.description)}</p>
                 {e.stack && e.stack.length > 0 && (
                   <p className="stack-note">{e.stack.join(" · ")}</p>

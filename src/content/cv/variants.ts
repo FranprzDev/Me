@@ -13,16 +13,16 @@ import { CvSection, CvVariant, type CvDefinition, type ExperienceEntry, type Loc
  * rest. Shortened text only trims words, never changes a fact.
  */
 
-const accountingClient: ExperienceEntry = {
+const freelanceProjects: ExperienceEntry = {
   role: F.ROLE_FREELANCE,
-  org: F.ACCOUNTING_FIRM_CLIENT.org,
-  period: F.ACCOUNTING_FIRM_CLIENT.period,
+  org: F.FREELANCE_PROJECTS.org,
+  period: F.FREELANCE_PROJECTS.period,
   bullets: [F.B_ACCOUNTING_PLATFORM],
 };
 
 /** FDE keeps the handover: client delivery is the point of that variant. */
-const accountingClientWithHandover: ExperienceEntry = {
-  ...accountingClient,
+const freelanceProjectsWithHandover: ExperienceEntry = {
+  ...freelanceProjects,
   bullets: [F.B_ACCOUNTING_PLATFORM, F.B_ACCOUNTING_HANDOVER],
 };
 
@@ -98,7 +98,7 @@ const fullstack: CvDefinition = {
   ],
   experience: [
     repuestoGeneral,
-    accountingClient,
+    freelanceProjects,
     studio({
       en: "Shipped frontend and backend features for client web projects in React, Next.js and Node.js.",
       es: "Desarrollé funcionalidades de frontend y backend para proyectos web de clientes en React, Next.js y Node.js.",
@@ -138,7 +138,7 @@ const backend: CvDefinition = {
   ],
   experience: [
     repuestoGeneral,
-    accountingClient,
+    freelanceProjects,
     studio({
       en: "Built backend features and APIs in Node.js for client web projects, plus the matching React/Next.js frontends.",
       es: "Desarrollé funcionalidades de backend y APIs en Node.js para proyectos web de clientes, junto con sus frontends en React/Next.js.",
@@ -190,7 +190,7 @@ const frontend: CvDefinition = {
     }),
     fla,
     repuestoGeneral,
-    accountingClient,
+    freelanceProjects,
     judiciary,
   ],
   projects: [F.PROJECT_PROOFY, F.PROJECT_NASA],
@@ -266,7 +266,7 @@ const appliedAi: CvDefinition = {
         },
       ],
     },
-    accountingClient,
+    freelanceProjects,
     judiciary,
     studio({
       en: "Built frontend and backend features for client web projects; introduced n8n automations and explored practical AI tools through working POCs.",
@@ -331,7 +331,7 @@ const fde: CvDefinition = {
   ],
   // Client-facing delivery first, then the rest by date.
   experience: [
-    accountingClientWithHandover,
+    freelanceProjectsWithHandover,
     {
       role: F.ROLE_AI,
       org: F.REPUESTOSHOP.org,

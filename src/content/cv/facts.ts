@@ -99,9 +99,9 @@ export const REPUESTOSHOP = {
   place: { en: "Remote", es: "Remoto" },
 } as const;
 
-/** A private client: never named publicly, only described by what it is. */
-export const ACCOUNTING_FIRM_CLIENT = {
-  org: { en: "Private client (accounting firm)", es: "Cliente privado (estudio contable)" },
+/** Freelance work is grouped as projects; clients are never named, only described by what they are. */
+export const FREELANCE_PROJECTS = {
+  org: { en: "Freelance Projects", es: "Proyectos freelance" },
   period: { en: "Nov 2025 – Aug 2026", es: "nov 2025 – ago 2026" },
 } as const;
 
@@ -124,7 +124,10 @@ export const JUDICIARY = {
 
 export const ROLE_SOFTWARE_AI: Localized = { en: "Software / AI Engineer", es: "Desarrollador de Software / IA" };
 export const ROLE_AI: Localized = { en: "AI Engineer", es: "AI Engineer" };
-export const ROLE_FREELANCE: Localized = { en: "Freelance Full-Stack Developer", es: "Desarrollador Full-Stack Freelance" };
+export const ROLE_FREELANCE: Localized = {
+  en: "Full-Stack & Automation Developer",
+  es: "Desarrollador Full-Stack y Automatización",
+};
 export const ROLE_PRODUCT: Localized = { en: "Product Engineer", es: "Product Engineer" };
 export const ROLE_FLA: Localized = { en: "Full-Stack Developer (Volunteer)", es: "Desarrollador Full-Stack (voluntario)" };
 export const ROLE_INSTRUCTOR: Localized = {
@@ -142,8 +145,8 @@ export const B_REPUESTO_AGENT: Localized = {
 };
 
 export const B_ACCOUNTING_PLATFORM: Localized = {
-  en: "Co-built a tax-deadline management platform for the firm: approval flows, change history and Google Calendar/Gmail integration. Running in production.",
-  es: "Co-desarrollé una plataforma de gestión de vencimientos impositivos para el estudio: flujos de aprobación, historial de cambios e integración con Google Calendar y Gmail. En producción.",
+  en: "Co-built a tax-deadline management platform for an accounting firm: approval flows, change history and Google Calendar/Gmail integration. Running in production.",
+  es: "Co-desarrollé una plataforma de gestión de vencimientos impositivos para un estudio contable: flujos de aprobación, historial de cambios e integración con Google Calendar y Gmail. En producción.",
 };
 export const B_ACCOUNTING_HANDOVER: Localized = {
   en: "Delivered full handover: technical report, executive summary and user guide.",

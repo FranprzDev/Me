@@ -10,7 +10,7 @@ export type Localized<T> = Record<Lang, T>;
 
 export interface ExperienceItem {
   role: Localized<string>;
-  org: string;
+  org: Localized<string>;
   period: Localized<string>;
   /** ISO de inicio para ordenar */
   start: string;
@@ -93,7 +93,7 @@ export const CV: CV = {
   experience: [
     {
       role: { es: "AI Engineer", en: "AI Engineer" },
-      org: "RepuestoShop",
+      org: { es: "RepuestoShop", en: "RepuestoShop" },
       period: { es: "Diciembre 2025 – Presente", en: "December 2025 – Present" },
       start: "2025-12",
       current: true,
@@ -104,11 +104,23 @@ export const CV: CV = {
       stack: ["LangChain", "LangGraph", "Multi-Agent", "RAG", "Web Scraping", "Meta APIs"],
     },
     {
+      role: { es: "Desarrollador Full-Stack y Automatización", en: "Full-Stack & Automation Developer" },
+      org: { es: "Proyectos freelance", en: "Freelance Projects" },
+      period: { es: "Noviembre 2025 – Agosto 2026", en: "November 2025 – August 2026" },
+      start: "2025-11",
+      current: false,
+      description: {
+        es: "Co-desarrollé una plataforma de gestión de vencimientos impositivos para un estudio contable: flujos de aprobación, historial de cambios e integración con Google Calendar y Gmail. En producción. Entregué documentación completa: informe técnico, resumen ejecutivo y guía de usuario.",
+        en: "Co-built a tax-deadline management platform for an accounting firm: approval flows, change history and Google Calendar/Gmail integration. Running in production. Delivered full handover: technical report, executive summary and user guide.",
+      },
+      stack: ["Full-Stack", "Automation", "Google Workspace APIs", "Approval Flows"],
+    },
+    {
       role: {
         es: "Docente — Curso de Automatización de Procesos con n8n (Poder Judicial de Tucumán)",
         en: "Instructor — Process Automation Course with n8n (Tucumán Judiciary)",
       },
-      org: "Poder Judicial de Tucumán",
+      org: { es: "Poder Judicial de Tucumán", en: "Poder Judicial de Tucumán" },
       period: { es: "Septiembre 2025 – Octubre 2025", en: "September 2025 – October 2025" },
       start: "2025-09",
       current: false,
@@ -120,7 +132,7 @@ export const CV: CV = {
     },
     {
       role: { es: "FullStack Developer", en: "FullStack Developer" },
-      org: "Fundación Líderes de Ansenuza",
+      org: { es: "Fundación Líderes de Ansenuza", en: "Fundación Líderes de Ansenuza" },
       period: { es: "Abril 2025 – Presente", en: "April 2025 – Present" },
       start: "2025-04",
       current: true,
@@ -135,7 +147,7 @@ export const CV: CV = {
         es: "Product Engineer",
         en: "Product Engineer",
       },
-      org: "RollingCode Studio",
+      org: { es: "RollingCode Studio", en: "RollingCode Studio" },
       period: { es: "Octubre 2024 – Diciembre 2025", en: "October 2024 – December 2025" },
       start: "2024-10",
       current: false,
@@ -150,7 +162,7 @@ export const CV: CV = {
         es: "Tutor Desarrollo Web & BackEnd Avanzado",
         en: "Web & Advanced BackEnd Development Tutor",
       },
-      org: "Rolling Code School",
+      org: { es: "Rolling Code School", en: "Rolling Code School" },
       period: { es: "Noviembre 2023 – Agosto 2024", en: "November 2023 – August 2024" },
       start: "2023-11",
       current: false,
