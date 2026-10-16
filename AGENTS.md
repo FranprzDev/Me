@@ -34,6 +34,12 @@ Guidance for coding agents working on this repo (Francisco Perez's portfolio, Ne
 - Copy-paste configs on `/for-agents` (Claude Code command, `mcpServers` JSON, VS Code `servers` JSON, Inspector CLI) are built from the request host and checked by `check:agent`; never hard-code another host.
 - Test with a real client before and after changes: `npx @modelcontextprotocol/inspector --cli <url>/api/mcp --transport http --method tools/list`, and `pnpm check:agent` (covers capabilities, invalid args, CORS, Accept, body cap, llms.txt and the configs).
 
+## Home experience constellation (src/components/ExperienceTrail.tsx)
+
+- The Experience section renders `CV.experience` as a constellation traced on scroll: an SVG line drawn by `stroke-dashoffset` (rAF-eased, stops when settled), one star per role, `data-state` = `upcoming` / `active` / `past` on each entry. Phones use a left rail; from 900px the cards alternate around a meandering central line.
+- Per frame only the dash offset and the tip's `transform` change; layout is measured on resize / `ResizeObserver`, never per frame. Dimmed entries change colour and scale, never opacity, so axe contrast passes in every state.
+- Reduced motion (and the server render) show the whole constellation drawn and every role lit; scroll does nothing then. `check:portfolio` covers both (`assertExperienceTrail`).
+
 ## Home worlds selector (src/components/OrbitSelector.tsx)
 
 - Worlds are layered CSS, never WebGPU. Press-and-drag turns a world about any axis: `src/lib/worldSpin.ts` keeps a quaternion per world and the selector paints it as CSS variables (`--spin-roll`, `--spin-tilt`, `--spin-lon`, `--ring-open`). A drag never navigates or steps; touch keeps quick vertical swipes for page scroll (grab = horizontal move or a short hold); inertia is off under reduced motion.

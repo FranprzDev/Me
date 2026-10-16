@@ -122,6 +122,8 @@ export function ExperienceTrail() {
     };
 
     const onScroll = () => {
+      // Reduced motion keeps the whole constellation drawn: scrolling changes nothing.
+      if (motionQuery.matches) return;
       target = targetLength();
       if (!frame && target !== drawn) frame = requestAnimationFrame(tick);
     };
