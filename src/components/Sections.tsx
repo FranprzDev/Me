@@ -9,6 +9,7 @@ import { ContactConstellations } from "@/components/ContactConstellations";
 import { OrbitSelector } from "@/components/OrbitSelector";
 import { GsapHeroName } from "@/components/GsapHeroName";
 import { Magnetic } from "@/components/Magnetic";
+import { ExperienceTrail } from "@/components/ExperienceTrail";
 
 export function Hero() {
   const { t, tl, lang } = useI18n();
@@ -93,7 +94,7 @@ export function Hero() {
 }
 
 export function Experience() {
-  const { t, tl } = useI18n();
+  const { t } = useI18n();
   return (
     <section id="experience" className="section">
       <div className="wrap">
@@ -105,31 +106,7 @@ export function Experience() {
             </h2>
           </div>
         </Reveal>
-        <div className="timeline-container">
-          {CV.experience.map((e, i) => (
-            <Reveal key={e.start + i} delay={i * 0.05}>
-              <article
-                className="glass tilt-card"
-                style={{
-                  padding: "1.4rem 1.6rem",
-                  borderLeft: e.current ? "3px solid var(--japan)" : "1px solid rgba(255,255,255,0.08)",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "0.4rem", alignItems: "baseline" }}>
-                  <h3 style={{ margin: 0, fontSize: "1.2rem", color: "var(--fg)" }}>{tl(e.role)}</h3>
-                  <span className="experience-period" data-current={e.current}>
-                    {tl(e.period)}
-                  </span>
-                </div>
-                <p className="accent-japan" style={{ margin: "0.3rem 0 0.7rem", fontWeight: 600 }}>{tl(e.org)}</p>
-                <p style={{ margin: 0, color: "var(--muted)", lineHeight: 1.7 }}>{tl(e.description)}</p>
-                {e.stack && e.stack.length > 0 && (
-                  <p className="stack-note">{e.stack.join(" · ")}</p>
-                )}
-              </article>
-            </Reveal>
-          ))}
-        </div>
+        <ExperienceTrail />
       </div>
     </section>
   );

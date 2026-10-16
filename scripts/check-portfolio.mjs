@@ -314,6 +314,39 @@ async function describeFailure(error) {
 }
 
 /**
+ * Experience constellation (src/components/ExperienceTrail.tsx): with motion the
+ * trace follows the scroll (lit entries behind the tip, dimmed ones ahead);
+ * with reduced motion the whole constellation stays drawn and lit.
+ */
+async function assertExperienceTrail(page, name, reduced) {
+  const read = () => page.evaluate(() => ({
+    mode: document.querySelector(".xp-trail")?.dataset.mode,
+    states: [...document.querySelectorAll(".xp-entry")].map((entry) => entry.dataset.state),
+    offset: Number.parseFloat(document.querySelector(".xp-trail__line")?.style.strokeDashoffset ?? "NaN"),
+  }));
+  // Park the viewport in the middle of the list and let the trace settle.
+  await page.evaluate(() => {
+    const list = document.querySelector(".xp-trail");
+    window.scrollTo({ top: list.getBoundingClientRect().top + scrollY + list.offsetHeight / 2 - innerHeight / 2, behavior: "instant" });
+  });
+  await page.waitForTimeout(900);
+  const mid = await read();
+  assert.ok(mid.states.length > 1, `${name}: experience entries rendered`);
+  if (reduced) {
+    assert.equal(mid.mode, "static", `${name}: reduced motion keeps the constellation static`);
+    assert.deepEqual([...new Set(mid.states)], ["past"], `${name}: reduced motion lights every entry`);
+    assert.equal(mid.offset, 0, `${name}: reduced motion draws the whole trace`);
+  } else {
+    assert.equal(mid.mode, "live", `${name}: the trace follows the scroll`);
+    assert.ok(mid.states.includes("active"), `${name}: the entry under the tip is active (${mid.states})`);
+    assert.ok(mid.states.includes("upcoming"), `${name}: entries ahead of the tip wait dimmed (${mid.states})`);
+    assert.ok(mid.offset > 0, `${name}: the trace is partly drawn mid-list`);
+  }
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await page.waitForTimeout(300);
+}
+
+/**
  * The hero CV button downloads the generated Applied AI PDF in the page
  * language, at its current manifest version (never the retired hand-committed file).
  */
@@ -355,6 +388,7 @@ async function main() {
       for (const route of routes) {
         await checkPage(page, route, name);
         if (route === "/") await assertHeroCvLink(page, "es");
+        if (route === "/") await assertExperienceTrail(page, name, name === "reduced-motion");
         await page.getByRole("button", { name: "Cambiar a inglés" }).click();
         assert.equal(await page.locator("html").getAttribute("lang"), "en");
         if (route === "/") await assertHeroCvLink(page, "en");

@@ -1,0 +1,294 @@
+/*
+ * Work experience traced as a constellation (src/components/ExperienceTrail.tsx).
+ * The SVG line is drawn by stroke-dashoffset from the scroll position; each
+ * entry carries data-state = upcoming | active | past. Only transform,
+ * opacity, colour and border change per state, never layout.
+ * Phones: one column, the line runs down a narrow rail on the left.
+ * Desktop (>= 900px): cards alternate sides of a central meandering line.
+ */
+
+.xp-trail {
+  --xp-rail: 2.4rem;
+  --xp-star-top: 1.55rem;
+  position: relative;
+}
+
+.xp-trail__sky {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.xp-trail__base,
+.xp-trail__glow,
+.xp-trail__line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The constellation still to come: a faint dotted guide. */
+.xp-trail__base {
+  stroke: rgba(196, 190, 255, 0.28);
+  stroke-width: 1.2;
+  stroke-dasharray: 1 7;
+}
+
+.xp-trail__glow {
+  stroke: url(#xp-trail-ink);
+  stroke-width: 7;
+  opacity: 0.16;
+}
+
+.xp-trail__line {
+  stroke: url(#xp-trail-ink);
+  stroke-width: 1.8;
+}
+
+/* Comet head at the tip of the trace (positioned by transform). */
+.xp-trail__tip {
+  fill: #fff7e0;
+  opacity: 0;
+  filter: drop-shadow(0 0 5px rgba(255, 233, 180, 0.95)) drop-shadow(0 0 12px rgba(155, 123, 255, 0.7));
+  transition: opacity 200ms ease;
+}
+
+.xp-trail__list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.xp-entry {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--xp-rail) minmax(0, 1fr);
+  align-items: start;
+}
+
+/* ---- Star ---- */
+
+.xp-star {
+  position: relative;
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: center;
+  width: 0.7rem;
+  height: 0.7rem;
+  margin-top: calc(var(--xp-star-top) - 0.35rem);
+  border-radius: 50%;
+  background: #4a4f78;
+  box-shadow: 0 0 0 1px rgba(196, 190, 255, 0.35);
+  transition: background-color 420ms ease, box-shadow 420ms ease, transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Halo and four-point flare: opacity/transform only. */
+.xp-star::before,
+.xp-star::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.4);
+  transition: opacity 520ms ease, transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.xp-star::before {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(233, 194, 112, 0.5), rgba(155, 123, 255, 0.2) 45%, transparent 70%);
+}
+
+.xp-star::after {
+  width: 2rem;
+  height: 2rem;
+  background:
+    linear-gradient(90deg, transparent 0 46%, rgba(255, 244, 214, 0.9) 50%, transparent 54% 100%),
+    linear-gradient(0deg, transparent 0 46%, rgba(255, 244, 214, 0.9) 50%, transparent 54% 100%);
+  -webkit-mask: radial-gradient(circle, #000 0 18%, transparent 62%);
+  mask: radial-gradient(circle, #000 0 18%, transparent 62%);
+}
+
+.xp-entry[data-state="past"] .xp-star,
+.xp-entry[data-state="active"] .xp-star {
+  background: #fff3d6;
+  box-shadow: 0 0 0 1px rgba(255, 236, 190, 0.7), 0 0 12px rgba(233, 194, 112, 0.8);
+}
+
+.xp-entry[data-state="past"] .xp-star::before {
+  opacity: 0.55;
+  transform: translate(-50%, -50%) scale(0.75);
+}
+
+.xp-entry[data-state="active"] .xp-star {
+  transform: scale(1.25);
+}
+
+.xp-entry[data-state="active"] .xp-star::before {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.xp-entry[data-state="active"] .xp-star::after {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1) rotate(45deg);
+}
+
+/* ---- Card ---- */
+
+.xp-card {
+  grid-column: 2;
+  grid-row: 1;
+  padding: 1.25rem 1.3rem;
+  transform-origin: left center;
+  transition:
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 420ms ease,
+    box-shadow 420ms ease,
+    background-color 420ms ease;
+}
+
+.xp-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.xp-card__role {
+  margin: 0;
+  color: var(--fg);
+  font-size: 1.2rem;
+  transition: color 420ms ease;
+}
+
+.xp-card__org {
+  margin: 0.3rem 0 0.7rem;
+  font-weight: 600;
+}
+
+.xp-card__body {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+  transition: color 420ms ease, transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.xp-entry[data-current="true"] .xp-card {
+  border-left: 3px solid var(--japan);
+}
+
+/* Upcoming: waiting in the dark. Colours keep WCAG AA contrast (no opacity). */
+.xp-trail[data-mode="live"] .xp-entry[data-state="upcoming"] .xp-card {
+  transform: scale(0.965);
+  background-color: rgba(10, 11, 24, 0.5);
+}
+
+.xp-trail[data-mode="live"] .xp-entry[data-state="upcoming"] .xp-card__role {
+  color: #c9c9de;
+}
+
+.xp-trail[data-mode="live"] .xp-entry[data-state="upcoming"] .xp-card__body {
+  color: #a9a9c4;
+  transform: translateY(0.35rem);
+}
+
+/* Active: the star the trace just reached. */
+.xp-trail[data-mode="live"] .xp-entry[data-state="active"] .xp-card,
+.xp-entry:focus-within .xp-card {
+  border-color: rgba(233, 194, 112, 0.42);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 18px 46px rgba(0, 0, 0, 0.42),
+    0 0 36px rgba(155, 123, 255, 0.2);
+}
+
+.xp-trail[data-mode="live"] .xp-entry[data-state="active"] .xp-card__body {
+  color: #dcdcef;
+}
+
+.xp-entry[data-current="true"][data-state="active"] .xp-card {
+  border-left-color: var(--japan);
+}
+
+/* ---- Desktop: alternate sides of a central meandering line ---- */
+
+@media (min-width: 900px) {
+  .xp-trail {
+    --xp-rail: 7rem;
+    --xp-star-top: 1.8rem;
+  }
+
+  .xp-trail__list {
+    gap: 0;
+  }
+
+  .xp-entry {
+    grid-template-columns: minmax(0, 1fr) var(--xp-rail) minmax(0, 1fr);
+  }
+
+  /* Opposite sides may overlap vertically: the column keeps them apart. */
+  .xp-entry + .xp-entry {
+    margin-top: -6rem;
+  }
+
+  .xp-star {
+    grid-column: 2;
+  }
+
+  .xp-entry[data-side="start"] .xp-star {
+    justify-self: start;
+    margin-left: 1.6rem;
+  }
+
+  .xp-entry[data-side="end"] .xp-star {
+    justify-self: end;
+    margin-right: 1.6rem;
+  }
+
+  .xp-entry[data-side="start"] .xp-card {
+    grid-column: 1;
+    transform-origin: right center;
+  }
+
+  .xp-entry[data-side="end"] .xp-card {
+    grid-column: 3;
+  }
+
+  .xp-card {
+    padding: 1.4rem 1.6rem;
+  }
+}
+
+@media (hover: hover) {
+  .xp-card:hover {
+    border-color: rgba(122, 162, 255, 0.35);
+  }
+}
+
+/* Reduced motion: the whole constellation is drawn and lit, nothing moves. */
+@media (prefers-reduced-motion: reduce) {
+  .xp-trail__tip {
+    display: none;
+  }
+
+  .xp-star,
+  .xp-star::before,
+  .xp-star::after,
+  .xp-card,
+  .xp-card__role,
+  .xp-card__body {
+    transition: none;
+  }
+}
