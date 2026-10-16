@@ -253,6 +253,18 @@ function worldPose(page, slot = "center") {
   }));
 }
 
+/** Waits until the world stops coasting (inertia) and returns its resting pose. */
+async function settledPose(page) {
+  let last = await worldPose(page);
+  for (let i = 0; i < 30; i++) {
+    await page.waitForTimeout(150);
+    const next = await worldPose(page);
+    if (JSON.stringify(next) === JSON.stringify(last)) return next;
+    last = next;
+  }
+  throw new Error("The world never stopped turning after a release");
+}
+
 /** Centre of the centred world, in viewport px. */
 async function worldCentre(page) {
   const box = await page.locator('#projects .orbit-select__slot[data-slot="center"] .orbit-select__orb').boundingBox();
@@ -560,10 +572,9 @@ async function main() {
         // A held press grabs the world in any direction, without scrolling the page.
         const scrollBefore = await page.evaluate(() => scrollY);
         await touchDrag(cdp, { x: centre.x - 30, y: centre.y + 20 }, { x: centre.x + 50, y: centre.y - 60 }, 260);
-        await page.waitForTimeout(500);
+        const after = await settledPose(page);
         assert.equal(new URL(page.url()).pathname, "/", `${name}: a held drag never enters the world`);
         assert.equal(await page.evaluate(() => scrollY), scrollBefore, `${name}: a grabbed world does not scroll the page`);
-        const after = await worldPose(page);
         assert.notDeepEqual(after, before, `${name}: touch drag turns the world (${JSON.stringify(after)})`);
         // A quick vertical swipe over the world still scrolls the page.
         await touchDrag(cdp, { x: centre.x, y: centre.y + 40 }, { x: centre.x, y: centre.y - 160 }, 0, 6);
