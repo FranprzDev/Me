@@ -18,6 +18,18 @@
   --japan-2: #e9c270; /* alias -> dorado estelar */
   --brain: #7aa2ff; /* alias -> azul claro */
   --brain-2: #b388ff; /* alias -> violeta claro */
+
+  /* Heading face: Space Grotesk (next/font, root layout). Body keeps system-ui. */
+  --font-heading: var(--font-heading-face), "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* Every heading wears the display face on screen. Zero specificity, so any
+   page or component rule (the /me editorial type, the print résumé) wins. */
+@media screen {
+  :where(h1, h2, h3, h4) {
+    font-family: var(--font-heading);
+    font-weight: 500;
+  }
 }
 
 @theme inline {
@@ -871,7 +883,7 @@ button:focus-visible {
 }
 
 .h-display {
-  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-family: var(--font-heading);
   line-height: 1.02;
   letter-spacing: -0.02em;
 }
@@ -915,7 +927,7 @@ button:focus-visible {
 .edu-hero h1 {
   max-width: 650px;
   margin: 1.2rem 0 1rem;
-  font: 500 clamp(3.2rem, 6vw, 5.7rem)/0.99 Georgia, Cambria, "Times New Roman", serif;
+  font: 500 clamp(3.2rem, 6vw, 5.7rem)/0.99 var(--font-heading);
   letter-spacing: -0.045em;
   text-wrap: balance;
   text-shadow: 0 8px 55px rgba(128, 93, 255, 0.3);
@@ -998,7 +1010,7 @@ button:focus-visible {
 
 .edu-section { padding-top: clamp(3.8rem, 8vw, 6rem); scroll-margin-top: 2rem; }
 .edu-section__heading { margin: 0 0 1.4rem 0.25rem; }
-.edu-section__heading h2 { margin: 0.55rem 0 0; font: 500 clamp(1.8rem, 3.5vw, 2.8rem)/1.1 Georgia, Cambria, "Times New Roman", serif; letter-spacing: -0.025em; }
+.edu-section__heading h2 { margin: 0.55rem 0 0; font: 500 clamp(1.8rem, 3.5vw, 2.8rem)/1.1 var(--font-heading); letter-spacing: -0.025em; }
 .edu-section__heading > p { max-width: 620px; margin: 0.65rem 0 0; color: var(--muted); line-height: 1.65; }
 
 .edu-degree {
@@ -1025,13 +1037,13 @@ button:focus-visible {
   border-radius: 50%;
   background: radial-gradient(circle, rgba(240, 206, 139, 0.2), rgba(20, 15, 37, 0.4) 70%);
   color: #f5d798;
-  font: 700 1.45rem Georgia, serif;
+  font: 700 1.45rem var(--font-heading);
   box-shadow: 0 0 30px rgba(238, 201, 132, 0.12);
 }
 
 .edu-degree__mark span { color: #e4d8ff; font: 600 0.56rem ui-monospace, monospace; letter-spacing: .2em; }
 .edu-degree__copy > p:first-child { margin: 0 0 0.55rem; color: #eac984; font: 0.67rem ui-monospace, monospace; letter-spacing: .15em; }
-.edu-degree__copy h3 { max-width: 650px; margin: 0; font: 500 clamp(1.45rem, 3vw, 2.25rem)/1.15 Georgia, Cambria, "Times New Roman", serif; }
+.edu-degree__copy h3 { max-width: 650px; margin: 0; font: 500 clamp(1.45rem, 3vw, 2.25rem)/1.15 var(--font-heading); }
 .edu-degree__copy > span { display: block; margin-top: 0.55rem; color: #c7b3ff; font-size: 0.93rem; font-weight: 600; }
 .edu-degree__status { display: flex; align-items: center; gap: 0.55rem; align-self: start; padding: 0.55rem 0.75rem; border: 1px solid rgba(127, 220, 177, 0.35); border-radius: 999px; color: #c5f2d8; background: rgba(38, 119, 84, 0.13); font-size: 0.72rem; white-space: nowrap; }
 .edu-degree__status i { width: 6px; height: 6px; border-radius: 50%; background: #75e2aa; box-shadow: 0 0 10px #75e2aa; }
@@ -1103,7 +1115,7 @@ button:focus-visible {
 .atlas-page h1,
 .dossier-page h1 {
   margin: 0;
-  font: 500 clamp(2.5rem, 6.4vw, 4.5rem)/1.02 Georgia, Cambria, "Times New Roman", serif;
+  font: 500 clamp(2.5rem, 6.4vw, 4.5rem)/1.02 var(--font-heading);
   letter-spacing: -0.04em;
   text-wrap: balance;
 }
@@ -1131,7 +1143,7 @@ button:focus-visible {
 }
 .hud-title h2 {
   margin: 0.55rem 0 0;
-  font: 500 clamp(1.7rem, 3.2vw, 2.5rem)/1.1 Georgia, Cambria, "Times New Roman", serif;
+  font: 500 clamp(1.7rem, 3.2vw, 2.5rem)/1.1 var(--font-heading);
   letter-spacing: -0.02em;
 }
 
@@ -1246,7 +1258,7 @@ button:focus-visible {
 .arena-trophy__badge i { font: normal 0.6rem/1.4 ui-monospace, monospace; opacity: 0.72; }
 
 .arena-trophy .hud-kicker { color: var(--gold); }
-.arena-trophy h2 { margin: 0; font: 500 clamp(1.55rem, 3vw, 2.4rem)/1.12 Georgia, serif; color: #fff6e6; }
+.arena-trophy h2 { margin: 0; font: 500 clamp(1.55rem, 3vw, 2.4rem)/1.12 var(--font-heading); color: #fff6e6; }
 .arena-trophy__copy > p:not(.hud-kicker) { max-width: 58ch; margin: 0.65rem 0 0; color: #ded8cb; line-height: 1.72; }
 
 .arena-trophy__ribbon {
@@ -1403,7 +1415,7 @@ button:focus-visible {
   order: 1;
   margin: 0 0 0.3rem;
   color: #fff3d9;
-  font: 500 1.35rem/1.05 Georgia, serif;
+  font: 500 1.35rem/1.05 var(--font-heading);
 }
 
 .aula-dial {
@@ -1425,7 +1437,7 @@ button:focus-visible {
 .aula-dial svg { position: relative; width: 100%; }
 .aula-dial__segment { opacity: 0.45; }
 .aula-dial__core { position: absolute; display: grid; justify-items: center; text-align: center; }
-.aula-dial__core span { color: #fff0d2; font: 500 clamp(2.8rem, 7vw, 4rem)/0.9 Georgia, serif; }
+.aula-dial__core span { color: #fff0d2; font: 500 clamp(2.8rem, 7vw, 4rem)/0.9 var(--font-heading); }
 .aula-dial__core b {
   margin-top: 0.55rem;
   color: var(--chalk);
@@ -1460,7 +1472,7 @@ button:focus-visible {
 .aula-course h2 {
   max-width: 30ch;
   margin: 1.1rem 0 0.8rem;
-  font: 500 clamp(1.55rem, 3.2vw, 2.4rem)/1.16 Georgia, serif;
+  font: 500 clamp(1.55rem, 3.2vw, 2.4rem)/1.16 var(--font-heading);
   color: #fff8ea;
 }
 .aula-course > p { max-width: 62ch; margin: 0; color: #d8d2c4; line-height: 1.78; }
@@ -1501,7 +1513,7 @@ button:focus-visible {
 }
 .aula-heading h2 {
   margin: 0.55rem 0 0;
-  font: 500 clamp(1.6rem, 3vw, 2.3rem)/1.12 Georgia, serif;
+  font: 500 clamp(1.6rem, 3vw, 2.3rem)/1.12 var(--font-heading);
   color: #fff8ea;
 }
 .aula-heading p { margin: 0.7rem 0 0; color: var(--muted); line-height: 1.7; }
@@ -1518,7 +1530,7 @@ button:focus-visible {
 .aula-book:first-child { border-top: 0; padding-top: 0.4rem; }
 .aula-book__index {
   color: color-mix(in srgb, var(--planet) 80%, white);
-  font: 500 1.35rem/1 Georgia, serif;
+  font: 500 1.35rem/1 var(--font-heading);
 }
 .aula-book__copy h3 {
   margin: 0;

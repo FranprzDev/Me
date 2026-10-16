@@ -1,8 +1,18 @@
 import type { Metadata } from "next";
+import { Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { I18nProvider } from "@/lib/i18n";
 import { ScrollProvider } from "@/lib/scroll";
 import { SiteChrome } from "@/components/SiteChrome";
+
+// Display face for every heading (OFL, self-hosted by next/font, latin subset,
+// variable weight axis). Body copy keeps the system UI stack.
+const headingFont = Space_Grotesk({
+  subsets: ["latin"],
+  weight: "variable",
+  variable: "--font-heading-face",
+  display: "swap",
+});
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://franprzdev.github.io";
 
@@ -35,7 +45,7 @@ export default function RootLayout({
     <html
       lang="es"
       data-scroll-behavior="smooth"
-      className="h-full antialiased"
+      className={`h-full antialiased ${headingFont.variable}`}
     >
       <body className="min-h-full">
         <I18nProvider>
