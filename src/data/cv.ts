@@ -207,5 +207,30 @@ export const CV: CV = {
       name: { es: "Data Engineer", en: "Data Engineer" },
       period: { es: "Junio 2025 – Octubre 2025", en: "June 2025 – October 2025" },
     },
+    {
+      school: "Google (Coursera)",
+      name: { es: "Google AI Essentials", en: "Google AI Essentials" },
+      period: { es: "Septiembre 2025 – Octubre 2025", en: "September 2025 – October 2025" },
+    },
+    {
+      school: "Google (Coursera)",
+      name: { es: "Google Prompting Essentials", en: "Google Prompting Essentials" },
+      period: { es: "Septiembre 2025", en: "September 2025" },
+    },
+    {
+      school: "OpenAI Academy",
+      name: { es: "AI Foundations", en: "AI Foundations" },
+      period: { es: "Agosto 2026", en: "August 2026" },
+    },
+    {
+      school: "OpenAI Academy",
+      name: { es: "Applied AI Foundations", en: "Applied AI Foundations" },
+      period: { es: "Agosto 2026", en: "August 2026" },
+    },
+    {
+      school: "OpenAI Academy",
+      name: { es: "Agents and Workflows", en: "Agents and Workflows" },
+      period: { es: "Septiembre 2026", en: "September 2026" },
+    },
   ],
 };
