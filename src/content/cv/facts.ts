@@ -170,7 +170,7 @@ export const B_ACCOUNTING_HANDOVER: Localized = {
 
 export const B_FLA: Localized = {
   en: "Leading the foundation's digital transformation: rebuilt its web platform (Next.js, Prisma, PostgreSQL) and internal tools.",
-  es: "Lidero la transformación digital de la fundación: rehice su plataforma web (Next.js, Prisma, PostgreSQL) y herramientas internas.",
+  es: "Lidero la transformación digital de la fundación: rehice su web (Next.js, Prisma, PostgreSQL) y herramientas internas.",
 };
 
 export const B_JUDICIARY: Localized = {

@@ -143,7 +143,7 @@ const backend: CvDefinition = {
     freelanceProjects,
     studio({
       en: "Built backend features and APIs in Node.js for client web projects, plus the matching React/Next.js frontends.",
-      es: "Desarrollé funcionalidades de backend y APIs en Node.js para proyectos web de clientes, junto con sus frontends en React/Next.js.",
+      es: "Desarrollé backend y APIs en Node.js para proyectos web de clientes, junto con sus frontends en React/Next.js.",
     }),
     fla,
     judiciary,
@@ -188,7 +188,7 @@ const frontend: CvDefinition = {
   experience: [
     studio({
       en: "Built React and Next.js frontends and UI features for client web projects, plus the Node.js backends behind them.",
-      es: "Desarrollé frontends y funcionalidades de interfaz en React y Next.js para proyectos web de clientes, junto con sus backends en Node.js.",
+      es: "Desarrollé frontends en React y Next.js para proyectos web de clientes, junto con sus backends en Node.js.",
     }),
     fla,
     repuestoGeneral,
@@ -243,7 +243,7 @@ const appliedAi: CvDefinition = {
       },
     },
     {
-      label: { en: "Tooling & practices", es: "Herramientas y prácticas" },
+      label: { en: "Tooling & practices", es: "Herramientas" },
       value: {
         en: "Codex, Claude Code, Git, Git Flow, CI/CD, Scrum",
         es: "Codex, Claude Code, Git, Git Flow, CI/CD, Scrum",
@@ -304,7 +304,7 @@ const fde: CvDefinition = {
       label: { en: "Client delivery", es: "Entrega a clientes" },
       value: {
         en: "Requirements gathering, handover documentation, user training, working with non-technical users",
-        es: "Relevamiento de requisitos, documentación de entrega, capacitación de usuarios, trabajo con usuarios no técnicos",
+        es: "Relevamiento, documentación de entrega, capacitación y trabajo con usuarios no técnicos",
       },
     },
     {
