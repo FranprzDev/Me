@@ -1108,14 +1108,6 @@ button:focus-visible {
   text-wrap: balance;
 }
 
-.dossier-hero__lede {
-  max-width: 54ch;
-  margin: 1.1rem 0 0;
-  font-size: clamp(1.05rem, 1.6vw, 1.2rem);
-  font-weight: 600;
-  line-height: 1.55;
-}
-
 .dossier-hero__body {
   max-width: 60ch;
   margin: 0.85rem 0 0;
@@ -1652,7 +1644,6 @@ button:focus-visible {
 }
 .dossier-hero .hud-kicker { color: var(--planet-2); }
 .dossier-hero h1 { color: #f7f4ff; }
-.dossier-hero__lede { color: var(--planet-2); }
 
 .dossier-catalog { padding-top: 1.5rem; }
 .dossier-group { padding: 1.7rem 0; border-top: 1px solid rgba(197, 180, 255, 0.13); }
@@ -2259,6 +2250,13 @@ button:focus-visible {
   /* Back item peeking above the centre sphere + centre sphere + its name. */
   height: calc(var(--orb-d) * 1.38 + 3.4rem);
   touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+}
+/* While a world is grabbed, the whole selector shows the grab. */
+.orbit-select[data-dragging],
+.orbit-select[data-dragging] .orbit-select__body {
+  cursor: grabbing;
 }
 /* Faint orbit line through the outer items. */
 .orbit-select__track {
@@ -2334,6 +2332,8 @@ button:focus-visible {
   background: none;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
 }
 .orbit-select__lift.is-zooming {
   scale: 1.8;
@@ -2383,15 +2383,26 @@ button:focus-visible {
     0 0 calc(var(--orb-d) * 0.42) color-mix(in srgb, var(--tone) 10%, transparent);
   transition: box-shadow 220ms ease;
 }
-/* Texture strip: two identical tiles side by side, scrolled by one tile so
-   the loop is seamless. Each tile is one globe wide (background-size 50%). */
+/* Drag pose (lib/worldSpin, set by the selector as CSS variables): the whole
+   surface rolls about the view axis and its bands slide when a pole leans
+   towards the viewer; lighting (the globe's pseudo-elements) stays put. */
+.orbit-select__surface {
+  position: absolute;
+  inset: 0;
+  transform: rotate(var(--spin-roll, 0deg)) translateY(calc(var(--spin-tilt, 0) * var(--orb-d)));
+}
+/* Texture strip: three identical tiles side by side. The spin animation
+   scrolls it by one tile (seamless loop) and the drag's longitude
+   (--spin-lon, one tile per half turn) by up to one more, so a tile always
+   covers the globe. Each tile is one globe wide. */
 .orbit-select__map,
 .orbit-select__clouds {
   position: absolute;
   inset: 0 auto 0 0;
-  width: 200%;
+  width: 300%;
   background-repeat: repeat-x;
-  background-size: 50% 100%;
+  background-size: calc(100% / 3) 100%;
+  translate: calc((var(--spin-lon, 0) - 1) * var(--orb-d)) 0;
   animation: orb-spin 96s linear infinite;
   will-change: transform;
 }
@@ -2560,7 +2571,8 @@ button:focus-visible {
     color-mix(in srgb, var(--ring) 22%, transparent) 90%,
     transparent 91%
   );
-  transform: translate(-50%, -50%) rotate(-14deg);
+  /* Follows the drag: rolls with the surface, opens as the pole leans in. */
+  transform: translate(-50%, -50%) rotate(calc(-14deg + var(--spin-roll, 0deg))) scaleY(var(--ring-open, 1));
   pointer-events: none;
 }
 .orbit-select__ring.is-back {
@@ -2627,7 +2639,7 @@ button:focus-visible {
     transform: translateX(0);
   }
   to {
-    transform: translateX(-50%);
+    transform: translateX(calc(100% / -3));
   }
 }
 @keyframes orb-halo {
@@ -2732,20 +2744,106 @@ button:focus-visible {
   transition: opacity 300ms ease;
 }
 
-.orbit-select__detail {
-  display: grid;
-  justify-items: center;
-  /* Room for a two-line tagline, so worlds with and without one keep the
-     heading above in place. */
-  min-height: 3rem;
-  align-content: start;
+/* Reduced motion: no landing, the selector just fades before the jump. */
+.orbit-select[data-entry="fading"] {
+  opacity: 0;
+  transition: opacity 160ms ease;
 }
-.orbit-select__tagline {
-  max-width: 34rem;
-  margin: 0;
-  color: var(--fg);
-  font-size: 1rem;
-  line-height: 1.5;
+
+/* ─── Puppy landing ───────────────────────────────────────────────────────
+   Entering a world lands a puppy astronaut on its top (components/
+   WorldLanding) before the zoom. Anchored at the world's north limb inside
+   the lift, so the zoom carries it; the path is WAAPI on transform and
+   opacity, the idle flicker below is CSS. Footpads sit at y = 124 of the
+   150-unit art. */
+.orbit-select__lift .world-landing {
+  --pup-w: calc(var(--orb-d) * 0.3);
+  position: absolute;
+  z-index: 5;
+  top: calc(var(--orb-d) / -2 + var(--orb-d) * 0.012);
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.world-landing__craft {
+  position: absolute;
+  left: calc(var(--pup-w) / -2);
+  top: calc(var(--pup-w) * -1.25 * 124 / 150);
+  width: var(--pup-w);
+  height: calc(var(--pup-w) * 1.25);
+  opacity: 0;
+  transform-origin: 50% 82.7%;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 0 calc(var(--pup-w) * 0.08) color-mix(in srgb, var(--tone) 45%, transparent));
+}
+.world-landing__art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.world-landing__art :is(.world-landing__flame, .world-landing__flicker, .world-landing__ear) {
+  transform-box: fill-box;
+}
+.world-landing__flame,
+.world-landing__flicker {
+  transform-origin: 50% 0;
+}
+.world-landing__ear {
+  transform-origin: 50% 8%;
+}
+.world-landing__flicker {
+  animation: landing-flicker 70ms ease-in-out infinite alternate;
+}
+.world-landing__tone {
+  fill: var(--tone);
+}
+.world-landing__beacon {
+  fill: var(--tone-2);
+  animation: landing-blink 360ms steps(2, jump-none) infinite alternate;
+}
+.world-landing__lamp {
+  fill: #ffd56b;
+  animation: landing-blink 240ms steps(2, jump-none) infinite alternate;
+}
+.world-landing__lamp.is-late {
+  animation-delay: -120ms;
+}
+.world-landing__shadow {
+  position: absolute;
+  left: calc(var(--pup-w) * -0.5);
+  top: calc(var(--pup-w) * -0.07);
+  width: var(--pup-w);
+  height: calc(var(--pup-w) * 0.16);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.75), transparent);
+  opacity: 0;
+}
+.world-landing__dust {
+  position: absolute;
+  top: calc(var(--pup-w) * -0.2);
+  width: calc(var(--pup-w) * 0.62);
+  height: calc(var(--pup-w) * 0.26);
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side at 40% 55%, color-mix(in srgb, var(--tone-2) 55%, #fff) 0 30%, transparent 100%),
+    radial-gradient(closest-side at 70% 60%, color-mix(in srgb, var(--tone-2) 40%, #fff) 0 20%, transparent 90%);
+  opacity: 0;
+}
+.world-landing__dust.is-left {
+  left: calc(var(--pup-w) * -0.78);
+}
+.world-landing__dust.is-right {
+  left: calc(var(--pup-w) * 0.16);
+}
+@keyframes landing-flicker {
+  from { transform: scale(0.88, 0.9); }
+  to { transform: scale(1.08, 1.06); }
+}
+@keyframes landing-blink {
+  from { opacity: 0.35; }
+  to { opacity: 1; }
 }
 @media (max-width: 560px) {
   .orbit-select {
@@ -2762,6 +2860,9 @@ button:focus-visible {
   }
   .orbit-select__ring {
     width: calc(var(--orb-d) * 1.42);
+  }
+  .orbit-select__lift .world-landing {
+    --pup-w: calc(var(--orb-d) * 0.34);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -2787,138 +2888,3 @@ button:focus-visible {
   }
 }
 
-/* ─── World-entry flights ─────────────────────────────────────────────────
-   Overlay flying the entered world's vehicle along its tangent curve
-   (components/WorldEntryFlight, lib/worldFlight). Fixed, clipped and
-   pointer-transparent; the path itself is a WAAPI transform animation and
-   the vehicles' idle motion below animates transform/opacity only. */
-.world-flight {
-  position: fixed;
-  inset: 0;
-  z-index: 86;
-  overflow: hidden;
-  pointer-events: none;
-  contain: strict;
-  --vehicle-size: clamp(84px, 8.5vw, 124px);
-}
-.world-flight__vehicle,
-.world-flight__echo {
-  position: absolute;
-  left: 0;
-  top: 0;
-  opacity: 0;
-  will-change: transform, opacity;
-}
-.world-flight__vehicle {
-  width: var(--vehicle-size);
-  height: var(--vehicle-size);
-  margin: calc(var(--vehicle-size) / -2) 0 0 calc(var(--vehicle-size) / -2);
-}
-.world-flight__vehicle .vehicle-art {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-.world-flight .vehicle-art * {
-  transform-box: fill-box;
-  transform-origin: center;
-}
-/* UFO afterglow: soft tone orbs trailing the saucer. */
-.world-flight__echo {
-  width: calc(var(--vehicle-size) * 0.55);
-  height: calc(var(--vehicle-size) * 0.3);
-  margin: calc(var(--vehicle-size) * -0.15) 0 0 calc(var(--vehicle-size) * -0.275);
-  border-radius: 50%;
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--tone) calc(var(--echo) * 70%), transparent), transparent);
-}
-/* UFO arrival: a tone shockwave where it dives into the world. */
-.world-flight__burst {
-  position: absolute;
-  width: 180px;
-  height: 180px;
-  margin: -90px 0 0 -90px;
-  border-radius: 50%;
-  opacity: 0;
-  border: 3px solid var(--tone-2);
-  box-shadow: 0 0 24px 6px color-mix(in srgb, var(--tone) 60%, transparent), inset 0 0 24px 4px color-mix(in srgb, var(--tone) 45%, transparent);
-}
-.vehicle-art--ufo .ufo__body {
-  animation: ufo-wobble 300ms ease-in-out infinite alternate;
-}
-.vehicle-art--ufo .ufo__glow {
-  animation: ufo-pulse 220ms ease-in-out infinite alternate;
-}
-.vehicle-art--ufo .ufo__beam {
-  transform-origin: top center;
-  animation: ufo-beam 140ms ease-in-out infinite alternate;
-}
-.vehicle-art--ufo .ufo__beam-rings ellipse {
-  animation: ufo-rings 360ms linear infinite;
-}
-.vehicle-art--ufo .ufo__beam-rings ellipse:last-child {
-  animation-delay: -180ms;
-}
-.vehicle-art--ufo .ufo__light {
-  animation: ufo-light 280ms steps(2, jump-none) infinite alternate;
-}
-@keyframes ufo-wobble {
-  from { transform: rotate(-8deg) translateY(-1.5px); }
-  to { transform: rotate(8deg) translateY(1.5px); }
-}
-@keyframes ufo-pulse {
-  from { transform: scale(0.88); opacity: 0.7; }
-  to { transform: scale(1.12); opacity: 1; }
-}
-@keyframes ufo-beam {
-  from { transform: scaleX(0.82); opacity: 0.65; }
-  to { transform: scaleX(1.08); opacity: 1; }
-}
-@keyframes ufo-rings {
-  from { transform: translateY(-14px) scale(0.6); opacity: 0; }
-  40% { opacity: 1; }
-  to { transform: translateY(16px) scale(1.25); opacity: 0; }
-}
-@keyframes ufo-light {
-  from { opacity: 0.25; }
-  to { opacity: 1; }
-}
-.vehicle-art--book .book__wing--up {
-  transform-origin: bottom center;
-  animation: book-flap 150ms ease-in-out infinite alternate;
-}
-.vehicle-art--book .book__wing--down {
-  transform-origin: top center;
-  animation: book-flap 150ms ease-in-out infinite alternate;
-}
-.vehicle-art--book .book__spark {
-  animation: ufo-light 200ms ease-in-out infinite alternate;
-}
-@keyframes book-flap {
-  from { transform: scaleY(1); }
-  to { transform: scaleY(0.22); }
-}
-.vehicle-art--hammer .hammer__spin {
-  animation: hammer-spin 260ms linear infinite;
-}
-.vehicle-art--hammer .hammer__swirl {
-  animation: hammer-spin 520ms linear infinite reverse;
-}
-@keyframes hammer-spin {
-  to { transform: rotate(360deg); }
-}
-.vehicle-art--plane .plane__body {
-  animation: plane-roll 240ms ease-in-out infinite alternate;
-}
-.vehicle-art--plane .plane__trail {
-  animation: ufo-light 160ms ease-in-out infinite alternate;
-}
-@keyframes plane-roll {
-  from { transform: scaleY(1) rotate(-3deg); }
-  to { transform: scaleY(0.78) rotate(3deg); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .world-flight {
-    display: none;
-  }
-}

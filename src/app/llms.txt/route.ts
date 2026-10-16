@@ -34,9 +34,7 @@ export function GET(request: Request) {
     "",
     `- [Home](${me.links.site})`,
     `- [About and experience](${origin}/me)`,
-    ...listProjects(Language.En, origin).map((project) =>
-      project.tagline ? `- [${project.title}](${project.url}): ${project.tagline}` : `- [${project.title}](${project.url})`
-    ),
+    ...listProjects(Language.En, origin).map((project) => `- [${project.title}](${project.url})`),
     "",
     "## Contact",
     "",

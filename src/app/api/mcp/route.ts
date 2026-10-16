@@ -126,7 +126,7 @@ function buildServer(origin: string) {
     McpTool.ListProjects,
     {
       title: "Portfolio worlds",
-      description: `The portfolio's project areas (worlds) with slug, title, tagline, years and page URL. Slugs: ${PROJECT_SLUGS.join(", ")}.`,
+      description: `The portfolio's project areas (worlds) with slug, title, years and page URL. Slugs: ${PROJECT_SLUGS.join(", ")}.`,
       inputSchema: languageInput,
       annotations: readOnly,
     },

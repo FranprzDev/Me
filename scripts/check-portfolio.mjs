@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { mkdir, readFile } from "node:fs/promises";
 import { chromium, devices } from "playwright";
 import AxeBuilder from "@axe-core/playwright";
-import ts from "typescript";
 import { privateClientLeaks, privateClientMentions, privateClientPdfLeaks } from "./client-privacy.mjs";
 import { CV_LOCALES, CV_VARIANTS, MANIFEST, PDF_DIR, cvPdfFile, cvRoute, cvSourceHash, pdfPageCount, pdfVersion } from "./cv-pdf-shared.mjs";
 
@@ -218,60 +217,79 @@ async function checkCvPages(browser) {
   }
 }
 
-/** Vehicle each world sends the visitor in with (WORLD_FLIGHTS in src/lib/worldFlight.ts). */
-const VEHICLE_BY_ROUTE = { "/hackathons": "ufo", "/teaching": "paper-plane", "/projects": "hammer", "/education": "book" };
+/** Subtitles that used to sit under the worlds (removed 2026-10-15), in both languages. */
+const REMOVED_WORLD_SUBTITLES = [
+  "Ingeniería en Sistemas — UTN-FRT y formación continua.",
+  "Systems Engineering — UTN-FRT and continuous training.",
+  "Herramientas reales: developer tools, IA y productos web.",
+  "Real tools: developer tools, AI and web products.",
+  "Compartir lo que sé y acompañar a otros en su recorrido técnico.",
+  "Sharing what I know and guiding others on their technical journey.",
+];
 
-/** Records every world-entry flight overlay that mounts (it lives well under a second). */
-function recordFlights() {
-  window.__flights = [];
+/** Records every puppy landing that mounts on a world, with the world it lands on and when. */
+function recordLandings() {
+  window.__landings = [];
   new MutationObserver((records) => {
     for (const record of records) {
       for (const node of record.addedNodes) {
-        if (!(node instanceof HTMLElement) || !node.matches("[data-world-flight]")) continue;
-        const entry = { vehicle: node.dataset.worldFlight, world: node.dataset.world, path: node.dataset.path, overflow: null };
-        window.__flights.push(entry);
+        if (!(node instanceof HTMLElement) || !node.matches("[data-world-landing]")) continue;
+        const entry = { href: node.closest(".orbit-select__slot")?.querySelector("a")?.getAttribute("href") ?? null, at: performance.now(), overflow: null };
+        window.__landings.push(entry);
         setTimeout(() => {
           entry.overflow = document.documentElement.scrollWidth > innerWidth;
-        }, 200);
+        }, 300);
       }
     }
   }).observe(document, { childList: true, subtree: true });
 }
 
-/** The country phase is derived on the client: no page may ever ask the removed endpoint for it. */
-const REMOVED_PHASE_ENDPOINT = "/api/geo-phase";
-
-/** Records every request the page makes to the removed phase endpoint (expected: none). */
-function recordPhaseRequests(page) {
-  const urls = [];
-  page.on("request", (request) => {
-    if (new URL(request.url()).pathname.startsWith(REMOVED_PHASE_ENDPOINT)) urls.push(request.url());
-  });
-  return urls;
+/** Drag pose painted on a world (CSS variables set by the trackball). */
+function worldPose(page, slot = "center") {
+  return page.locator(`#projects .orbit-select__slot[data-slot="${slot}"] .orbit-select__orb`).evaluate((el) => ({
+    roll: el.style.getPropertyValue("--spin-roll"),
+    tilt: el.style.getPropertyValue("--spin-tilt"),
+    lon: el.style.getPropertyValue("--spin-lon"),
+  }));
 }
 
-/** Loads src/lib/geoPhase.ts (pure, no imports) as an ES module, transpiled with the repo's TypeScript. */
-async function importGeoPhase() {
-  const source = await readFile(new URL("../src/lib/geoPhase.ts", import.meta.url), "utf8");
-  const { outputText } = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } });
-  return import(`data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`);
+/** Waits until the world stops coasting (inertia) and returns its resting pose. */
+async function settledPose(page) {
+  let last = await worldPose(page);
+  for (let i = 0; i < 30; i++) {
+    await page.waitForTimeout(150);
+    const next = await worldPose(page);
+    if (JSON.stringify(next) === JSON.stringify(last)) return next;
+    last = next;
+  }
+  throw new Error("The world never stopped turning after a release");
 }
 
-/** Opens home on the selector, waits for the idle work (vehicle chunk), then enters `route` with Enter. */
-async function enterWorld(page, route) {
-  const phaseRequests = recordPhaseRequests(page);
+/** Centre of the centred world, in viewport px. */
+async function worldCentre(page) {
+  const box = await page.locator('#projects .orbit-select__slot[data-slot="center"] .orbit-select__orb').boundingBox();
+  return { x: box.x + box.width / 2, y: box.y + box.height / 2, r: box.width / 2 };
+}
+
+/** Opens home on the selector with the auto-rotation settled out of the way. */
+async function openSelector(page) {
   await page.goto(`${baseURL}/#projects`);
   await page.waitForLoadState("networkidle");
-  await page.waitForTimeout(300);
-  const card = page.locator("#world-details");
-  await card.focus();
-  while ((await card.getAttribute("href")) !== route) await page.keyboard.press("ArrowRight");
-  await card.focus();
-  await Promise.all([page.waitForURL(`**${route}`), page.keyboard.press("Enter")]);
-  await page.waitForFunction(() => document.querySelector("[data-world-flight]") === null, null, { timeout: 2000 });
-  await page.locator("h1").waitFor();
-  assert.deepEqual(phaseRequests, [], `No request to ${REMOVED_PHASE_ENDPOINT} entering ${route}`);
-  return page.evaluate(() => window.__flights);
+  await page.locator("#world-details").waitFor();
+  await page.locator("#projects .orbit-select__stage").scrollIntoViewIfNeeded();
+  await page.waitForTimeout(400);
+}
+
+/** One finger: press, optionally hold, move in steps, release (CDP touch events, so touch-action and scrolling are real). */
+async function touchDrag(cdp, from, to, holdMs, steps = 8) {
+  const point = (x, y) => [{ x: Math.round(x), y: Math.round(y), id: 1 }];
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: point(from.x, from.y) });
+  if (holdMs) await new Promise((resolve) => setTimeout(resolve, holdMs));
+  for (let i = 1; i <= steps; i++) {
+    await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: point(from.x + ((to.x - from.x) * i) / steps, from.y + ((to.y - from.y) * i) / steps) });
+    await new Promise((resolve) => setTimeout(resolve, 16));
+  }
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
 }
 
 /** Scenario + page being checked, reported with any failure. */
@@ -322,7 +340,7 @@ async function main() {
     ];
     for (const [name, options, fallback] of scenarios.filter(([, , fallback]) => process.env.HEADFUL !== "1" || !fallback)) {
       const context = await browser.newContext(options);
-      await context.addInitScript(recordFlights);
+      await context.addInitScript(recordLandings);
       if (fallback) await context.addInitScript(() => Object.defineProperty(navigator, "gpu", { value: undefined }));
       const page = await context.newPage();
       progress.scenario = name;
@@ -401,6 +419,8 @@ async function main() {
       assert.ok(layout.scrollW <= vw, "No horizontal scroll");
       assert.equal(await page.locator("#projects h2").textContent(), "Construir cosas que importan.");
       assert.equal(await page.getByText("Hackathones bajo presión").count(), 0, "Removed hackathons tagline");
+      for (const subtitle of REMOVED_WORLD_SUBTITLES) assert.equal(await page.getByText(subtitle).count(), 0, `Removed world subtitle "${subtitle}"`);
+      assert.equal(await page.locator(".orbit-select__tagline, .dossier-hero__lede").count(), 0, "No subtitle slot under the worlds");
       assert.equal(await page.getByText(/Elegí un mundo y descubrí/).count(), 0, "Removed the section subtitle");
       assert.equal(await page.getByText("Desarrollo de producto").count(), 0, "Hero no longer says 'Desarrollo de producto'");
       assert.equal(await page.locator("#top").getByText(/AI Applied Engineer/).count(), 1, "Hero role is AI Applied Engineer");
@@ -447,7 +467,9 @@ async function main() {
       await worldCard.focus();
       await Promise.all([page.waitForURL(`**${routes[1]}`), page.keyboard.press("Enter")]);
       await page.locator(".story-back").waitFor();
-      if (name === "reduced-motion") assert.deepEqual(await page.evaluate(() => window.__flights), [], "Reduced motion: no world-entry flight, instant navigation");
+      const landings = await page.evaluate(() => window.__landings);
+      if (name === "reduced-motion") assert.deepEqual(landings, [], "Reduced motion: no landing, a short fade then the jump");
+      else assert.deepEqual(landings.map(({ href }) => href), [routes[1]], "The puppy lands on the entered world before the jump");
       assert.equal(await page.locator("[data-rocket-loader]").count(), 0, "Launch loader never replays on client navigation");
       await page.locator(".story-back").click();
       await page.waitForURL((url) => new URL(url).pathname === "/" && new URL(url).hash.startsWith("#projects"));
@@ -528,63 +550,80 @@ async function main() {
       console.log(`PASS ${name} navigation, keyboard, CV and metadata`);
     }
 
-    // World-entry vehicles: each world flies its own vehicle in over the jump;
-    // the overlay never scrolls sideways and is gone once the world is shown.
-    for (const [name, options, worlds] of [
-      ["vehicles-desktop", { viewport: { width: 1440, height: 900 } }, routes.slice(1)],
-      ["vehicles-mobile", { viewport: { width: 412, height: 915 }, isMobile: true, hasTouch: true }, ["/hackathons"]],
+    // Worlds: press-and-drag turns a world (trackball) and never navigates;
+    // a plain click / tap lands the puppy, then zooms into the world.
+    for (const [name, options] of [
+      ["landing-desktop", { viewport: { width: 1440, height: 900 } }],
+      ["landing-mobile", { viewport: { width: 412, height: 915 }, isMobile: true, hasTouch: true }],
     ]) {
       const context = await browser.newContext(options);
-      await context.addInitScript(recordFlights);
+      await context.addInitScript(recordLandings);
       const page = await context.newPage();
       progress.scenario = name;
       progress.page = page;
       page.setDefaultTimeout(15000);
-      for (const route of worlds) {
-        const flights = await enterWorld(page, route);
-        assert.equal(flights.length, 1, `${name}: one flight entering ${route}`);
-        assert.equal(flights[0].vehicle, VEHICLE_BY_ROUTE[route], `${name}: ${route} flies its own vehicle`);
-        assert.equal(flights[0].world, route.slice(1));
-        assert.equal(flights[0].overflow, false, `${name}: no horizontal overflow mid-flight`);
-        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${name}: no horizontal overflow after ${route}`);
+      const errors = [];
+      page.on("pageerror", (error) => errors.push(error.message));
+      await openSelector(page);
+      const before = await worldPose(page);
+      const centre = await worldCentre(page);
+      if (options.hasTouch) {
+        const cdp = await context.newCDPSession(page);
+        // A held press grabs the world in any direction, without scrolling the page.
+        const scrollBefore = await page.evaluate(() => scrollY);
+        await touchDrag(cdp, { x: centre.x - 30, y: centre.y + 20 }, { x: centre.x + 50, y: centre.y - 60 }, 260);
+        const after = await settledPose(page);
+        assert.equal(new URL(page.url()).pathname, "/", `${name}: a held drag never enters the world`);
+        assert.equal(await page.evaluate(() => scrollY), scrollBefore, `${name}: a grabbed world does not scroll the page`);
+        assert.notDeepEqual(after, before, `${name}: touch drag turns the world (${JSON.stringify(after)})`);
+        // A quick vertical swipe over the world still scrolls the page.
+        await touchDrag(cdp, { x: centre.x, y: centre.y + 40 }, { x: centre.x, y: centre.y - 160 }, 0, 6);
+        await page.waitForTimeout(600);
+        assert.notEqual(await page.evaluate(() => scrollY), scrollBefore, `${name}: a quick vertical swipe over a world scrolls the page`);
+        assert.deepEqual(await worldPose(page), after, `${name}: the scroll swipe does not turn the world`);
+        await cdp.detach();
+        await openSelector(page);
+      } else {
+        await page.mouse.move(centre.x, centre.y);
+        await page.mouse.down();
+        await page.mouse.move(centre.x + 90, centre.y + 40, { steps: 10 });
+        await page.mouse.move(centre.x + 140, centre.y - 30, { steps: 10 });
+        await page.mouse.up();
+        await page.waitForTimeout(700);
+        assert.equal(new URL(page.url()).pathname, "/", `${name}: a drag never enters the world`);
+        const after = await worldPose(page);
+        assert.notDeepEqual(after, before, `${name}: mouse drag turns the world`);
+        assert.notEqual(after.roll, "0.00deg", `${name}: a diagonal drag rolls the world off its axis`);
+        assert.equal(await page.evaluate(() => window.__landings.length), 0, `${name}: no landing after a drag`);
+        assert.equal(await page.locator(".orbit-select[data-dragging]").count(), 0, `${name}: drag state cleared`);
       }
+      for (const subtitle of REMOVED_WORLD_SUBTITLES) assert.equal(await page.getByText(subtitle).count(), 0, `${name}: removed world subtitle "${subtitle}"`);
+      // A plain click / tap: the puppy lands on the world, then the jump.
+      const card = page.locator("#world-details");
+      const href = await card.getAttribute("href");
+      const target = await worldCentre(page);
+      const started = Date.now();
+      await Promise.all([
+        page.waitForURL(`**${href}`, { timeout: 4000 }),
+        options.hasTouch ? page.touchscreen.tap(target.x, target.y) : page.mouse.click(target.x, target.y),
+      ]);
+      const elapsed = Date.now() - started;
+      const landings = await page.evaluate(() => window.__landings);
+      assert.deepEqual(landings.map((entry) => entry.href), [href], `${name}: one landing, on the clicked world`);
+      assert.equal(landings[0].overflow, false, `${name}: no horizontal overflow mid-landing`);
+      assert.ok(elapsed < 2400, `${name}: landing + jump stay snappy (${elapsed} ms)`);
+      await page.locator("h1").waitFor();
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${name}: no horizontal overflow on ${href}`);
+      assert.deepEqual(errors, [], `${name}: browser errors`);
       await context.close();
-      console.log(`PASS ${name} world-entry vehicles`);
+      console.log(`PASS ${name} world drag and puppy landing (${elapsed} ms to ${href})`);
     }
 
-    // Country phase: φ = ISO 3166-1 numeric code of the locale region mod 360 degrees, 0 when unknown.
+    // The MCP and llms.txt never carry the removed world subtitles either.
     {
-      const { countryPhaseDegrees, localePhaseDegrees } = await importGeoPhase();
-      for (const [country, degrees] of [["AR", 32], ["ar", 32], ["US", 120], ["JP", 32], ["BR", 76], ["XX", 0], ["", 0], [null, 0]]) {
-        assert.equal(countryPhaseDegrees(country), degrees, `Country ${country} → ${degrees}°`);
-      }
-      for (const [tags, degrees] of [[["es-AR"], 32], [["en-US"], 120], [["ja"], 32], [["pt-BR"], 76], [["es-419", "es-AR"], 32], [["es-419"], 0], [["not a tag"], 0], [[], 0]]) {
-        assert.equal(localePhaseDegrees(tags), degrees, `Locale ${tags.join(",") || "(none)"} → ${degrees}°`);
-      }
-      // The endpoint is gone: it no longer builds and answers 404.
-      const context = await browser.newContext();
-      assert.equal((await context.request.get(`${baseURL}${REMOVED_PHASE_ENDPOINT}`)).status(), 404, `${REMOVED_PHASE_ENDPOINT} is removed`);
-      // The ISO table only ships in the lazy flight chunk, never in the initial bundle.
-      const html = await (await context.request.get(`${baseURL}/`)).text();
-      const scripts = [...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map(([, src]) => src);
-      assert.ok(scripts.length > 0, "Initial scripts found");
-      for (const src of new Set(scripts)) {
-        const body = await (await context.request.get(new URL(src, baseURL).href)).text();
-        assert.equal(body.includes("AR032"), false, `ISO phase table is not in the initial bundle (${src})`);
-      }
-      await context.close();
-      // Two locales (es-AR → 32°, en-US → 120°) fly visibly different paths into the same world.
-      const paths = [];
-      for (const locale of ["es-AR", "en-US"]) {
-        const phased = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale });
-        await phased.addInitScript(recordFlights);
-        const flights = await enterWorld(await phased.newPage(), "/hackathons");
-        assert.equal(flights.length, 1, `Flight with locale ${locale}`);
-        paths.push(flights[0].path);
-        await phased.close();
-      }
-      assert.notEqual(paths[0], paths[1], `Different phases give different flight paths (${paths.join(" vs ")})`);
-      console.log("PASS country phase mapping, no phase request and phased paths");
+      const llms = await (await fetch(`${baseURL}/llms.txt`)).text();
+      for (const subtitle of REMOVED_WORLD_SUBTITLES) assert.equal(llms.includes(subtitle), false, `llms.txt drops "${subtitle}"`);
+      console.log("PASS removed world subtitles in llms.txt");
     }
 
     if (process.env.HEADFUL === "1") return;
