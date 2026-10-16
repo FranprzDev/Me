@@ -314,8 +314,8 @@ export const PROJECTS: Project[] = [
     name: "Educación",
     title: { es: "Educación & Formación", en: "Education & Degree" },
     description: {
-      es: "Mi base académica: Ingeniería en Sistemas de Información en la UTN-FRT (2022 – en curso) más certificaciones que complementan el perfil full-stack y data.",
-      en: "My academic base: Information Systems Engineering at UTN-FRT (2022 – in progress) plus certifications that round out my full-stack and data profile.",
+      es: "Mi base académica: Ingeniería en Sistemas de Información en la UTN-FRT (2022 – en curso) más certificaciones que complementan el perfil full-stack, data e IA.",
+      en: "My academic base: Information Systems Engineering at UTN-FRT (2022 – in progress) plus certifications that round out my full-stack, data and AI profile.",
     },
     stack: ["UTN-FRT", "Ingeniería", "2022 – en curso"],
     year: "2022 – en curso",
@@ -371,6 +371,24 @@ export const PROJECTS: Project[] = [
           en: "RollingCode School — June to October 2025.",
         },
         year: "2025",
+        category: { es: "Certificaciones", en: "Certifications" },
+      },
+      {
+        name: "Google AI Essentials · Google Prompting Essentials",
+        description: {
+          es: "Google, vía Coursera — Septiembre a Octubre 2025. Certificados e insignias de Google.",
+          en: "Google, via Coursera — September to October 2025. Certificates and Google badges.",
+        },
+        year: "2025",
+        category: { es: "Certificaciones", en: "Certifications" },
+      },
+      {
+        name: "OpenAI Academy — AI Foundations · Applied AI Foundations · Agents and Workflows",
+        description: {
+          es: "OpenAI Academy — Agosto a Septiembre 2026. Tres certificados.",
+          en: "OpenAI Academy — August to September 2026. Three certificates.",
+        },
+        year: "2026",
         category: { es: "Certificaciones", en: "Certifications" },
       },
       {

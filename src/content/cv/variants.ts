@@ -62,7 +62,9 @@ const generalSections = [
   CvSection.Languages,
 ];
 
-const webCertifications = [F.CERT_MERN, F.CERT_REACT, F.CERT_NEXT];
+/** Every variant lists every course; applied-ai and fde lead with the AI ones. */
+const aiCertifications = [F.CERT_OPENAI_ACADEMY, F.CERT_GOOGLE_AI];
+const webCertifications = [F.CERT_MERN, F.CERT_REACT, F.CERT_NEXT, F.CERT_DATA, ...aiCertifications];
 
 /** Web variants: one compact AI + integrations row instead of two. */
 const SKILL_AI_INTEGRATIONS = {
@@ -194,7 +196,7 @@ const frontend: CvDefinition = {
     judiciary,
   ],
   projects: [F.PROJECT_PROOFY, F.PROJECT_NASA],
-  certifications: [F.CERT_REACT, F.CERT_NEXT, F.CERT_MERN],
+  certifications: [F.CERT_REACT, F.CERT_NEXT, F.CERT_MERN, F.CERT_DATA, ...aiCertifications],
 };
 
 const appliedAi: CvDefinition = {
@@ -274,7 +276,7 @@ const appliedAi: CvDefinition = {
     }),
   ],
   projects: highlightProjects,
-  certifications: [F.CERT_MERN, F.CERT_REACT, F.CERT_NEXT, F.CERT_DATA],
+  certifications: [...aiCertifications, F.CERT_DATA, F.CERT_MERN, F.CERT_REACT, F.CERT_NEXT],
 };
 
 const fde: CvDefinition = {
@@ -347,7 +349,7 @@ const fde: CvDefinition = {
     fla,
   ],
   projects: [F.PROJECT_PROOFY, F.PROJECT_NASA],
-  certifications: webCertifications,
+  certifications: [...aiCertifications, F.CERT_MERN, F.CERT_REACT, F.CERT_NEXT, F.CERT_DATA],
 };
 
 /** Variants in the order the index and the switcher list them. */

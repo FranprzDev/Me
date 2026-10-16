@@ -75,6 +75,21 @@ export const CERT_DATA: CertificationEntry = {
   name: { en: "Data Engineer", es: "Data Engineer" },
   period: { en: "Jun 2025 – Oct 2025", es: "jun 2025 – oct 2025" },
 };
+/** Three OpenAI Academy certificates, grouped to keep every CV on one page. */
+export const CERT_OPENAI_ACADEMY: CertificationEntry = {
+  school: "OpenAI Academy",
+  name: {
+    en: "AI Foundations · Applied AI Foundations · Agents and Workflows",
+    es: "AI Foundations · Applied AI Foundations · Agents and Workflows",
+  },
+  period: { en: "Aug – Sep 2026", es: "ago – sep 2026" },
+};
+/** Google AI Essentials and Google Prompting Essentials (certificates + Google badges), taken on Coursera. */
+export const CERT_GOOGLE_AI: CertificationEntry = {
+  school: "Google (Coursera)",
+  name: { en: "AI Essentials · Prompting Essentials", es: "AI Essentials · Prompting Essentials" },
+  period: { en: "Sep – Oct 2025", es: "sep – oct 2025" },
+};
 
 export const PROJECT_NASA: ProjectEntry = {
   name: { en: "NASA Space Apps 2024 — National Winner", es: "NASA Space Apps 2024 — Ganador nacional" },
