@@ -29,6 +29,12 @@ Guidance for coding agents working on this repo (Francisco Perez's portfolio, Ne
 - Copy-paste configs on `/for-agents` (Claude Code command, `mcpServers` JSON, VS Code `servers` JSON, Inspector CLI) are built from the request host and checked by `check:agent`; never hard-code another host.
 - Test with a real client before and after changes: `npx @modelcontextprotocol/inspector --cli <url>/api/mcp --transport http --method tools/list`, and `pnpm check:agent` (covers capabilities, invalid args, CORS, Accept, body cap, llms.txt and the configs).
 
+## Home worlds selector (src/components/OrbitSelector.tsx)
+
+- Worlds are layered CSS, never WebGPU. Press-and-drag turns a world about any axis: `src/lib/worldSpin.ts` keeps a quaternion per world and the selector paints it as CSS variables (`--spin-roll`, `--spin-tilt`, `--spin-lon`, `--ring-open`). A drag never navigates or steps; touch keeps quick vertical swipes for page scroll (grab = horizontal move or a short hold); inertia is off under reduced motion.
+- Entering a world (click, tap or Enter on the centred link) lands the puppy astronaut (`src/components/WorldLanding.tsx`, inline SVG + WAAPI, ~0.8 s), then zooms and pushes the route; reduced motion skips it for a short fade. Keep landing + zoom under ~1.4 s.
+- The worlds carry no subtitle/tagline anywhere (selector, world pages, MCP, llms.txt). Copy, aria and identifiers say "world", never "planet". `check:portfolio` covers drag, landing and the removed copy (`landing-*` scenarios).
+
 ## Workflow
 
 - Never push to `main`. Work on `feat/`, `fix/`, `chore/` or `agent/` branches and open a PR with What changes / Why / Impact / Validation.

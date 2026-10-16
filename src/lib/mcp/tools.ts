@@ -15,7 +15,7 @@ export enum McpTool {
 }
 
 /** Server identity reported by initialize and repeated in the agent card. */
-export const MCP_SERVER_INFO = { name: "francisco-perez-portfolio", version: "1.2.0" } as const;
+export const MCP_SERVER_INFO = { name: "francisco-perez-portfolio", version: "1.3.0" } as const;
 
 /** Protocol revision the server is built and tested against. */
 export const MCP_PROTOCOL_VERSION = "2025-06-18";
@@ -34,6 +34,6 @@ export const MCP_TOOL_SUMMARIES: Record<McpTool, string> = {
     "The CV versions the site publishes (one per kind of role), each with its headline, page URL and PDF URL. Call it to pick the right CV for a role.",
   [McpTool.GetCv]:
     "Full CV: profile, experience, education, certifications and the PDF link. Pass a version from list_cv_versions to get that version's content, page and PDF.",
-  [McpTool.ListProjects]: "The portfolio worlds (project areas) with slug, tagline and page URL.",
+  [McpTool.ListProjects]: "The portfolio worlds (project areas) with slug, title and page URL.",
   [McpTool.GetProject]: "Every entry of one world by slug.",
 };

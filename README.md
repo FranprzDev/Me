@@ -45,7 +45,7 @@ except `get_contact`):
 - `get_contact` — email, LinkedIn, GitHub and WhatsApp
 - `get_experience` — roles, organizations, periods and stack, newest first
 - `get_cv` — profile, experience, education and certifications, plus the PDF link
-- `list_projects` — portfolio worlds with slug, tagline and page URL
+- `list_projects` — portfolio worlds with slug, title and page URL
 - `get_project` — every entry of one world, by `slug`
 
 The `/for-agents` page explains how to connect, and

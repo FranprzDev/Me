@@ -994,7 +994,6 @@ function DossierJourney({ project }: { project: Project }) {
           {project.year}{project.featured ? ` ★ ${tl({ es: "MUNDO DESTACADO", en: "FEATURED WORLD" })}` : ""}
         </p>
         <h1>{project.title ? tl(project.title) : project.name}</h1>
-        {project.tagline ? <p className="dossier-hero__lede">{tl(project.tagline)}</p> : null}
         <p className="dossier-hero__body">{tl(project.description)}</p>
         {project.link && <ExternalLink href={project.link} />}
       </header>

@@ -34,8 +34,6 @@ export interface Project {
   slug: string;
   name: string;
   title?: Localized<string>;
-  /** Optional one-liner shown under the title on the home selector. */
-  tagline?: Localized<string>;
   description: Localized<string>;
   stack: string[];
   year: string;
@@ -131,10 +129,6 @@ export const PROJECTS: Project[] = [
     slug: "teaching",
     name: "Mentorías",
     title: { es: "Mentorías", en: "Teaching & Mentorship" },
-    tagline: {
-      es: "Compartir lo que sé y acompañar a otros en su recorrido técnico.",
-      en: "Sharing what I know and guiding others on their technical journey.",
-    },
     description: {
       es: "Espacios de formación práctica en desarrollo y automatización. El curso de n8n para el Poder Judicial de Tucumán es una de esas experiencias.",
       en: "Hands-on learning experiences in development and automation. The n8n course for the Tucumán Judiciary is one of them.",
@@ -194,10 +188,6 @@ export const PROJECTS: Project[] = [
     slug: "projects",
     name: "Proyectos Personales",
     title: { es: "Proyectos Personales", en: "Personal Projects" },
-    tagline: {
-      es: "Herramientas reales: developer tools, IA y productos web.",
-      en: "Real tools: developer tools, AI and web products.",
-    },
     description: {
       es: "Una selección de herramientas que construí para resolver problemas concretos: automatización, agentes de IA, utilidades para desarrollo y productos web.",
       en: "A selection of tools I built to solve concrete problems: automation, AI agents, developer utilities and web products.",
@@ -323,10 +313,6 @@ export const PROJECTS: Project[] = [
     slug: "education",
     name: "Educación",
     title: { es: "Educación & Formación", en: "Education & Degree" },
-    tagline: {
-      es: "Ingeniería en Sistemas — UTN-FRT y formación continua.",
-      en: "Systems Engineering — UTN-FRT and continuous training.",
-    },
     description: {
       es: "Mi base académica: Ingeniería en Sistemas de Información en la UTN-FRT (2022 – en curso) más certificaciones que complementan el perfil full-stack y data.",
       en: "My academic base: Information Systems Engineering at UTN-FRT (2022 – in progress) plus certifications that round out my full-stack and data profile.",
