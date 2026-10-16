@@ -664,12 +664,6 @@ button.chip,
   background: #1c2844;
 }
 
-.timeline-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.4rem;
-}
-
 .contact-copy {
   max-width: 580px;
 }
