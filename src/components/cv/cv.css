@@ -2,7 +2,7 @@
  * /cv — hosted résumés.
  *
  * Two looks from one markup, every selector scoped under .cv-root:
- * - screen: the portfolio's night sky (glass panels, Georgia display type,
+ * - screen: the portfolio's night sky (glass panels, Space Grotesk display type,
  *   mono kickers, star palette) under the site nav;
  * - print: the clean light A4 résumé the committed PDFs are rendered from.
  * The two live in separate media blocks so neither leaks into the other.
@@ -37,7 +37,7 @@ html:has(.cv-root) {
     --cv-violet: #c9b8ff;
     --cv-gold: #e9c270;
     --cv-line: rgba(255, 255, 255, 0.08);
-    --cv-display: Georgia, Cambria, "Times New Roman", serif;
+    --cv-display: var(--font-heading);
     --cv-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     --cv-panel-tint: rgba(7, 10, 24, 0.72);
 
