@@ -2,8 +2,7 @@ import type { MetadataRoute } from "next";
 import { PROJECTS } from "@/data/projects";
 import { CV_LOCALES, CV_VARIANTS, cvIndexPath, cvPath } from "@/content/cv/routes";
 import { CvLocale, type CvVariant } from "@/content/cv/types";
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
+import { SITE_URL } from "@/lib/site";
 
 /** Every CV route in both languages, each listing its hreflang alternates. */
 function cvEntries(base: string): MetadataRoute.Sitemap {
@@ -22,24 +21,27 @@ function cvEntries(base: string): MetadataRoute.Sitemap {
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return siteUrl
-    ? [
-        {
-          url: siteUrl,
-          changeFrequency: "monthly",
-          priority: 1,
-        },
-        ...PROJECTS.map((project) => ({
-          url: `${siteUrl}/${project.slug}`,
-          changeFrequency: "monthly" as const,
-          priority: 0.8,
-        })),
-        {
-          url: `${siteUrl}/me`,
-          changeFrequency: "monthly" as const,
-          priority: 0.8,
-        },
-        ...cvEntries(siteUrl),
-      ]
-    : [];
+  return [
+    {
+      url: `${SITE_URL}/`,
+      changeFrequency: "monthly",
+      priority: 1,
+    },
+    ...PROJECTS.map((project) => ({
+      url: `${SITE_URL}/${project.slug}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    })),
+    {
+      url: `${SITE_URL}/me`,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/for-agents`,
+      changeFrequency: "monthly" as const,
+      priority: 0.5,
+    },
+    ...cvEntries(SITE_URL),
+  ];
 }

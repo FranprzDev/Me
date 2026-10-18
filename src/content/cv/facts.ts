@@ -6,6 +6,7 @@ import {
   type Localized,
   type ProjectEntry,
 } from "./types";
+import { CANONICAL_SITE_HOST, CANONICAL_SITE_URL } from "@/lib/site";
 
 /**
  * Facts shared by every résumé variant. Everything here comes from
@@ -18,13 +19,14 @@ import {
 
 export const CV_NAME = "Francisco Miguel Perez";
 
-export const PORTFOLIO_URL = "https://me-pink-ten.vercel.app";
+/** Printed on every CV page and PDF; the domain itself lives in src/lib/site.ts. */
+export const PORTFOLIO_URL = CANONICAL_SITE_URL;
 
 export const CV_CONTACTS: ContactLink[] = [
   { label: "franciscoperezdeveloper@gmail.com", href: "mailto:franciscoperezdeveloper@gmail.com" },
   { label: "linkedin.com/in/franprzdev", href: "https://linkedin.com/in/franprzdev" },
   { label: "github.com/franprzdev", href: "https://github.com/franprzdev" },
-  { label: "me-pink-ten.vercel.app", href: PORTFOLIO_URL },
+  { label: CANONICAL_SITE_HOST, href: PORTFOLIO_URL },
 ];
 
 export const CV_LOCATION: Localized = {

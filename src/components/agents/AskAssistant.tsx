@@ -2,9 +2,7 @@
 
 import { useRef, useState } from "react";
 import { MCP_TOOLS } from "@/lib/mcp/tools";
-
-/** Public production URL the assistants are asked to read. */
-const SITE_URL = "https://me-pink-ten.vercel.app";
+import { CANONICAL_SITE_URL as SITE_URL } from "@/lib/site";
 
 /** One-shot prompt handed to ChatGPT / Claude through their `?q=` links. */
 export const ASSISTANT_PROMPT = [
