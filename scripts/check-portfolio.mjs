@@ -361,6 +361,32 @@ async function assertHeroCvLink(page, locale) {
   assert.equal(await link.getAttribute("download"), file, `Hero CV (${locale}) downloads under a clean file name`);
 }
 
+/**
+ * Featured project case studies under the worlds selector: rendered as real
+ * markup (also without JavaScript), each with problem, build, stack and a
+ * GitHub link, in the page language. Plus the Person JSON-LD.
+ */
+async function assertFeaturedProjects(page, lang) {
+  const cards = page.locator("#projects .featured-card");
+  assert.equal(await cards.count(), 4, `featured projects (${lang})`);
+  const heading = lang === "es" ? "Proyectos destacados" : "Featured projects";
+  assert.equal(await page.locator("#projects").getByRole("heading", { name: heading }).count(), 1, `featured heading (${lang})`);
+  for (let i = 0; i < 4; i++) {
+    const card = cards.nth(i);
+    assert.equal(await card.locator("h4").count(), 1, `featured card ${i}: title`);
+    assert.ok((await card.locator("dd").count()) >= 3, `featured card ${i}: problem, build and stack`);
+    const github = card.locator('a[href^="https://github.com/FranprzDev/"]');
+    assert.equal(await github.count(), 1, `featured card ${i}: GitHub link`);
+    assert.equal(await github.getAttribute("target"), "_blank");
+    assert.match(await github.getAttribute("rel"), /noopener/);
+  }
+  assert.equal(await page.locator("#projects .featured").evaluate((el) => /timed-buffer/i.test(el.textContent)), false, "n8n-nodes-timed-buffer is not featured as his own");
+  const ld = JSON.parse(await page.locator('script[type="application/ld+json"]').first().textContent());
+  const person = ld["@graph"].find((node) => node["@type"] === "Person");
+  assert.equal(person.name, "Francisco Miguel Perez", "Person JSON-LD");
+  assert.equal(person.jobTitle, "AI Applied Engineer", "Person JSON-LD job title matches the hero");
+}
+
 async function main() {
   await mkdir(output, { recursive: true });
   const browser = await chromium.launch({ headless: process.env.HEADFUL !== "1" });
@@ -389,9 +415,11 @@ async function main() {
         await checkPage(page, route, name);
         if (route === "/") await assertHeroCvLink(page, "es");
         if (route === "/") await assertExperienceTrail(page, name, name === "reduced-motion");
+        if (route === "/") await assertFeaturedProjects(page, "es");
         await page.getByRole("button", { name: "Cambiar a inglés" }).click();
         assert.equal(await page.locator("html").getAttribute("lang"), "en");
         if (route === "/") await assertHeroCvLink(page, "en");
+        if (route === "/") await assertFeaturedProjects(page, "en");
         assert.equal(await page.getByRole("button", { name: "Switch to Spanish" }).count(), 1);
         await page.getByRole("button", { name: "Switch to Spanish" }).click();
       }
@@ -458,7 +486,8 @@ async function main() {
       assert.equal(await page.getByText(/Elegí un mundo y descubrí/).count(), 0, "Removed the section subtitle");
       assert.equal(await page.getByText("Desarrollo de producto").count(), 0, "Hero no longer says 'Desarrollo de producto'");
       assert.equal(await page.locator("#top").getByText(/AI Applied Engineer/).count(), 1, "Hero role is AI Applied Engineer");
-      assert.equal(await page.locator("#projects").evaluate((el) => /planet/i.test(el.outerHTML)), false, "No 'planet' wording in the selector markup");
+      // Scoped to the selector: the featured cards below may say "exoplanets" (ExoGames).
+      assert.equal(await page.locator("#projects .orbit-select").evaluate((el) => /planet/i.test(el.outerHTML)), false, "No 'planet' wording in the selector markup");
       const worldCard = page.locator("#world-details");
       assert.equal(await worldCard.evaluate((el) => el.tagName), "A", "Front item is a real link");
       assert.equal(await page.locator("#projects .orbit-select__controls, #projects .orbit-select__count").count(), 0, "No controls row or counter under the selector");
@@ -678,7 +707,7 @@ async function main() {
         assert.equal(await link.count(), 1, `${name}: ${label} button`);
         const href = await link.getAttribute("href");
         assert.ok(href.startsWith(prefix), `${label} uses ${prefix}`);
-        assert.match(decodeURIComponent(href.slice(prefix.length)), /https:\/\/me-pink-ten\.vercel\.app\/api\/mcp/, `${label} prompt points at the MCP server`);
+        assert.match(decodeURIComponent(href.slice(prefix.length)), /https:\/\/franprz\.vercel\.app\/api\/mcp/, `${label} prompt points at the MCP server`);
         assert.equal(await link.getAttribute("target"), "_blank");
         assert.match(await link.getAttribute("rel"), /noopener/);
       }
@@ -701,6 +730,7 @@ async function main() {
       page.setDefaultTimeout(15000);
       page.setDefaultNavigationTimeout(15000);
       await checkPage(page, "/", name);
+      if (name === "no-javascript") await assertFeaturedProjects(page, "es");
       if (name === "blocked-storage") {
         await page.getByRole("button", { name: "Cambiar a inglés" }).click();
         assert.equal(await page.locator("html").getAttribute("lang"), "en");
