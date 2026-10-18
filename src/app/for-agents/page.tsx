@@ -4,11 +4,22 @@ import { headers } from "next/headers";
 import { AskAssistant } from "@/components/agents/AskAssistant";
 import { LunarScene } from "@/components/agents/LunarScene";
 import { MCP_ENDPOINT_PATH, MCP_TOOLS, MCP_TOOL_SUMMARIES } from "@/lib/mcp/tools";
+import { SITE_HOST } from "@/lib/site";
+import { SITE_OG_IMAGE, SITE_OPEN_GRAPH } from "@/lib/seo";
 import "./for-agents.css";
 
 export const metadata: Metadata = {
   title: "For AI agents (MCP) | Francisco Perez",
   description: "Connect any MCP client to Francisco Perez's read-only portfolio server at /api/mcp, or open ChatGPT or Claude with a ready prompt.",
+  alternates: { canonical: "/for-agents" },
+  openGraph: {
+    title: "For AI agents (MCP) | Francisco Perez",
+    description: "A public, read-only MCP server with Francisco Perez's portfolio data: profile, experience, CV versions, projects and contact.",
+    url: "/for-agents",
+    type: "website",
+    siteName: SITE_OPEN_GRAPH.siteName,
+    images: [SITE_OG_IMAGE],
+  },
 };
 
 const TOOLS = MCP_TOOLS.map((name) => [name, MCP_TOOL_SUMMARIES[name]] as const);
@@ -17,7 +28,7 @@ const TOOLS = MCP_TOOLS.map((name) => [name, MCP_TOOL_SUMMARIES[name]] as const)
 const SERVER_KEY = "francisco-perez";
 
 export default async function ForAgentsPage() {
-  const host = (await headers()).get("host") ?? "me-pink-ten.vercel.app";
+  const host = (await headers()).get("host") ?? SITE_HOST;
   const protocol = host.startsWith("localhost") ? "http" : "https";
   const endpoint = `${protocol}://${host}${MCP_ENDPOINT_PATH}`;
 

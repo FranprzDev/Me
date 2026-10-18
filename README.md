@@ -18,9 +18,12 @@ public read-only MCP server so AI agents can query the same data.
 
 This project uses pnpm as its package manager.
 
-To generate canonical URLs, robots and sitemap with the public URL, set
-`NEXT_PUBLIC_SITE_URL` in the build environment (for example,
-`https://your-domain.com`).
+The public origin lives in one constant, `CANONICAL_SITE_URL` in
+`src/lib/site.ts` (currently `https://franprz.vercel.app`). Canonical URLs,
+Open Graph images, robots, the sitemap, the Person JSON-LD, the agent prompts
+and the URL printed on the CV all read it. To move to another domain, change
+that line and regenerate the CV PDFs (`pnpm cv:pdf`). A preview build can
+point its metadata elsewhere with `NEXT_PUBLIC_SITE_URL`.
 
 ```bash
 pnpm install

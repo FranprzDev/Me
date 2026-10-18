@@ -12,6 +12,7 @@ import { RocketLoader } from "@/components/RocketLoader";
 import { HomeSky } from "@/components/HomeSky";
 import { expireLaunchLoader } from "@/lib/launchLoader";
 import { hasWebGPU } from "@/lib/webgpu";
+import { shouldSkipScene } from "@/lib/lite";
 import { SceneStatus, setSceneStatus } from "@/lib/sceneStatus";
 import type { BackdropView } from "@/components/three/Backdrop";
 
@@ -78,14 +79,17 @@ export function SiteChrome() {
   // The 3D layer is the heaviest thing on the site (~420 KB gzipped): let the
   // text UI paint first, then on idle probe for a WebGPU adapter, and only
   // download and mount the chunk when one exists. Devices without WebGPU never
-  // fetch or parse it and keep the CSS background. Once mounted it is never
+  // fetch or parse it and keep the CSS background, and neither do visitors
+  // who asked for reduced motion or data saving, or phone-sized touch
+  // screens (lib/lite shouldSkipScene). Once mounted it is never
   // unmounted, so navigating home <-> worlds reuses the same renderer.
   useEffect(() => {
     let alive = true;
     let timer: number | undefined;
     let idleId: number | undefined;
     const start = async () => {
-      const supported = await hasWebGPU();
+      // Reduced motion, data saver or a phone: keep the CSS sky, skip the chunk.
+      const supported = !shouldSkipScene() && (await hasWebGPU());
       if (!alive) return;
       if (!supported) {
         setSceneStatus(SceneStatus.Failed);

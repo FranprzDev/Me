@@ -46,6 +46,14 @@ Guidance for coding agents working on this repo (Francisco Perez's portfolio, Ne
 - Entering a world (click, tap or Enter on the centred link) lands the puppy astronaut (`src/components/WorldLanding.tsx`, inline SVG + WAAPI, ~0.8 s), then zooms and pushes the route; reduced motion skips it for a short fade. Keep landing + zoom under ~1.4 s.
 - The worlds carry no subtitle/tagline anywhere (selector, world pages, MCP, llms.txt). Copy, aria and identifiers say "world", never "planet". `check:portfolio` covers drag, landing and the removed copy (`landing-*` scenarios).
 
+## Domain, SEO and featured projects
+
+- `src/lib/site.ts` is the only place that names the production origin (`CANONICAL_SITE_URL`, now `https://franprz.vercel.app`; `franprz.tech` is being registered: switch it there only once that domain serves the site). `metadataBase`, canonicals, robots, sitemap, JSON-LD, the /for-agents prompt and the CV contact line read it. The CV PDFs print it, so `src/lib/site.ts` is part of the CV source hash: after changing it, run `pnpm cv:pdf`.
+- Every route sets its own `alternates.canonical` and `openGraph.url`; the root layout sets neither (a layout-level canonical leaked `/` into /for-agents). A route that sets `openGraph` lists `SITE_OG_IMAGE` (src/lib/seo.ts) again, because a child `openGraph` replaces the inherited one.
+- The home page carries Person + WebSite JSON-LD (`src/lib/structuredData.ts`), built only from facts the page shows; no phone or street address.
+- Featured projects (`src/data/featured.ts`, `src/components/FeaturedProjects.tsx`) render as plain markup under the worlds selector, so no-JS visitors and crawlers read them. Each card is problem / what he built / stack / outcome / links; `outcome` only when the project's README or this site already states it. Never add metrics. `n8n-nodes-timed-buffer` belongs to IAntropo (Francisco contributed): never feature or describe it as his own.
+- The WebGPU backdrop is skipped entirely (no chunk download) under `prefers-reduced-motion: reduce`, Save-Data, or a coarse pointer below 768px (`shouldSkipScene` in src/lib/lite.ts); the CSS sky stays.
+
 ## Workflow
 
 - Never push to `main`. Work on `feat/`, `fix/`, `chore/` or `agent/` branches and open a PR with What changes / Why / Impact / Validation.

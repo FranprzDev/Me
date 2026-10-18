@@ -551,6 +551,28 @@ body:has([data-scene-root] canvas) .home-sky {
   color: #b9c7ef;
 }
 
+/* Availability for recruiters: a quiet line with a live-green dot. */
+.hero-availability {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.7rem 0 0;
+  color: #b9e8c8;
+  font: 0.78rem/1.5 ui-monospace, monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero-availability::before {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 8px rgba(74, 222, 128, 0.8);
+}
+
 .hero-summary {
   max-width: 34em;
   margin: 0.95rem auto 0;
@@ -674,9 +696,14 @@ button.chip,
 }
 
 .hiring-agents-link {
+  /* Above the contact constellation's overflow, which used to cover part of
+     the link (Lighthouse target-size, desktop). */
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
-  min-height: 24px; /* WCAG 2.2 target size */
+  min-height: 44px; /* WCAG 2.2 target size */
+  padding-inline: 0.5rem;
   margin-top: 1rem;
   color: var(--muted);
   font-size: 0.85rem;

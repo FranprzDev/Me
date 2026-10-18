@@ -10,6 +10,8 @@ import { OrbitSelector } from "@/components/OrbitSelector";
 import { GsapHeroName } from "@/components/GsapHeroName";
 import { Magnetic } from "@/components/Magnetic";
 import { ExperienceTrail } from "@/components/ExperienceTrail";
+import { FeaturedProjects } from "@/components/FeaturedProjects";
+import { HERO_ROLE } from "@/lib/structuredData";
 
 export function Hero() {
   const { t, tl, lang } = useI18n();
@@ -28,8 +30,11 @@ export function Hero() {
 
         <Reveal delay={0.12}>
           <p className="hero-role">
-            <span className="hero-role-title">AI Applied Engineer</span>{" "}
+            <span className="hero-role-title">{HERO_ROLE}</span>{" "}
             <span className="hero-role-place">{tl({ es: "en Tucumán", en: "in Tucumán" })}</span>
+          </p>
+          <p className="hero-availability">
+            {tl({ es: "Abierto a trabajo remoto · GMT-3", en: "Open to remote work · GMT-3" })}
           </p>
         </Reveal>
 
@@ -168,6 +173,7 @@ export function Projects() {
           </h2>
         </Reveal>
         <OrbitSelector />
+        <FeaturedProjects />
       </div>
     </section>
   );

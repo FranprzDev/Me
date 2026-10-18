@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { PROJECTS } from "@/data/projects";
 import { PlanetBackground } from "@/components/PlanetBackground";
 import { ProjectPageContent } from "@/components/ProjectPageContent";
+import { SITE_OG_IMAGE, SITE_OPEN_GRAPH } from "@/lib/seo";
 
 export function generateStaticParams() {
   return PROJECTS.map((p) => ({ slug: p.slug }));
@@ -27,6 +28,9 @@ export async function generateMetadata({
       description: p.description.es,
       url: `/${slug}`,
       type: "website",
+      siteName: SITE_OPEN_GRAPH.siteName,
+      locale: SITE_OPEN_GRAPH.locale,
+      images: [SITE_OG_IMAGE],
     },
   };
 }

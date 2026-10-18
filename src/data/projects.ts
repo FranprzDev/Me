@@ -233,19 +233,21 @@ export const PROJECTS: Project[] = [
         category: { es: "Developer Tools", en: "Developer Tools" },
       },
       {
-        name: "n8n-nodes-timed-buffer",
+        // Not Francisco's own package: the node and its npm release belong to
+        // IAntropo; Francisco worked with its author to improve the buffer.
+        name: "n8n-nodes-timed-buffer (contribución)",
         description: {
-          es: "Nodo comunitario de n8n que agrupa mensajes por tiempo usando Redis antes de emitirlos.",
-          en: "Community n8n node that batches messages over time with Redis before emitting them.",
+          es: "Contribución al nodo comunitario de n8n de IAntropo, que agrupa mensajes por tiempo usando Redis antes de emitirlos. Trabajé con su autor para mejorar el buffer.",
+          en: "Contribution to IAntropo's community n8n node, which batches messages over time with Redis before emitting them. I worked with its author to improve the buffer.",
         },
         year: "2025",
-        link: "https://github.com/FranprzDev/n8n-nodes-timed-buffer",
+        link: "https://www.npmjs.com/package/n8n-nodes-timed-buffer",
         pitch: {
-          es: "Nodo comunitario de n8n que agrupa mensajes por tiempo con Redis.",
-          en: "Community n8n node that batches messages over time with Redis.",
+          es: "Contribución al nodo comunitario de n8n de IAntropo que agrupa mensajes por tiempo con Redis.",
+          en: "Contribution to IAntropo's community n8n node that batches messages over time with Redis.",
         },
         stack: ["JavaScript", "n8n", "Redis"],
-        category: { es: "Developer Tools", en: "Developer Tools" },
+        category: { es: "Contribuciones", en: "Contributions" },
       },
       {
         name: "Scrapping-Repuestos-UY-API",

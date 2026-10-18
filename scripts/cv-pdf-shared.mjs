@@ -20,6 +20,8 @@ export function cvPdfFile(variant, locale) {
 
 /** Everything the PDFs are rendered from: résumé content and the résumé components. */
 const SOURCE_DIRS = ["src/content/cv", "src/components/cv"];
+/** Single files the PDFs also print from (the portfolio URL lives in src/lib/site.ts). */
+const SOURCE_FILES = ["src/lib/site.ts"];
 
 /** Hash of the CV sources, recorded next to the PDFs so a stale PDF fails the checks. */
 export async function cvSourceHash() {
@@ -30,6 +32,10 @@ export async function cvSourceHash() {
       hash.update(`${dir}/${name}\n`);
       hash.update(await readFile(path.join(dir, name)));
     }
+  }
+  for (const file of SOURCE_FILES) {
+    hash.update(`${file}\n`);
+    hash.update(await readFile(file));
   }
   return hash.digest("hex");
 }
