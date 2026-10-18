@@ -77,13 +77,16 @@ function ExternalLink({ href }: { href: string }) {
   const { tl } = useI18n();
   const isRepo = href.includes("github.com");
   const isColosseum = href.includes("colosseum.com");
+  const isNpm = href.includes("npmjs.com");
   return (
     <a className="story-link" href={href} target="_blank" rel="noreferrer">
       {isRepo
         ? tl({ es: "Abrir repositorio", en: "Open repository" })
         : isColosseum
           ? tl({ es: "Ver en Colosseum", en: "View on Colosseum" })
-          : tl({ es: "Ver en vivo", en: "View live" })}{" "}↗
+          : isNpm
+            ? tl({ es: "Ver en npm", en: "View on npm" })
+            : tl({ es: "Ver en vivo", en: "View live" })}{" "}↗
     </a>
   );
 }
