@@ -314,34 +314,37 @@ async function describeFailure(error) {
 }
 
 /**
- * Experience constellation (src/components/ExperienceTrail.tsx): with motion the
- * trace follows the scroll (lit entries behind the tip, dimmed ones ahead);
- * with reduced motion the whole constellation stays drawn and lit.
+ * Experience constellation (src/components/ExperienceTrail.tsx): static in every
+ * mode. The whole line is drawn and every card keeps the same look wherever the
+ * viewport sits, so scrolling never changes what is readable.
  */
-async function assertExperienceTrail(page, name, reduced) {
+async function assertExperienceTrail(page, name) {
   const read = () => page.evaluate(() => ({
-    mode: document.querySelector(".xp-trail")?.dataset.mode,
-    states: [...document.querySelectorAll(".xp-entry")].map((entry) => entry.dataset.state),
-    offset: Number.parseFloat(document.querySelector(".xp-trail__line")?.style.strokeDashoffset ?? "NaN"),
+    states: [...document.querySelectorAll(".xp-entry")].map((entry) => entry.dataset.state ?? null),
+    path: document.querySelector(".xp-trail__line")?.getAttribute("d") ?? "",
+    dash: document.querySelector(".xp-trail__line")?.style.strokeDasharray ?? "",
+    tip: document.querySelectorAll(".xp-trail__tip").length,
+    cards: [...document.querySelectorAll(".xp-card")].map((card) => {
+      const style = getComputedStyle(card);
+      return `${style.transform}|${style.backgroundColor}|${getComputedStyle(card.querySelector(".xp-card__body")).color}`;
+    }),
   }));
-  // Park the viewport in the middle of the list and let the trace settle.
-  await page.evaluate(() => {
+  const scrollToList = (share) => page.evaluate((s) => {
     const list = document.querySelector(".xp-trail");
-    window.scrollTo({ top: list.getBoundingClientRect().top + scrollY + list.offsetHeight / 2 - innerHeight / 2, behavior: "instant" });
-  });
-  await page.waitForTimeout(900);
+    window.scrollTo({ top: list.getBoundingClientRect().top + scrollY + list.offsetHeight * s - innerHeight / 2, behavior: "instant" });
+  }, share);
+  await scrollToList(0);
+  await page.waitForTimeout(600);
+  const start = await read();
+  await scrollToList(0.5);
+  await page.waitForTimeout(600);
   const mid = await read();
   assert.ok(mid.states.length > 1, `${name}: experience entries rendered`);
-  if (reduced) {
-    assert.equal(mid.mode, "static", `${name}: reduced motion keeps the constellation static`);
-    assert.deepEqual([...new Set(mid.states)], ["past"], `${name}: reduced motion lights every entry`);
-    assert.equal(mid.offset, 0, `${name}: reduced motion draws the whole trace`);
-  } else {
-    assert.equal(mid.mode, "live", `${name}: the trace follows the scroll`);
-    assert.ok(mid.states.includes("active"), `${name}: the entry under the tip is active (${mid.states})`);
-    assert.ok(mid.states.includes("upcoming"), `${name}: entries ahead of the tip wait dimmed (${mid.states})`);
-    assert.ok(mid.offset > 0, `${name}: the trace is partly drawn mid-list`);
-  }
+  assert.deepEqual([...new Set(mid.states)], [null], `${name}: entries carry no scroll state`);
+  assert.equal(mid.tip, 0, `${name}: no comet tip following the scroll`);
+  assert.equal(mid.dash, "", `${name}: the line is fully drawn (no dash offset)`);
+  assert.match(mid.path, /^M /, `${name}: the constellation line is drawn`);
+  assert.deepEqual(mid.cards, start.cards, `${name}: cards look the same wherever the viewport sits`);
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.waitForTimeout(300);
 }
@@ -362,25 +365,15 @@ async function assertHeroCvLink(page, locale) {
 }
 
 /**
- * Featured project case studies under the worlds selector: rendered as real
- * markup (also without JavaScript), each with problem, build, stack and a
- * GitHub link, in the page language. Plus the Person JSON-LD.
+ * The home page goes from the worlds selector straight to "Charlemos": no
+ * featured projects block in either language. Plus the Person JSON-LD.
  */
-async function assertFeaturedProjects(page, lang) {
-  const cards = page.locator("#projects .featured-card");
-  assert.equal(await cards.count(), 4, `featured projects (${lang})`);
+async function assertHomeSections(page, lang) {
   const heading = lang === "es" ? "Proyectos destacados" : "Featured projects";
-  assert.equal(await page.locator("#projects").getByRole("heading", { name: heading }).count(), 1, `featured heading (${lang})`);
-  for (let i = 0; i < 4; i++) {
-    const card = cards.nth(i);
-    assert.equal(await card.locator("h4").count(), 1, `featured card ${i}: title`);
-    assert.ok((await card.locator("dd").count()) >= 3, `featured card ${i}: problem, build and stack`);
-    const github = card.locator('a[href^="https://github.com/FranprzDev/"]');
-    assert.equal(await github.count(), 1, `featured card ${i}: GitHub link`);
-    assert.equal(await github.getAttribute("target"), "_blank");
-    assert.match(await github.getAttribute("rel"), /noopener/);
-  }
-  assert.equal(await page.locator("#projects .featured").evaluate((el) => /timed-buffer/i.test(el.textContent)), false, "n8n-nodes-timed-buffer is not featured as his own");
+  assert.equal(await page.getByText(heading).count(), 0, `no featured projects heading (${lang})`);
+  assert.equal(await page.locator(".featured, .featured-card").count(), 0, `no featured project cards (${lang})`);
+  const order = await page.evaluate(() => [...document.querySelectorAll("#main-content > section")].map((section) => section.id));
+  assert.deepEqual(order, ["top", "experience", "projects", "contact"], `home sections (${lang})`);
   const ld = JSON.parse(await page.locator('script[type="application/ld+json"]').first().textContent());
   const person = ld["@graph"].find((node) => node["@type"] === "Person");
   assert.equal(person.name, "Francisco Miguel Perez", "Person JSON-LD");
@@ -414,12 +407,12 @@ async function main() {
       for (const route of routes) {
         await checkPage(page, route, name);
         if (route === "/") await assertHeroCvLink(page, "es");
-        if (route === "/") await assertExperienceTrail(page, name, name === "reduced-motion");
-        if (route === "/") await assertFeaturedProjects(page, "es");
+        if (route === "/") await assertExperienceTrail(page, name);
+        if (route === "/") await assertHomeSections(page, "es");
         await page.getByRole("button", { name: "Cambiar a inglés" }).click();
         assert.equal(await page.locator("html").getAttribute("lang"), "en");
         if (route === "/") await assertHeroCvLink(page, "en");
-        if (route === "/") await assertFeaturedProjects(page, "en");
+        if (route === "/") await assertHomeSections(page, "en");
         assert.equal(await page.getByRole("button", { name: "Switch to Spanish" }).count(), 1);
         await page.getByRole("button", { name: "Switch to Spanish" }).click();
       }
@@ -486,7 +479,7 @@ async function main() {
       assert.equal(await page.getByText(/Elegí un mundo y descubrí/).count(), 0, "Removed the section subtitle");
       assert.equal(await page.getByText("Desarrollo de producto").count(), 0, "Hero no longer says 'Desarrollo de producto'");
       assert.equal(await page.locator("#top").getByText(/AI Applied Engineer/).count(), 1, "Hero role is AI Applied Engineer");
-      // Scoped to the selector: the featured cards below may say "exoplanets" (ExoGames).
+      // Scoped to the selector markup.
       assert.equal(await page.locator("#projects .orbit-select").evaluate((el) => /planet/i.test(el.outerHTML)), false, "No 'planet' wording in the selector markup");
       const worldCard = page.locator("#world-details");
       assert.equal(await worldCard.evaluate((el) => el.tagName), "A", "Front item is a real link");
@@ -730,7 +723,7 @@ async function main() {
       page.setDefaultTimeout(15000);
       page.setDefaultNavigationTimeout(15000);
       await checkPage(page, "/", name);
-      if (name === "no-javascript") await assertFeaturedProjects(page, "es");
+      if (name === "no-javascript") await assertHomeSections(page, "es");
       if (name === "blocked-storage") {
         await page.getByRole("button", { name: "Cambiar a inglés" }).click();
         assert.equal(await page.locator("html").getAttribute("lang"), "en");

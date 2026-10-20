@@ -34,11 +34,15 @@ Guidance for coding agents working on this repo (Francisco Perez's portfolio, Ne
 - Copy-paste configs on `/for-agents` (Claude Code command, `mcpServers` JSON, VS Code `servers` JSON, Inspector CLI) are built from the request host and checked by `check:agent`; never hard-code another host.
 - Test with a real client before and after changes: `npx @modelcontextprotocol/inspector --cli <url>/api/mcp --transport http --method tools/list`, and `pnpm check:agent` (covers capabilities, invalid args, CORS, Accept, body cap, llms.txt and the configs).
 
+## Home scrolling (no scroll-driven animation)
+
+- The home page scrolls natively and nothing on it is tied to the scroll position: no section snapping (`scroll-snap-*` was removed from `html` / `.section`), no scroll-triggered entrances (the Motion `Reveal` wrapper and the `motion` dependency are gone) and no scroll-traced experience line. Francisco asked for this on 2026-10-20 because the scroll animation made the page hard to read. Do not reintroduce scroll-linked effects on `/` (ScrollTrigger, `whileInView`, scroll listeners that change content) without his explicit ask.
+- Kept on purpose: the persistent WebGPU/CSS backdrop, the shooting stars, the hero name intro, the thin reading-progress bar and the nav band.
+
 ## Home experience constellation (src/components/ExperienceTrail.tsx)
 
-- The Experience section renders `CV.experience` as a constellation traced on scroll: an SVG line drawn by `stroke-dashoffset` (rAF-eased, stops when settled), one star per role, `data-state` = `upcoming` / `active` / `past` on each entry. Phones use a left rail; from 900px the cards alternate around a meandering central line.
-- Per frame only the dash offset and the tip's `transform` change; layout is measured on resize / `ResizeObserver`, never per frame. Dimmed entries change colour and scale, never opacity, so axe contrast passes in every state.
-- Reduced motion (and the server render) show the whole constellation drawn and every role lit; scroll does nothing then. `check:portfolio` covers both (`assertExperienceTrail`).
+- The Experience section renders `CV.experience` as a static constellation: one lit star per role joined by a fully drawn SVG line. Phones use a left rail; from 900px the cards alternate around a meandering central line.
+- The line is measured on mount and on `ResizeObserver` / breakpoint change only, never on scroll. `check:portfolio` (`assertExperienceTrail`) checks there is no scroll state and that cards look the same wherever the viewport sits.
 
 ## Home worlds selector (src/components/OrbitSelector.tsx)
 
@@ -46,12 +50,12 @@ Guidance for coding agents working on this repo (Francisco Perez's portfolio, Ne
 - Entering a world (click, tap or Enter on the centred link) lands the puppy astronaut (`src/components/WorldLanding.tsx`, inline SVG + WAAPI, ~0.8 s), then zooms and pushes the route; reduced motion skips it for a short fade. Keep landing + zoom under ~1.4 s.
 - The worlds carry no subtitle/tagline anywhere (selector, world pages, MCP, llms.txt). Copy, aria and identifiers say "world", never "planet". `check:portfolio` covers drag, landing and the removed copy (`landing-*` scenarios).
 
-## Domain, SEO and featured projects
+## Domain and SEO
 
 - `src/lib/site.ts` is the only place that names the production origin (`CANONICAL_SITE_URL`, now `https://franprz.vercel.app`; `franprz.tech` is being registered: switch it there only once that domain serves the site). `metadataBase`, canonicals, robots, sitemap, JSON-LD, the /for-agents prompt and the CV contact line read it. The CV PDFs print it, so `src/lib/site.ts` is part of the CV source hash: after changing it, run `pnpm cv:pdf`.
 - Every route sets its own `alternates.canonical` and `openGraph.url`; the root layout sets neither (a layout-level canonical leaked `/` into /for-agents). A route that sets `openGraph` lists `SITE_OG_IMAGE` (src/lib/seo.ts) again, because a child `openGraph` replaces the inherited one.
 - The home page carries Person + WebSite JSON-LD (`src/lib/structuredData.ts`), built only from facts the page shows; no phone or street address.
-- Featured projects (`src/data/featured.ts`, `src/components/FeaturedProjects.tsx`) render as plain markup under the worlds selector, so no-JS visitors and crawlers read them. Each card is problem / what he built / stack / outcome / links; `outcome` only when the project's README or this site already states it. Never add metrics. `n8n-nodes-timed-buffer` belongs to IAntropo (Francisco contributed): never feature or describe it as his own.
+- The home page has no featured projects block (removed 2026-10-20 at Francisco's request): after the worlds selector it goes straight to "Charlemos" (#contact). `n8n-nodes-timed-buffer` belongs to IAntropo (Francisco contributed): never feature or describe it as his own anywhere.
 - The WebGPU backdrop is skipped entirely (no chunk download) under `prefers-reduced-motion: reduce`, Save-Data, or a coarse pointer below 768px (`shouldSkipScene` in src/lib/lite.ts); the CSS sky stays.
 
 ## Workflow
