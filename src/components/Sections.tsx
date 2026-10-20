@@ -10,7 +10,6 @@ import { OrbitSelector } from "@/components/OrbitSelector";
 import { GsapHeroName } from "@/components/GsapHeroName";
 import { Magnetic } from "@/components/Magnetic";
 import { ExperienceTrail } from "@/components/ExperienceTrail";
-import { FeaturedProjects } from "@/components/FeaturedProjects";
 import { HERO_ROLE } from "@/lib/structuredData";
 
 export function Hero() {
@@ -173,7 +172,6 @@ export function Projects() {
           </h2>
         </Reveal>
         <OrbitSelector />
-        <FeaturedProjects />
       </div>
     </section>
   );
