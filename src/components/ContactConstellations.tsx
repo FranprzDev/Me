@@ -9,8 +9,8 @@ import { useI18n } from "@/lib/i18n";
  * Contactos como CONSTELACIONES clickeables. En vez de tarjetas de vidrio, cada
  * medio (Email · LinkedIn · WhatsApp) es su palabra escrita en estrellas (la
  * misma "fuente de trazos" que dibuja CHARLEMOS), envuelta en un <a> real:
- * accesible, responsive y sin depender del canvas 3D (que está detrás con
- * pointer-events:none). Al pasar el mouse, la constelación se enciende.
+ * accesible y responsive, sin capas decorativas que bloqueen el puntero
+ * (todas usan pointer-events:none). Al pasar el mouse, la constelación se enciende.
  */
 
 const UNIT = 20; // px por unidad local de la fuente

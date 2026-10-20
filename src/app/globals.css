@@ -2,8 +2,8 @@
 
 :root {
   --bg: #05060f;
-  /* Fondo de la escena 3D (lo actualiza el render loop). Definido por defecto
-     para que html/body nunca muestren blanco antes de que arranque WebGL. */
+  /* Plain dark page background (the 3D backdrop was removed on 2026-10-20).
+     Kept as a variable because the nav band and the CV sky read it too. */
   --scene-bg: #040612;
   --fg: #f4f4f8;
   --muted: #c2c2da;
@@ -87,8 +87,8 @@ body {
   background-clip: padding-box;
 }
 
-/* El canvas 3D vive en z-0; el contenido por encima. La sombra suave mejora la
-   legibilidad del texto sobre las estrellas/constelaciones del fondo. */
+/* Content sits above the fixed decorative layers. The soft shadow keeps text
+   readable over the shooting stars and the world tints. */
 .content-layer {
   position: relative;
   z-index: 10;
@@ -97,133 +97,7 @@ body {
     0 2px 18px rgba(2, 4, 12, 0.85);
 }
 
-/* --- Home CSS sky (first paint and devices without WebGPU) ---
-   Same family as the /cv backdrop. Painted under the 3D canvas, and removed
-   once the canvas exists so its layers and drift cost nothing there. */
-.home-sky {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-  background: #040612;
-}
-body:has([data-scene-root] canvas) .home-sky {
-  display: none;
-}
-.home-sky > div {
-  position: absolute;
-  pointer-events: none;
-}
-.home-sky__nebula {
-  inset: -10%;
-  background:
-    radial-gradient(ellipse 46% 40% at 86% 10%, rgba(91, 140, 255, 0.42), transparent 70%),
-    radial-gradient(ellipse 30% 28% at 70% 30%, rgba(155, 123, 255, 0.2), transparent 70%),
-    radial-gradient(ellipse 46% 44% at 6% 86%, rgba(155, 123, 255, 0.38), transparent 70%),
-    radial-gradient(ellipse 30% 26% at 22% 62%, rgba(91, 140, 255, 0.14), transparent 70%),
-    radial-gradient(ellipse 58% 28% at 60% 104%, rgba(233, 194, 112, 0.2), transparent 70%),
-    radial-gradient(ellipse 24% 20% at 14% 16%, rgba(201, 184, 255, 0.1), transparent 70%);
-}
-/* A soft diagonal ribbon of light (no blur filter: the gradient is soft). */
-.home-sky__aurora {
-  inset: -20% -10%;
-  background: linear-gradient(
-    118deg,
-    transparent 28%,
-    rgba(91, 140, 255, 0.07) 38%,
-    rgba(155, 123, 255, 0.1) 46%,
-    rgba(233, 194, 112, 0.04) 53%,
-    transparent 64%
-  );
-}
-/* Each depth drifts by a whole number of its tiles, so the loop is seamless. */
-.home-sky__stars {
-  --drift: 480px;
-  inset: calc(-1 * var(--drift)) 0 0;
-  opacity: 0.75;
-  background-image:
-    radial-gradient(1px 1px at 24px 36px, rgba(255, 255, 255, 0.85), transparent 70%),
-    radial-gradient(1px 1px at 132px 88px, rgba(200, 214, 255, 0.7), transparent 70%),
-    radial-gradient(1px 1px at 196px 172px, rgba(255, 255, 255, 0.8), transparent 70%),
-    radial-gradient(1px 1px at 78px 204px, rgba(201, 184, 255, 0.7), transparent 70%),
-    radial-gradient(1px 1px at 168px 18px, rgba(255, 255, 255, 0.6), transparent 70%),
-    radial-gradient(1px 1px at 218px 120px, rgba(255, 255, 255, 0.5), transparent 70%),
-    radial-gradient(1px 1px at 52px 140px, rgba(255, 255, 255, 0.55), transparent 70%),
-    radial-gradient(1px 1px at 150px 226px, rgba(200, 214, 255, 0.6), transparent 70%),
-    radial-gradient(1px 1px at 110px 60px, rgba(255, 255, 255, 0.45), transparent 70%);
-  background-size: 240px 240px;
-}
-/* A third, odd-sized tile so the pattern never reads as a grid. */
-.home-sky__stars--far {
-  --drift: 674px;
-  opacity: 0.6;
-  background-image:
-    radial-gradient(1px 1px at 41px 77px, rgba(255, 255, 255, 0.7), transparent 70%),
-    radial-gradient(1px 1px at 233px 19px, rgba(201, 184, 255, 0.6), transparent 70%),
-    radial-gradient(1px 1px at 301px 251px, rgba(255, 255, 255, 0.65), transparent 70%),
-    radial-gradient(1px 1px at 157px 311px, rgba(200, 214, 255, 0.6), transparent 70%),
-    radial-gradient(1.2px 1.2px at 89px 203px, rgba(255, 255, 255, 0.7), transparent 70%);
-  background-size: 337px 337px;
-  background-position: 120px 70px;
-}
-.home-sky__stars--near {
-  --drift: 520px;
-  opacity: 0.85;
-  background-image:
-    radial-gradient(1.8px 1.8px at 90px 120px, rgba(233, 194, 112, 0.95), transparent 70%),
-    radial-gradient(1.6px 1.6px at 380px 300px, rgba(159, 184, 255, 0.95), transparent 70%),
-    radial-gradient(1.3px 1.3px at 300px 430px, rgba(255, 255, 255, 0.9), transparent 70%),
-    radial-gradient(2.2px 2.2px at 440px 64px, rgba(255, 255, 255, 0.85), transparent 70%),
-    radial-gradient(1.5px 1.5px at 200px 250px, rgba(201, 184, 255, 0.9), transparent 70%);
-  background-size: 520px 520px;
-  background-position: 60px 40px;
-}
-.home-sky__vignette {
-  inset: 0;
-  background: radial-gradient(ellipse 120% 90% at 50% 40%, transparent 55%, rgba(2, 3, 10, 0.6) 100%);
-}
-@media (prefers-reduced-motion: no-preference) {
-  .home-sky__stars {
-    animation: home-sky-drift 160s linear infinite;
-  }
-  .home-sky__stars--far {
-    animation: home-sky-drift 220s linear infinite;
-  }
-  .home-sky__stars--near {
-    animation:
-      home-sky-drift 110s linear infinite,
-      home-sky-twinkle 5.5s ease-in-out infinite alternate;
-  }
-  .home-sky__nebula {
-    animation: home-sky-breathe 26s ease-in-out infinite alternate;
-  }
-}
-@keyframes home-sky-drift {
-  to {
-    transform: translate3d(0, var(--drift), 0);
-  }
-}
-@keyframes home-sky-twinkle {
-  from {
-    opacity: 0.55;
-  }
-  to {
-    opacity: 0.95;
-  }
-}
-@keyframes home-sky-breathe {
-  from {
-    transform: scale(1);
-    opacity: 0.9;
-  }
-  to {
-    transform: scale(1.06);
-    opacity: 1;
-  }
-}
-
-/* --- GSAP star aura layer (entre el canvas 3D y el contenido) --- */
+/* --- GSAP star aura layer (between the page background and the content) --- */
 .star-aura-layer {
   position: fixed;
   inset: 0;
@@ -233,7 +107,7 @@ body:has([data-scene-root] canvas) .home-sky {
 }
 
 /* On the home page the layer lives inside the content stacking context: a
-   negative z-index keeps the streaks above the 3D canvas but behind the copy. */
+   negative z-index keeps the streaks above the background but behind the copy. */
 .content-layer > .star-aura-layer {
   z-index: -1;
 }
@@ -704,16 +578,6 @@ button.chip,
   .hiring-agents-link { margin-top: 2.25rem; }
 }
 
-body:has([data-contact-heading="true"] canvas) .contact-copy h2 {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
 .contact-copy p {
   margin: 1rem 0 0;
   color: var(--muted);
@@ -740,8 +604,8 @@ body:has([data-contact-heading="true"] canvas) .contact-copy h2 {
    Transparent over the hero; once the page scrolls, a solid band slides in
    under it so content never shows through the logo and controls. The band is
    a pseudo-element faded with opacity (compositor-only). Phones get a
-   solid band in the scene colour, no blur: a full-width backdrop-filter over the
-   animated canvas would be re-blurred on every scroll frame. */
+   solid band in the page colour, no blur: a full-width backdrop-filter would
+   be re-blurred on every scroll frame. */
 .site-nav {
   position: fixed;
   top: 0;
@@ -1864,8 +1728,8 @@ button:focus-visible {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Glass surfaces: translucent panels over the 3D background so the planet
-   shows through. Only card-sized elements blur (never a full-screen layer).
+   Glass surfaces: translucent panels over the dark page background and its
+   decorative layers. Only card-sized elements blur (never a full-screen layer).
    Without backdrop-filter support every surface keeps a near-solid tint, so
    text contrast never depends on the effect.
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -2126,97 +1990,9 @@ button:focus-visible {
   .story-back:focus-visible .story-back__icon svg { transform: none; }
 }
 
-/* --- One-time launch loader: tangent-curve flight, burst and iris reveal --- */
-@property --iris {
-  syntax: "<percentage>";
-  inherits: false;
-  initial-value: 0%;
-}
-.rocket-loader {
-  position: fixed;
-  inset: 0;
-  z-index: 2; /* above the canvas (0), below stars (5) and content (10) */
-  pointer-events: none;
-  overflow: hidden;
-}
-.rocket-loader__veil {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 50% 120%, rgba(91, 140, 255, 0.12), transparent 55%),
-    var(--scene-bg, #040612);
-  transition: opacity 600ms ease;
-}
-/* Iris: the veil opens from the burst point, revealing the planet behind. */
-.rocket-loader.is-burst .rocket-loader__veil {
-  -webkit-mask-image: radial-gradient(circle at var(--burst-x, 50%) var(--burst-y, 20%), transparent var(--iris), #000 calc(var(--iris) + 12%));
-  mask-image: radial-gradient(circle at var(--burst-x, 50%) var(--burst-y, 20%), transparent var(--iris), #000 calc(var(--iris) + 12%));
-  animation: rocket-iris 1000ms cubic-bezier(0.6, 0, 0.3, 1) 80ms both;
-  opacity: 0;
-  transition: opacity 500ms ease 650ms; /* fallback where @property is missing */
-}
-.rocket-loader.is-burst {
-  animation: rocket-shake 420ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-}
-.rocket-loader.is-exit .rocket-loader__veil {
-  opacity: 0;
-}
-.rocket-loader__canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-.rocket-loader__rocket {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: clamp(64px, 8vmin, 96px);
-  aspect-ratio: 40 / 84;
-  opacity: 0;
-  filter: drop-shadow(0 0 16px rgba(91, 140, 255, 0.7)) drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
-  transition: opacity 160ms ease;
-  will-change: transform;
-}
-.rocket-loader__rocket svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-.rocket-loader__flame {
-  transform-origin: 20px 58px;
-  animation: rocket-flame 90ms ease-in-out infinite alternate;
-}
-.rocket-loader.is-exit .rocket-loader__rocket {
-  opacity: 0 !important;
-}
-
-@keyframes rocket-flame {
-  from { transform: scaleY(0.8) scaleX(0.95); }
-  to { transform: scaleY(1.25) scaleX(1.05); }
-}
-@keyframes rocket-iris {
-  from { --iris: 0%; }
-  to { --iris: 160%; }
-}
-@keyframes rocket-shake {
-  10%, 90% { transform: translate(-2px, 1px); }
-  20%, 80% { transform: translate(4px, -2px); }
-  30%, 50%, 70% { transform: translate(-6px, 3px); }
-  40%, 60% { transform: translate(6px, -3px); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .rocket-loader.is-burst { animation: none; }
-  .rocket-loader__veil {
-    transition: opacity 400ms ease !important;
-  }
-}
-
-
 /* ═══════════════════════════════════════════════════════════════════════════
    Phones and touch-first screens: no backdrop blur anywhere.
-   Every blurred surface sits over an animated canvas, so the browser has to
+   Every blurred surface sits over moving layers (shooting stars, cursor trail), so the browser has to
    re-blur it on every frame, and while scrolling on every scroll frame, which
    is heavy for a phone GPU. Surfaces keep a denser tint instead, so text
    contrast does not depend on the blur.
