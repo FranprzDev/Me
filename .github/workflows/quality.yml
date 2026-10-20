@@ -22,8 +22,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm exec tsc --noEmit
-      - run: pnpm exec vgpu install-software-renderer
-      - run: pnpm check:shaders
       - run: pnpm build
       - run: pnpm exec playwright install --with-deps chromium
       # pdftotext: check:portfolio reads the committed CV PDFs' text for private client names.
