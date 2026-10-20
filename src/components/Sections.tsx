@@ -4,7 +4,6 @@ import Link from "next/link";
 import { CV } from "@/data/cv";
 import { cvLocaleForLang, primaryCvPdfFile, primaryCvPdfPath } from "@/lib/primaryCv";
 import { useI18n } from "@/lib/i18n";
-import { Reveal } from "@/components/Reveal";
 import { ContactConstellations } from "@/components/ContactConstellations";
 import { OrbitSelector } from "@/components/OrbitSelector";
 import { GsapHeroName } from "@/components/GsapHeroName";
@@ -21,13 +20,13 @@ export function Hero() {
       {/* Open stage: no box, just a feathered scrim behind the copy. The
           shooting stars steer clear of `data-sky-clear`. */}
       <div className="wrap hero-stage" data-sky-clear="">
-        <Reveal>
+        <div>
           <span className="eyebrow hero-eyebrow">{tl(CV.location)}</span>
-        </Reveal>
+        </div>
 
         <GsapHeroName text={CV.name} />
 
-        <Reveal delay={0.12}>
+        <div>
           <p className="hero-role">
             <span className="hero-role-title">{HERO_ROLE}</span>{" "}
             <span className="hero-role-place">{tl({ es: "en Tucumán", en: "in Tucumán" })}</span>
@@ -35,18 +34,18 @@ export function Hero() {
           <p className="hero-availability">
             {tl({ es: "Abierto a trabajo remoto · GMT-3", en: "Open to remote work · GMT-3" })}
           </p>
-        </Reveal>
+        </div>
 
-        <Reveal delay={0.18}>
+        <div>
           <p className="hero-summary">
             {tl({
               es: "Transformo datos y procesos en software útil: agentes de IA, automatizaciones y productos web para problemas reales.",
               en: "I turn data and processes into useful software: AI agents, automations and web products for real problems.",
             })}
           </p>
-        </Reveal>
+        </div>
 
-        <Reveal delay={0.28}>
+        <div>
           <div className="hero-actions-grid">
             <Magnetic strength={0.3}>
               <a
@@ -76,22 +75,22 @@ export function Hero() {
               </a>
             </Magnetic>
           </div>
-        </Reveal>
+        </div>
 
-        <Reveal delay={0.34}>
+        <div>
           <div className="hero-proof">
             <Link href="/hackathons" className="hero-chip hero-chip-award">{tl({ es: "NASA Space Apps · Ganador nacional 2024", en: "NASA Space Apps · National winner 2024" })} ↗</Link>
             <Link href="/teaching" className="hero-chip hero-chip-teaching">{tl({ es: "Docente n8n · Poder Judicial de Tucumán", en: "n8n instructor · Tucumán Judiciary" })} ↗</Link>
           </div>
-        </Reveal>
+        </div>
 
-        <Reveal delay={0.45}>
+        <div>
           <div className="scroll-cue hero-scroll-cue" aria-hidden>
             <span>⌄</span>
             <span>⌄</span>
             <span>⌄</span>
           </div>
-        </Reveal>
+        </div>
       </div>
     </section>
   );
@@ -102,14 +101,14 @@ export function Experience() {
   return (
     <section id="experience" className="section">
       <div className="wrap">
-        <Reveal>
+        <div>
           <div style={{ marginBottom: "2rem" }}>
             <span className="eyebrow" style={{ color: "var(--space)" }}>{t("career_path")}</span>
             <h2 className="h-display" style={{ fontSize: "clamp(2rem, 5vw, 3.4rem)", margin: "0.4rem 0 0" }}>
               {t("exp_title")}
             </h2>
           </div>
-        </Reveal>
+        </div>
         <ExperienceTrail />
       </div>
     </section>
@@ -121,30 +120,30 @@ export function Education() {
   return (
     <section id="education" className="section">
       <div className="wrap">
-        <Reveal>
+        <div>
           <h2 className="h-display" style={{ fontSize: "clamp(2rem, 5vw, 3.4rem)", margin: "0.4rem 0 2rem" }}>
             {t("edu_title")}
           </h2>
-        </Reveal>
+        </div>
 
         <div style={{ display: "grid", gap: "1rem", gridTemplateColumns: "1fr" }}>
           {CV.education.map((ed, i) => (
-            <Reveal key={i}>
+            <div key={i}>
               <article className="glass" style={{ padding: "1.4rem 1.6rem" }}>
                 <h3 style={{ margin: 0, fontSize: "1.2rem" }}>{tl(ed.degree)}</h3>
                 <p className="accent-japan" style={{ margin: "0.3rem 0", fontWeight: 600 }}>{ed.institution}</p>
                 <span className="chip">{tl(ed.period)}</span>
               </article>
-            </Reveal>
+            </div>
           ))}
         </div>
 
-        <Reveal delay={0.1}>
+        <div>
           <h3 className="h-display" style={{ fontSize: "1.6rem", margin: "2.2rem 0 1rem" }}>{t("edu_certs")}</h3>
-        </Reveal>
+        </div>
         <div style={{ display: "grid", gap: "0.7rem", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
           {CV.certifications.map((c, i) => (
-            <Reveal key={i} delay={i * 0.05}>
+            <div key={i}>
               <div className="glass-soft tilt-card" style={{ padding: "1rem 1.2rem", height: "100%" }}>
                 <strong style={{ fontSize: "0.98rem" }}>{tl(c.name)}</strong>
                 {c.highlight && (
@@ -153,7 +152,7 @@ export function Education() {
                 <p style={{ margin: "0.4rem 0 0", color: "var(--muted)", fontSize: "0.82rem" }}>{c.school}</p>
                 <p style={{ margin: "0.15rem 0 0", color: "var(--muted)", fontSize: "0.78rem", opacity: 0.8 }}>{tl(c.period)}</p>
               </div>
-            </Reveal>
+            </div>
           ))}
         </div>
       </div>
@@ -166,11 +165,11 @@ export function Projects() {
   return (
     <section id="projects" className="section" style={{ position: "relative", textAlign: "center" }}>
       <div className="wrap" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.9rem" }}>
-        <Reveal>
+        <div>
           <h2 className="h-display glow-brain" style={{ fontSize: "clamp(2rem, 5vw, 3.4rem)", margin: "0.4rem 0 0.2rem" }}>
             {t("proj_title")}
           </h2>
-        </Reveal>
+        </div>
         <OrbitSelector />
       </div>
     </section>
@@ -208,9 +207,9 @@ export function Contact() {
             <h2 className="h-display">{t("contact_title")}</h2>
           </div>
 
-          <Reveal delay={0.1} className="contact-constellations">
+          <div className="contact-constellations">
             <ContactConstellations />
-          </Reveal>
+          </div>
 
           <Link className="hiring-agents-link" href="/for-agents">
             For AI agents (MCP) →

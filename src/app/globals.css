@@ -58,16 +58,6 @@ html {
   scrollbar-color: rgba(123, 150, 255, 0.4) transparent;
 }
 
-/* Section snap only for mouse/trackpad: each wheel gesture settles on a
-   section ("station to station"), and `proximity` keeps tall sections freely
-   readable. Touch screens keep plain native momentum scrolling; snapping
-   there fights the fling and feels forced. */
-@media (hover: hover) and (pointer: fine) {
-  html {
-    scroll-snap-type: y proximity;
-  }
-}
-
 body {
   background: var(--scene-bg, var(--bg));
   color: var(--fg);
@@ -302,12 +292,6 @@ body:has([data-scene-root] canvas) .home-sky {
   flex-direction: column;
   justify-content: center;
   padding: clamp(2.5rem, 7vw, 4rem) clamp(1rem, 5vw, 2.5rem);
-  /* Punto de anclaje del snap: el borde superior de cada sección. Sin
-     `scroll-snap-stop: always` a propósito —ese forzaba una parada dura en cada
-     borde y hacía que la rueda se sintiera "atascada". Con `proximity` (en html)
-     y sólo `align: start`, dentro de la sección el scroll es libre/normal y al
-     acercarse a un borde ancla suave a la siguiente "estación". */
-  scroll-snap-align: start;
 }
 
 @media (min-width: 768px) {
