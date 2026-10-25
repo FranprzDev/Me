@@ -25,6 +25,8 @@ const UI = {
   hero_cta_cv: { es: "Descargar CV", en: "Download Resume" },
 
   exp_title: { es: "Experiencia profesional", en: "Professional experience" },
+  exp_more: { es: "Ver más", en: "Show more" },
+  exp_less: { es: "Ver menos", en: "Show less" },
   exp_present: { es: "Presente", en: "Present" },
 
   edu_title: { es: "Educación", en: "Education" },

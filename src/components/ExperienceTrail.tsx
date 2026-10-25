@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { CV } from "@/data/cv";
 import { useI18n } from "@/lib/i18n";
 import "./experience-trail.css";
@@ -36,6 +36,51 @@ function segment(from: StarPoint, to: StarPoint, index: number, bulge: number): 
   const c1x = from.x + side * bulge;
   const c2x = to.x + side * bulge;
   return ` C ${c1x} ${from.y + dy * 0.45} ${c2x} ${to.y - dy * 0.45} ${to.x} ${to.y}`;
+}
+
+/**
+ * Entry description clamped to a few lines with a Show more toggle. The full
+ * text is always in the DOM (clamping is CSS only), and the toggle only
+ * appears when the text actually overflows.
+ */
+function ExpandableDescription({ text }: { text: string }) {
+  const { t } = useI18n();
+  const id = useId();
+  const ref = useRef<HTMLParagraphElement>(null);
+  const [expanded, setExpanded] = useState(false);
+  const [overflows, setOverflows] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const check = () => {
+      if (el.dataset.expanded === "true") return;
+      setOverflows(el.scrollHeight - el.clientHeight > 1);
+    };
+    check();
+    const observer = new ResizeObserver(check);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [text]);
+
+  return (
+    <>
+      <p ref={ref} id={id} className="xp-card__body" data-expanded={expanded}>
+        {text}
+      </p>
+      {(overflows || expanded) && (
+        <button
+          type="button"
+          className="xp-card__more"
+          aria-expanded={expanded}
+          aria-controls={id}
+          onClick={() => setExpanded((v) => !v)}
+        >
+          {expanded ? t("exp_less") : t("exp_more")}
+        </button>
+      )}
+    </>
+  );
 }
 
 /**
@@ -221,7 +266,7 @@ export function ExperienceTrail() {
               </span>
             </div>
             <p className="xp-card__org accent-japan">{tl(entry.org)}</p>
-            <p className="xp-card__body">{tl(entry.description)}</p>
+            <ExpandableDescription text={tl(entry.description)} />
             {entry.stack && entry.stack.length > 0 && <p className="stack-note">{entry.stack.join(" · ")}</p>}
           </article>
         </li>
