@@ -18,6 +18,7 @@ import {
 } from "@/lib/mcp/portfolio";
 import { MCP_SERVER_INFO, McpTool } from "@/lib/mcp/tools";
 import { MCP_CORS_HEADERS, withCors } from "@/lib/mcp/http";
+import { checkRateLimit, clientKey } from "@/lib/mcp/rateLimit";
 
 /**
  * Public, read-only MCP server (Streamable HTTP) for Francisco Perez's
@@ -31,6 +32,7 @@ import { MCP_CORS_HEADERS, withCors } from "@/lib/mcp/http";
  * - Clients that only accept application/json (or send no Accept header) are
  *   served, since this server never opens an SSE stream.
  * - Request bodies are capped well below the platform limit.
+ * - Best-effort per-client rate limit (src/lib/mcp/rateLimit.ts): 429 + Retry-After.
  */
 
 export const dynamic = "force-dynamic";
@@ -191,6 +193,15 @@ async function handle(request: Request): Promise<Response> {
 }
 
 export async function POST(request: Request) {
+  const limit = checkRateLimit(clientKey(request));
+  if (!limit.allowed) {
+    return withCors(
+      Response.json(
+        { jsonrpc: "2.0", error: { code: -32029, message: "Too many requests. Retry later." }, id: null },
+        { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } }
+      )
+    );
+  }
   return handle(request);
 }
 

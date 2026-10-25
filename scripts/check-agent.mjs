@@ -240,4 +240,26 @@ assert.ok(
 );
 assert.doesNotMatch(codeBlocks.join("\n"), /github\.io/, "Configs never point to the old GitHub Pages host");
 
+// Rate limit: a client over the limit gets 429 + Retry-After, another client is unaffected.
+// A dedicated x-forwarded-for keeps this burst from counting against the checks above.
+const burstHeaders = { "content-type": "application/json", accept: "application/json, text/event-stream", "x-forwarded-for": "203.0.113.77" };
+const burstBody = JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list", params: {} });
+let limited = null;
+let served = 0;
+for (let i = 0; i < 200 && !limited; i += 1) {
+  const response = await fetch(endpoint, { method: "POST", headers: burstHeaders, body: burstBody });
+  if (response.status === 429) limited = response;
+  else {
+    assert.equal(response.status, 200, "Requests under the limit are served");
+    served += 1;
+  }
+}
+assert.ok(limited, "A burst of requests from one client is rate limited");
+assert.ok(served >= 60, `A normal session fits well under the limit (served ${served})`);
+assert.ok(Number(limited.headers.get("retry-after")) >= 1, "429 carries Retry-After");
+assert.equal(limited.headers.get("access-control-allow-origin"), "*", "429 keeps CORS so browser clients can read it");
+assert.equal((await limited.json()).error.message, "Too many requests. Retry later.");
+const otherClient = await fetch(endpoint, { method: "POST", headers: { ...burstHeaders, "x-forwarded-for": "203.0.113.78" }, body: burstBody });
+assert.equal(otherClient.status, 200, "A different client is not affected by the limit");
+
 console.log(`Agent card, /for-agents and MCP tools/list + tools/call passed (CV versions: ${sourceVariants.join(", ")}).`);
