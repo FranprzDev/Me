@@ -314,37 +314,34 @@ async function describeFailure(error) {
 }
 
 /**
- * Experience constellation (src/components/ExperienceTrail.tsx): static in every
- * mode. The whole line is drawn and every card keeps the same look wherever the
- * viewport sits, so scrolling never changes what is readable.
+ * Experience constellation (src/components/ExperienceTrail.tsx): with motion the
+ * trace follows the scroll (lit entries behind the tip, dimmed ones ahead);
+ * with reduced motion the whole constellation stays drawn and lit.
  */
-async function assertExperienceTrail(page, name) {
+async function assertExperienceTrail(page, name, reduced) {
   const read = () => page.evaluate(() => ({
-    states: [...document.querySelectorAll(".xp-entry")].map((entry) => entry.dataset.state ?? null),
-    path: document.querySelector(".xp-trail__line")?.getAttribute("d") ?? "",
-    dash: document.querySelector(".xp-trail__line")?.style.strokeDasharray ?? "",
-    tip: document.querySelectorAll(".xp-trail__tip").length,
-    cards: [...document.querySelectorAll(".xp-card")].map((card) => {
-      const style = getComputedStyle(card);
-      return `${style.transform}|${style.backgroundColor}|${getComputedStyle(card.querySelector(".xp-card__body")).color}`;
-    }),
+    mode: document.querySelector(".xp-trail")?.dataset.mode,
+    states: [...document.querySelectorAll(".xp-entry")].map((entry) => entry.dataset.state),
+    offset: Number.parseFloat(document.querySelector(".xp-trail__line")?.style.strokeDashoffset ?? "NaN"),
   }));
-  const scrollToList = (share) => page.evaluate((s) => {
+  // Park the viewport in the middle of the list and let the trace settle.
+  await page.evaluate(() => {
     const list = document.querySelector(".xp-trail");
-    window.scrollTo({ top: list.getBoundingClientRect().top + scrollY + list.offsetHeight * s - innerHeight / 2, behavior: "instant" });
-  }, share);
-  await scrollToList(0);
-  await page.waitForTimeout(600);
-  const start = await read();
-  await scrollToList(0.5);
-  await page.waitForTimeout(600);
+    window.scrollTo({ top: list.getBoundingClientRect().top + scrollY + list.offsetHeight / 2 - innerHeight / 2, behavior: "instant" });
+  });
+  await page.waitForTimeout(900);
   const mid = await read();
   assert.ok(mid.states.length > 1, `${name}: experience entries rendered`);
-  assert.deepEqual([...new Set(mid.states)], [null], `${name}: entries carry no scroll state`);
-  assert.equal(mid.tip, 0, `${name}: no comet tip following the scroll`);
-  assert.equal(mid.dash, "", `${name}: the line is fully drawn (no dash offset)`);
-  assert.match(mid.path, /^M /, `${name}: the constellation line is drawn`);
-  assert.deepEqual(mid.cards, start.cards, `${name}: cards look the same wherever the viewport sits`);
+  if (reduced) {
+    assert.equal(mid.mode, "static", `${name}: reduced motion keeps the constellation static`);
+    assert.deepEqual([...new Set(mid.states)], ["past"], `${name}: reduced motion lights every entry`);
+    assert.equal(mid.offset, 0, `${name}: reduced motion draws the whole trace`);
+  } else {
+    assert.equal(mid.mode, "live", `${name}: the trace follows the scroll`);
+    assert.ok(mid.states.includes("active"), `${name}: the entry under the tip is active (${mid.states})`);
+    assert.ok(mid.states.includes("upcoming"), `${name}: entries ahead of the tip wait dimmed (${mid.states})`);
+    assert.ok(mid.offset > 0, `${name}: the trace is partly drawn mid-list`);
+  }
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.waitForTimeout(300);
 }
@@ -407,7 +404,7 @@ async function main() {
       for (const route of routes) {
         await checkPage(page, route, name);
         if (route === "/") await assertHeroCvLink(page, "es");
-        if (route === "/") await assertExperienceTrail(page, name);
+        if (route === "/") await assertExperienceTrail(page, name, name === "reduced-motion");
         if (route === "/") await assertHomeSections(page, "es");
         await page.getByRole("button", { name: "Cambiar a inglés" }).click();
         assert.equal(await page.locator("html").getAttribute("lang"), "en");
