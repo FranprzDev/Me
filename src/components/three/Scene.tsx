@@ -16,7 +16,7 @@ import { getScrollProgress, measuredSectionCenter, bumpWeight } from "@/lib/scro
 import { getConstellations, type Constellation } from "@/data/constellations";
 import { useI18n } from "@/lib/i18n";
 import { Nebula, Planet } from "./Cosmos";
-import { DecorSide, StarShell, WarpField, clearOfContentX, dampingFactor, smoother } from "./shared";
+import { DecorSide, StarShell, clearOfContentX, dampingFactor, smoother } from "./shared";
 
 // Familia de color del nebulón: todo dentro del "espacio" (índigos/violetas
 // oscuros). No son mundos distintos, sólo un leve cambio de humor por profundidad.
@@ -271,9 +271,6 @@ function Rig({
   // Progreso suavizado: desacopla la escena del scroll crudo (la rueda llega en
   // saltos discretos) para que el viaje y los cross-fade se sientan fluidos.
   const pRef = useRef(0);
-  // Velocidad de scroll suavizada -> intensidad del warp.
-  const velRef = useRef(0);
-  const lastRaw = useRef(0);
 
   useEffect(() => {
     scene.fog = fog;
@@ -287,11 +284,6 @@ function Rig({
 
   useFrame((_, dt) => {
     const raw = getScrollProgress();
-    // Velocidad instantánea de scroll -> suavizada.
-    const inst = Math.abs(raw - lastRaw.current) / Math.max(dt, 0.0001);
-    lastRaw.current = raw;
-    velRef.current += (inst - velRef.current) * dampingFactor(dt, 6);
-
     // Easing del progreso hacia el objetivo de scroll: viaje "buttery".
     pRef.current += (raw - pRef.current) * dampingFactor(dt, 5);
     const p = pRef.current;
@@ -323,8 +315,6 @@ function Rig({
       {!performanceMode && <Planet pRef={pRef} />}
 
       <StarShell count={starCount} reduced={reduced} spin={0.006} opacity={0.85} />
-
-      <WarpField velocity={velRef} reduced={reduced} performanceMode={performanceMode} />
 
       {/* En modo minimal sólo quedan los puntos viajando, sin constelaciones. */}
       {!minimal &&

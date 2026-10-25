@@ -185,6 +185,38 @@
   transition: color 420ms ease, transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Collapsed description: a few lines, full text one tap away (Show more). */
+.xp-card__body[data-expanded="false"] {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  overflow: hidden;
+}
+
+.xp-card__more {
+  margin: 0.5rem 0 0;
+  padding: 0.35rem 0;
+  min-height: 2.75rem;
+  border: 0;
+  background: none;
+  color: var(--star, #e9c270);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.xp-card__more:hover {
+  text-decoration: underline;
+}
+
+.xp-card__more:focus-visible {
+  outline: 2px solid #9fb8ff;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .xp-entry[data-current="true"] .xp-card {
   border-left: 3px solid var(--japan);
 }
