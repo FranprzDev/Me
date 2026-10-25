@@ -8,6 +8,8 @@ import { expireLaunchLoader, isLaunchLoaderPending } from "@/lib/launchLoader";
 const ASCENT_MS = 1700;
 /** Burst + iris reveal once the background is really ready. */
 const BURST_MS = 1100;
+/** Extra time before the safety timer closes a burst that did not finish drawing. */
+const BURST_GRACE_MS = 2500;
 /** Graceful exit when the scene failed or is too slow. */
 const EXIT_MS = 600;
 /** Hard cap: never keep the loader around longer than this. */
@@ -93,18 +95,22 @@ function RocketLoaderClient() {
       if (settled) return;
       settled = true;
       setPhase(next);
+      // The burst is closed by its own last frame (see the canvas loop); this
+      // timer is only the safety net, longer than the burst so that a main
+      // thread busy with shader compilation cannot cut the explosion short.
       timers.push(
         window.setTimeout(() => {
           expireLaunchLoader();
           setPhase(Phase.Done);
-        }, next === Phase.Burst ? BURST_MS : EXIT_MS)
+        }, next === Phase.Burst ? BURST_MS + BURST_GRACE_MS : EXIT_MS)
       );
     };
 
     const evaluate = () => {
       const status = getSceneStatus();
-      if (status === SceneStatus.Failed) return finish(Phase.Exit);
-      if (status === SceneStatus.Ready && ascended) return finish(reduced ? Phase.Exit : Phase.Burst);
+      // The rocket always finishes its flight and bursts, whatever is behind
+      // the veil (the 3D scene or the static CSS sky). Only reduced motion fades.
+      if (status !== SceneStatus.Pending && ascended) return finish(reduced ? Phase.Exit : Phase.Burst);
     };
 
     if (!reduced) {
@@ -116,7 +122,7 @@ function RocketLoaderClient() {
         }, ASCENT_MS)
       );
     }
-    timers.push(window.setTimeout(() => finish(Phase.Exit), TIMEOUT_MS));
+    timers.push(window.setTimeout(() => finish(reduced ? Phase.Exit : Phase.Burst), TIMEOUT_MS));
 
     const unsubscribe = subscribeSceneStatus(evaluate);
     evaluate();
@@ -314,7 +320,11 @@ function RocketLoaderClient() {
           ctx.fill();
         }
         ctx.globalCompositeOperation = "source-over";
-        if (t >= 1) return;
+        if (t >= 1) {
+          expireLaunchLoader();
+          setPhase(Phase.Done);
+          return;
+        }
       } else {
         rocket.style.opacity = "0";
         return;
