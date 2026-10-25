@@ -18,8 +18,10 @@ async function checkPage(page, route, name) {
     assert.equal(response.status(), 200, `${name}: ${route}`);
     await page.locator("h1").waitFor();
     await page.waitForTimeout(2000);
-    // The 3D backdrop is gone (2026-10-20): no WebGPU scene, launch loader or CSS sky layer behind the copy.
-    assert.equal(await page.locator("[data-scene-root], [data-rocket-loader], .home-sky").count(), 0, `${name}: plain dark background ${route}`);
+    if (process.env.HEADFUL === "1") {
+      await page.locator("[data-scene-root] canvas").waitFor({ state: "attached" });
+      assert.equal(await page.locator("[data-scene-root] canvas").evaluate((el) => el.width > 0 && el.height > 0), true, `${name}: 3D background ${route}`);
+    }
     assert.equal(await page.locator("h1").count(), 1, "One main heading");
     assert.equal(await page.locator("main#main-content").count(), 1, "Skip-link target");
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${name}: horizontal overflow`);
@@ -109,7 +111,7 @@ async function checkCvPages(browser) {
       assert.equal(await page.locator(".cv-root").getAttribute("lang"), locale, `${route}: content language`);
       assert.equal(await page.locator("h1").count(), 1, `${route}: one h1`);
       assert.equal(await page.locator("main#main-content").count(), 1, `${route}: main landmark`);
-      // CV pages wear the portfolio chrome (nav, CSS night sky) and no 3D layer.
+      // CV pages wear the portfolio chrome (nav, CSS night sky) but never the WebGPU layer.
       assert.equal(await page.locator(".site-nav").count(), 1, `${route}: portfolio nav`);
       assert.equal(await page.locator(".cv-cosmos").count(), 1, `${route}: night-sky backdrop`);
       assert.equal(await page.locator("[data-scene-root]").count(), 0, `${route}: no 3D layer`);
@@ -312,34 +314,37 @@ async function describeFailure(error) {
 }
 
 /**
- * Experience constellation (src/components/ExperienceTrail.tsx): with motion the
- * trace follows the scroll (lit entries behind the tip, dimmed ones ahead);
- * with reduced motion the whole constellation stays drawn and lit.
+ * Experience constellation (src/components/ExperienceTrail.tsx): static in every
+ * mode. The whole line is drawn and every card keeps the same look wherever the
+ * viewport sits, so scrolling never changes what is readable.
  */
-async function assertExperienceTrail(page, name, reduced) {
+async function assertExperienceTrail(page, name) {
   const read = () => page.evaluate(() => ({
-    mode: document.querySelector(".xp-trail")?.dataset.mode,
-    states: [...document.querySelectorAll(".xp-entry")].map((entry) => entry.dataset.state),
-    offset: Number.parseFloat(document.querySelector(".xp-trail__line")?.style.strokeDashoffset ?? "NaN"),
+    states: [...document.querySelectorAll(".xp-entry")].map((entry) => entry.dataset.state ?? null),
+    path: document.querySelector(".xp-trail__line")?.getAttribute("d") ?? "",
+    dash: document.querySelector(".xp-trail__line")?.style.strokeDasharray ?? "",
+    tip: document.querySelectorAll(".xp-trail__tip").length,
+    cards: [...document.querySelectorAll(".xp-card")].map((card) => {
+      const style = getComputedStyle(card);
+      return `${style.transform}|${style.backgroundColor}|${getComputedStyle(card.querySelector(".xp-card__body")).color}`;
+    }),
   }));
-  // Park the viewport in the middle of the list and let the trace settle.
-  await page.evaluate(() => {
+  const scrollToList = (share) => page.evaluate((s) => {
     const list = document.querySelector(".xp-trail");
-    window.scrollTo({ top: list.getBoundingClientRect().top + scrollY + list.offsetHeight / 2 - innerHeight / 2, behavior: "instant" });
-  });
-  await page.waitForTimeout(900);
+    window.scrollTo({ top: list.getBoundingClientRect().top + scrollY + list.offsetHeight * s - innerHeight / 2, behavior: "instant" });
+  }, share);
+  await scrollToList(0);
+  await page.waitForTimeout(600);
+  const start = await read();
+  await scrollToList(0.5);
+  await page.waitForTimeout(600);
   const mid = await read();
   assert.ok(mid.states.length > 1, `${name}: experience entries rendered`);
-  if (reduced) {
-    assert.equal(mid.mode, "static", `${name}: reduced motion keeps the constellation static`);
-    assert.deepEqual([...new Set(mid.states)], ["past"], `${name}: reduced motion lights every entry`);
-    assert.equal(mid.offset, 0, `${name}: reduced motion draws the whole trace`);
-  } else {
-    assert.equal(mid.mode, "live", `${name}: the trace follows the scroll`);
-    assert.ok(mid.states.includes("active"), `${name}: the entry under the tip is active (${mid.states})`);
-    assert.ok(mid.states.includes("upcoming"), `${name}: entries ahead of the tip wait dimmed (${mid.states})`);
-    assert.ok(mid.offset > 0, `${name}: the trace is partly drawn mid-list`);
-  }
+  assert.deepEqual([...new Set(mid.states)], [null], `${name}: entries carry no scroll state`);
+  assert.equal(mid.tip, 0, `${name}: no comet tip following the scroll`);
+  assert.equal(mid.dash, "", `${name}: the line is fully drawn (no dash offset)`);
+  assert.match(mid.path, /^M /, `${name}: the constellation line is drawn`);
+  assert.deepEqual(mid.cards, start.cards, `${name}: cards look the same wherever the viewport sits`);
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.waitForTimeout(300);
 }
@@ -380,13 +385,15 @@ async function main() {
   const browser = await chromium.launch({ headless: process.env.HEADFUL !== "1" });
   try {
     const scenarios = [
-      ["desktop", { viewport: { width: 1440, height: 900 } }],
-      ["mobile", devices["iPhone 13"]],
-      ["reduced-motion", { ...devices["iPhone 13"], reducedMotion: "reduce" }],
+      ["desktop", { viewport: { width: 1440, height: 900 } }, false],
+      ["mobile", devices["iPhone 13"], false],
+      ["no-webgpu", { viewport: { width: 1440, height: 900 } }, true],
+      ["reduced-motion", { ...devices["iPhone 13"], reducedMotion: "reduce" }, true],
     ];
-    for (const [name, options] of scenarios) {
+    for (const [name, options, fallback] of scenarios.filter(([, , fallback]) => process.env.HEADFUL !== "1" || !fallback)) {
       const context = await browser.newContext(options);
       await context.addInitScript(recordLandings);
+      if (fallback) await context.addInitScript(() => Object.defineProperty(navigator, "gpu", { value: undefined }));
       const page = await context.newPage();
       progress.scenario = name;
       progress.page = page;
@@ -400,7 +407,7 @@ async function main() {
       for (const route of routes) {
         await checkPage(page, route, name);
         if (route === "/") await assertHeroCvLink(page, "es");
-        if (route === "/") await assertExperienceTrail(page, name, name === "reduced-motion");
+        if (route === "/") await assertExperienceTrail(page, name);
         if (route === "/") await assertHomeSections(page, "es");
         await page.getByRole("button", { name: "Cambiar a inglés" }).click();
         assert.equal(await page.locator("html").getAttribute("lang"), "en");
@@ -408,6 +415,10 @@ async function main() {
         if (route === "/") await assertHomeSections(page, "en");
         assert.equal(await page.getByRole("button", { name: "Switch to Spanish" }).count(), 1);
         await page.getByRole("button", { name: "Switch to Spanish" }).click();
+      }
+      if (fallback) {
+        // Without a WebGPU adapter the 3D chunk is never downloaded or mounted.
+        assert.equal(await page.locator("[data-scene-root]").count(), 0, `${name}: no 3D backdrop without WebGPU`);
       }
       await page.goto(baseURL);
       assert.deepEqual(await page.evaluate(() => ["/hackathons", "/projects"].map((href) => {
@@ -515,11 +526,16 @@ async function main() {
       const landings = await page.evaluate(() => window.__landings);
       if (name === "reduced-motion") assert.deepEqual(landings, [], "Reduced motion: no landing, a short fade then the jump");
       else assert.deepEqual(landings.map(({ href }) => href), [routes[1]], "The puppy lands on the entered world before the jump");
+      assert.equal(await page.locator("[data-rocket-loader]").count(), 0, "Launch loader never replays on client navigation");
       await page.locator(".story-back").click();
       await page.waitForURL((url) => new URL(url).pathname === "/" && new URL(url).hash.startsWith("#projects"));
+      assert.equal(await page.locator("[data-rocket-loader]").count(), 0, "Launch loader never replays going back home");
+      await page.reload();
+      await page.waitForTimeout(400);
+      assert.equal(await page.locator("[data-rocket-loader]").count(), 0, "Launch loader shows once per browser session");
       const heading = page.locator("#contact h2");
       assert.equal(await heading.count(), 1, "Contact always has a semantic heading");
-      assert.equal(await heading.evaluate((el) => el.getBoundingClientRect().width > 100), true, "Contact has a visible DOM heading");
+      if (fallback || options.isMobile) assert.equal(await heading.evaluate((el) => el.getBoundingClientRect().width > 100), true, "Contact has a visible DOM heading without the 3D title");
       const download = await page.locator("a[download]").getAttribute("href");
       const cv = await page.request.get(`${baseURL}${download}`);
       assert.equal(cv.status(), 200);

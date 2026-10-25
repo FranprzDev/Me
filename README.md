@@ -1,7 +1,7 @@
 # Francisco Miguel Perez — Portfolio
 
 Personal portfolio built with Next.js: a space-themed, bilingual (ES/EN) site
-with a lightweight CSS/SVG experience aimed at professional presentation, plus a
+with a lightweight 3D experience aimed at professional presentation, plus a
 public read-only MCP server so AI agents can query the same data.
 
 ## Stack
@@ -10,7 +10,8 @@ public read-only MCP server so AI agents can query the same data.
 - React 19
 - TypeScript
 - Tailwind CSS v4
-- GSAP
+- Motion
+- React Three Fiber
 - Model Context Protocol TypeScript SDK (MCP server)
 
 ## Development
@@ -69,6 +70,7 @@ curl -s -X POST http://localhost:3000/api/mcp \
 ```bash
 pnpm lint
 pnpm exec tsc --noEmit
+pnpm check:shaders
 pnpm build
 pnpm exec playwright install chromium
 pnpm start
@@ -79,22 +81,23 @@ link to `/for-agents`, the `/for-recruiters` redirect, the agent card and the
 MCP `initialize` / `tools/list` / `tools/call` round trip), and
 `pnpm check:portfolio` verifies the five routes, ES/EN, keyboard, mobile menu,
 world selection, CV, canonical, browser errors, overflow and automated
-accessibility with axe. It includes scenarios on desktop, on a phone, with reduced
+accessibility with axe. It includes scenarios without WebGPU, with reduced
 motion, without JavaScript, with blocked storage and on a 320px screen.
 Screenshots are saved to `artifacts/portfolio-quality/` (not versioned).
 
 For another URL: `PORTFOLIO_URL=http://localhost:3001 pnpm check:portfolio`.
-To watch the checks in a headed browser (needs a display):
-`HEADFUL=1 pnpm check:portfolio`. Automated checks do not replace visual
+To review rendering with a real GPU in an environment with a display:
+`HEADFUL=1 pnpm check:portfolio` (desktop/mobile with normal rendering; the
+no-effects scenarios run only headless). Automated checks do not replace visual
 inspection or a test on a physical phone.
 
-GitHub Actions runs lint, TypeScript, build and the browser checks on
+GitHub Actions runs lint, TypeScript, shaders, build and the browser checks on
 every PR. Vercel validates the preview build separately.
 
 ## Structure
 
 - `src/app` - routes, global layout and styles
 - `src/app/api/mcp` - read-only MCP server
-- `src/components` - sections, navigation and decorative layers
+- `src/components` - sections, navigation and 3D scene
 - `src/data` - portfolio content
 - `src/lib` - i18n, scroll, MCP data views and utilities
