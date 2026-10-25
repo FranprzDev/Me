@@ -7,6 +7,8 @@ export interface PlanetSpec {
   atmoA: string;
   /** Color del borde (rim) de la atmósfera. */
   atmoB: string;
+  /** Radio relativo del planeta. */
+  radius: number;
   /** Anillo tenue (reservado para el proyecto destacado). */
   ring?: string;
 }
@@ -37,7 +39,7 @@ export interface Project {
   year: string;
   link?: string;
   featured?: boolean;
-  /** World palette: tints the selector orb, the world page backdrop and its accents. */
+  /** Cómo se ve este proyecto como planeta en el cosmos 3D. */
   planet: PlanetSpec;
   /** Mundos internos del planeta (p.ej. las dos participaciones en Space Apps). */
   items?: ProjectItem[];
@@ -63,6 +65,7 @@ export const PROJECTS: Project[] = [
       body: "#2e5c38",
       atmoA: "#39ff14",
       atmoB: "#baffd0",
+      radius: 1.15,
       ring: "#7ddc8f",
     },
     items: [
@@ -136,6 +139,7 @@ export const PROJECTS: Project[] = [
       body: "#6b4a1d",
       atmoA: "#e9b949",
       atmoB: "#ffe6b0",
+      radius: 0.95,
     },
     items: [
       {
@@ -195,6 +199,7 @@ export const PROJECTS: Project[] = [
       body: "#1f4a66",
       atmoA: "#4fc3f7",
       atmoB: "#c5ecff",
+      radius: 0.88,
     },
     items: [
       {
@@ -321,6 +326,7 @@ export const PROJECTS: Project[] = [
       body: "#3b2d6e",
       atmoA: "#8f7bff",
       atmoB: "#d4c9ff",
+      radius: 1.02,
     },
     items: [
       {

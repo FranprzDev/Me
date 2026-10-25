@@ -18,3 +18,18 @@ export function isLiteMode(): boolean {
     (navigator.hardwareConcurrency > 0 && navigator.hardwareConcurrency <= 4)
   );
 }
+
+/**
+ * Whether to skip the WebGPU backdrop entirely (never download its ~420 KB
+ * chunk) and keep the static CSS sky: the visitor asked for less motion or
+ * less data, or is on a phone-sized touch screen, where the 3D layer is the
+ * largest cost of the page for a background the CSS sky already paints.
+ */
+export function shouldSkipScene(): boolean {
+  if (typeof window === "undefined") return true;
+  return (
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+    saveData() ||
+    (window.matchMedia("(pointer: coarse)").matches && window.innerWidth < 768)
+  );
+}

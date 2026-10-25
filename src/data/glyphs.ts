@@ -1,7 +1,8 @@
 /**
  * Fuente de TRAZOS para escribir palabras con estrellas. Cada letra es una lista
  * de "trazos" (polilíneas) en una celda x∈[0,1], y∈[0,2] (0 = abajo). La usan
- * los enlaces de contacto en SVG (components/ContactConstellations.tsx).
+ * tanto la constelación 3D "CHARLEMOS" (data/constellations.ts) como los enlaces
+ * de contacto en SVG (components/ContactConstellations.tsx), por eso vive aparte.
  */
 export type Stroke = [number, number][];
 

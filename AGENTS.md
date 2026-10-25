@@ -9,6 +9,7 @@ Guidance for coding agents working on this repo (Francisco Perez's portfolio, Ne
 - Quality gates (same as `.github/workflows/quality.yml`):
   - `pnpm lint`
   - `pnpm exec tsc --noEmit`
+  - `pnpm check:shaders`
   - `pnpm build`
   - with `pnpm start` running: `PORTFOLIO_URL=http://localhost:3000 pnpm check:agent` and `pnpm check:portfolio` (Playwright + axe browser checks; update them when UI changes).
 
@@ -20,7 +21,7 @@ Guidance for coding agents working on this repo (Francisco Perez's portfolio, Ne
 ## CV pages (/cv, /es/cv)
 
 - Content: `src/content/cv/` is the single typed source (`CvVariant`, `CvLocale`, `CvSection` enums). `facts.ts` holds the real facts from Francisco's CVs; `variants.ts` only reorders and re-emphasises them. Never invent roles, dates, metrics or skills, and never publish a phone number or home address (email, GitHub, LinkedIn and portfolio URL only).
-- Rendering: `src/components/cv/` (server components). Routes are static (`generateStaticParams`, `dynamicParams = false`). CV pages wear the portfolio chrome (site nav with the EN/ES switch linking to the counterpart page, cursor trail, a static CSS night-sky backdrop; no 3D layer). Keep the backdrop static: nothing may loop under the glass panels (no infinite CSS animations, no shooting stars), because any motion behind `backdrop-filter` re-rasters and re-blurs the whole viewport every frame (prod audit 2026-10-14: 12-23 fps idle on desktop, ~60% raster load on phones). `check:portfolio` fails on any infinite animation on a CV page. `cv.css` keeps two separate blocks: `@media screen` (the portfolio look: glass panels, Space Grotesk display (the site heading face), mono kickers, entrance motion only under `prefers-reduced-motion: no-preference`) and `@media print` (the clean light A4 résumé the PDFs are rendered from, with every piece of site chrome hidden). Never let screen styles leak into print. The Fraunces / IBM Plex faces are print-only and not preloaded.
+- Rendering: `src/components/cv/` (server components). Routes are static (`generateStaticParams`, `dynamicParams = false`). CV pages wear the portfolio chrome (site nav with the EN/ES switch linking to the counterpart page, cursor trail, a static CSS night-sky backdrop; no WebGPU layer). Keep the backdrop static: nothing may loop under the glass panels (no infinite CSS animations, no shooting stars), because any motion behind `backdrop-filter` re-rasters and re-blurs the whole viewport every frame (prod audit 2026-10-14: 12-23 fps idle on desktop, ~60% raster load on phones). `check:portfolio` fails on any infinite animation on a CV page. `cv.css` keeps two separate blocks: `@media screen` (the portfolio look: glass panels, Space Grotesk display (the site heading face), mono kickers, entrance motion only under `prefers-reduced-motion: no-preference`) and `@media print` (the clean light A4 résumé the PDFs are rendered from, with every piece of site chrome hidden). Never let screen styles leak into print. The Fraunces / IBM Plex faces are print-only and not preloaded.
 - One page: every variant (EN and ES) must fit on ONE A4 page in print and in its PDF (Francisco's rule). `pnpm cv:pdf` and `check:portfolio` fail otherwise. To make room, prioritise per variant in `variants.ts` (drop the least relevant role, bullet or project for that role type, shorten wording without changing facts); never shrink body text below 9.5pt or squeeze margins below 10mm. The screen page shows the same content set.
 - Index (/cv, /es/cv): each version is one glass tile that is itself the PDF download link (`download`, aria-label "Download <Version> CV (PDF)"); no inner buttons. The /cv/<variant> pages stay live. User-facing English says "CV", never "Résumé". The site nav has no CV item; the hero CTA downloads the generated Applied AI PDF in the page language (`src/lib/primaryCv.ts` on top of `cvPdfPath`, versioned `?v=`); /me and the MCP profile's `cv_pdf` use the same file. The old hand-committed `/cv/FranciscoPerez-AIEngineer.pdf` is gone and redirects to the English Applied AI PDF.
 - PDFs: committed in `public/cv/files/`, rendered from the pages with Playwright. After changing anything in `src/content/cv/` or `src/components/cv/`, rebuild, start the server and run `PORTFOLIO_URL=http://localhost:3000 pnpm cv:pdf`, then commit `public/cv/files/`. They are not generated during `next build` because the build host (Vercel) has no browser. `check:portfolio` fails when `manifest.json`'s source hash no longer matches, so a stale PDF cannot ship. The manifest also records each file's content version; `cvPdfPath()` links `?v=<version>` everywhere (index cards, Download PDF button, MCP `pdf_url`) with a clean `download` filename, versioned URLs are cached `immutable` and bare URLs revalidate (`next.config.ts`), so a regenerated PDF is never served from cache.
@@ -33,18 +34,15 @@ Guidance for coding agents working on this repo (Francisco Perez's portfolio, Ne
 - Copy-paste configs on `/for-agents` (Claude Code command, `mcpServers` JSON, VS Code `servers` JSON, Inspector CLI) are built from the request host and checked by `check:agent`; never hard-code another host.
 - Test with a real client before and after changes: `npx @modelcontextprotocol/inspector --cli <url>/api/mcp --transport http --method tools/list`, and `pnpm check:agent` (covers capabilities, invalid args, CORS, Accept, body cap, llms.txt and the configs).
 
-## Home scrolling and background
+## Home scrolling (no scroll-driven animation)
 
-- No section snapping (`scroll-snap-*` was removed from `html` / `.section`) and no scroll-triggered entrances (the Motion `Reveal` wrapper and the `motion` dependency are gone): Francisco asked for this on 2026-10-20 because they made the page hard to read. Do not bring them back without his explicit ask.
-- The one scroll-driven effect on `/` is the experience constellation below; Francisco asked for it back on 2026-10-20 ("la animación de scroll al mostrar la experiencia estaba buenísima").
-- Background: a plain dark page (`--scene-bg` / `--bg` in `globals.css`). The WebGPU/three.js backdrop (camera drift, constellations fading with scroll, world scenes, its WGSL shader and the rocket launch loader that waited on it) and the CSS home sky under it were removed on 2026-10-20 at Francisco's request ("el fondo 3d era lo que quería que borres"). Do not reintroduce a canvas/WebGL/WebGPU background, three.js, React Three Fiber or vgpu. `check:portfolio` fails if `[data-scene-root]`, `[data-rocket-loader]` or `.home-sky` render on any route.
-- Kept on purpose (lightweight, not part of that system): the GSAP shooting stars (`StarAura`), the per-world CSS tint (`PlanetBackground`), the 2D-canvas link warp (`WarpTransition`), the cursor trail, the hero name intro, the thin reading-progress bar and the nav band.
+- The home page scrolls natively and nothing on it is tied to the scroll position: no section snapping (`scroll-snap-*` was removed from `html` / `.section`), no scroll-triggered entrances (the Motion `Reveal` wrapper and the `motion` dependency are gone) and no scroll-traced experience line. Francisco asked for this on 2026-10-20 because the scroll animation made the page hard to read. Do not reintroduce scroll-linked effects on `/` (ScrollTrigger, `whileInView`, scroll listeners that change content) without his explicit ask.
+- Kept on purpose: the persistent WebGPU/CSS backdrop, the shooting stars, the hero name intro, the thin reading-progress bar and the nav band.
 
 ## Home experience constellation (src/components/ExperienceTrail.tsx)
 
-- The Experience section renders `CV.experience` as a constellation traced on scroll: an SVG line drawn by `stroke-dashoffset` (rAF-eased, stops when settled), one star per role, `data-state` = `upcoming` / `active` / `past` on each entry. Phones use a left rail; from 900px the cards alternate around a meandering central line.
-- Per frame only the dash offset and the tip's `transform` change; layout is measured on resize / `ResizeObserver`, never per frame. Dimmed entries change colour and scale, never opacity, so axe contrast passes in every state.
-- Reduced motion (and the server render) show the whole constellation drawn and every role lit; scroll does nothing then. `check:portfolio` covers both (`assertExperienceTrail`).
+- The Experience section renders `CV.experience` as a static constellation: one lit star per role joined by a fully drawn SVG line. Phones use a left rail; from 900px the cards alternate around a meandering central line.
+- The line is measured on mount and on `ResizeObserver` / breakpoint change only, never on scroll. `check:portfolio` (`assertExperienceTrail`) checks there is no scroll state and that cards look the same wherever the viewport sits.
 
 ## Home worlds selector (src/components/OrbitSelector.tsx)
 
@@ -58,6 +56,7 @@ Guidance for coding agents working on this repo (Francisco Perez's portfolio, Ne
 - Every route sets its own `alternates.canonical` and `openGraph.url`; the root layout sets neither (a layout-level canonical leaked `/` into /for-agents). A route that sets `openGraph` lists `SITE_OG_IMAGE` (src/lib/seo.ts) again, because a child `openGraph` replaces the inherited one.
 - The home page carries Person + WebSite JSON-LD (`src/lib/structuredData.ts`), built only from facts the page shows; no phone or street address.
 - The home page has no featured projects block (removed 2026-10-20 at Francisco's request): after the worlds selector it goes straight to "Charlemos" (#contact). `n8n-nodes-timed-buffer` belongs to IAntropo (Francisco contributed): never feature or describe it as his own anywhere.
+- The WebGPU backdrop is skipped entirely (no chunk download) under `prefers-reduced-motion: reduce`, Save-Data, or a coarse pointer below 768px (`shouldSkipScene` in src/lib/lite.ts); the CSS sky stays.
 
 ## Workflow
 
@@ -70,7 +69,7 @@ Guidance for coding agents working on this repo (Francisco Perez's portfolio, Ne
 
 Web quality skills from [addyosmani/web-quality-skills](https://github.com/addyosmani/web-quality-skills) are vendored in [`.agents/skills/`](.agents/skills/README.md). Load the matching one before working on that area:
 
-- Performance and bundle size: [`.agents/skills/performance/SKILL.md`](.agents/skills/performance/SKILL.md) and its [measurement workflow](.agents/skills/performance/references/MEASUREMENT.md)
+- Performance, bundle size, 3D/WebGPU cost: [`.agents/skills/performance/SKILL.md`](.agents/skills/performance/SKILL.md) and its [measurement workflow](.agents/skills/performance/references/MEASUREMENT.md)
 - LCP / INP / CLS: [`.agents/skills/core-web-vitals/SKILL.md`](.agents/skills/core-web-vitals/SKILL.md)
 - Accessibility: [`.agents/skills/accessibility/SKILL.md`](.agents/skills/accessibility/SKILL.md)
 - SEO: [`.agents/skills/seo/SKILL.md`](.agents/skills/seo/SKILL.md)
