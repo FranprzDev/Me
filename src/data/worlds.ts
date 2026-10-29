@@ -13,7 +13,6 @@ export interface PlanetSpec {
   ring?: string;
 }
 
-/** Mundo del portfolio con la información ligera que usan el selector y el chrome. */
 export interface WorldEntry {
   slug: string;
   name: string;
@@ -21,10 +20,6 @@ export interface WorldEntry {
   planet: PlanetSpec;
 }
 
-/**
- * Los cuatro mundos del portfolio, en orden, con solo el dato ligero: slug,
- * nombre, título y planeta. El resto del contenido vive en projects.ts.
- */
 export const WORLDS: WorldEntry[] = [
   {
     slug: "hackathons",

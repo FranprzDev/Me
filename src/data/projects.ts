@@ -35,7 +35,6 @@ export interface Project {
   items?: ProjectItem[];
 }
 
-/** Detalle por slug: todo lo que un mundo no lleva en su dato ligero (WORLDS). */
 type ProjectDetail = Omit<Project, "slug" | "name" | "title" | "planet">;
 
 const DETAILS: Record<string, ProjectDetail> = {
