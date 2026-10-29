@@ -693,8 +693,8 @@ async function main() {
       progress.page = page;
       page.setDefaultTimeout(15000);
       await checkPage(page, "/for-agents", name);
-      for (const [label, prefix] of [["Open in ChatGPT", "https://chatgpt.com/?q="], ["Open in Claude", "https://claude.ai/new?q="]]) {
-        const link = page.getByRole("link", { name: new RegExp(`^${label}`) });
+      for (const [label, prefix] of [["Open in ChatGPT|Abrir en ChatGPT", "https://chatgpt.com/?q="], ["Open in Claude|Abrir en Claude", "https://claude.ai/new?q="]]) {
+        const link = page.getByRole("link", { name: new RegExp(`^(?:${label})`) });
         assert.equal(await link.count(), 1, `${name}: ${label} button`);
         const href = await link.getAttribute("href");
         assert.ok(href.startsWith(prefix), `${label} uses ${prefix}`);
@@ -702,7 +702,7 @@ async function main() {
         assert.equal(await link.getAttribute("target"), "_blank");
         assert.match(await link.getAttribute("rel"), /noopener/);
       }
-      assert.equal(await page.getByRole("button", { name: "Copy prompt" }).count(), 1, "Copy-prompt fallback");
+      assert.equal(await page.getByRole("button", { name: /^(?:Copy prompt|Copiar prompt)$/ }).count(), 1, "Copy-prompt fallback");
       assert.equal(await page.locator("main pre").count() >= 1, true, "The assistant prompt snippet is rendered");
       assert.equal(await page.locator("main").evaluate((el) => /planet/i.test(el.outerHTML)), false, "No 'planet' wording on /for-agents");
       assert.equal(await page.locator("main").evaluate((el) => /CH-0\d \/\//.test(el.outerHTML)), false, "No channel labels (CH-0x //) on /for-agents panels");
