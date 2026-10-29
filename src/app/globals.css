@@ -292,6 +292,8 @@ body:has([data-scene-root] canvas) .home-sky {
   flex-direction: column;
   justify-content: center;
   padding: clamp(2.5rem, 7vw, 4rem) clamp(1rem, 5vw, 2.5rem);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
 }
 
 @media (min-width: 768px) {
