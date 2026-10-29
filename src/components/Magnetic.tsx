@@ -29,10 +29,12 @@ export function Magnetic({
     const xTo = gsap.quickTo(el, "x", { duration: 0.5, ease: "power3.out" });
     const yTo = gsap.quickTo(el, "y", { duration: 0.5, ease: "power3.out" });
 
+    const maxTravel = 16;
+    const clampTravel = (value: number) => Math.max(-maxTravel, Math.min(maxTravel, value));
     const onMove = (e: MouseEvent) => {
       const r = el.getBoundingClientRect();
-      xTo((e.clientX - (r.left + r.width / 2)) * strength);
-      yTo((e.clientY - (r.top + r.height / 2)) * strength);
+      xTo(clampTravel((e.clientX - (r.left + r.width / 2)) * strength));
+      yTo(clampTravel((e.clientY - (r.top + r.height / 2)) * strength));
     };
     const onLeave = () => {
       gsap.to(el, { x: 0, y: 0, duration: 0.9, ease: "elastic.out(1, 0.4)" });
