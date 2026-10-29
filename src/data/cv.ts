@@ -94,9 +94,9 @@ export const CV: CV = {
     {
       role: { es: "AI Engineer", en: "AI Engineer" },
       org: { es: "RepuestoShop", en: "RepuestoShop" },
-      period: { es: "Diciembre 2025 – Presente", en: "December 2025 – Present" },
+      period: { es: "Diciembre 2025 – Octubre 2026", en: "December 2025 – October 2026" },
       start: "2025-12",
-      current: true,
+      current: false,
       description: {
         es: "Diseño y despliego sistemas multi-agente y pipelines RAG a medida con LangChain, LangGraph y otras herramientas, con foco en agent harness, tool calling y control de contexto. Construyo herramientas internas con Meta APIs y pipelines de scraping para grounding de datos. Muy hands-on: investigo tech nuevo, comparo modelos y entrego POCs sólidos listos para producción.",
         en: "Architect and deploy multi-agent systems and custom RAG pipelines with LangChain, LangGraph and other tools, focused on agent harness engineering, tool calling and context control. Build internal tools with Meta APIs and scraping pipelines for data grounding. Hands-on: research unfamiliar tech, benchmark models and ship production-ready POCs fast.",
