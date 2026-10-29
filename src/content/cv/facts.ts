@@ -112,7 +112,7 @@ export const PROJECT_PROOFY: ProjectEntry = {
 
 export const REPUESTOSHOP = {
   org: { en: "RepuestoShop", es: "RepuestoShop" },
-  period: { en: "Dec 2025 – Present", es: "dic 2025 – actualidad" },
+  period: { en: "Dec 2025 – Oct 2026", es: "dic 2025 – oct 2026" },
   place: { en: "Remote", es: "Remoto" },
 } as const;
 

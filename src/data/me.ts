@@ -119,7 +119,7 @@ export const ME = {
       {
         org: "RepuestoShop",
         role: { es: "AI Engineer · part-time", en: "AI Engineer · part-time" },
-        period: { es: "Dic 2025 – hoy", en: "Dec 2025 – now" },
+        period: { es: "Dic 2025 – oct 2026", en: "Dec 2025 – Oct 2026" },
         body: {
           es: "Diseño y despliego sistemas multi-agente y pipelines RAG a medida, con foco en agent harness, tool calling y control de contexto. Construyo herramientas internas con Meta APIs y pipelines de scraping para grounding de datos.",
           en: "I design and deploy multi-agent systems and custom RAG pipelines, focused on agent harness engineering, tool calling and context control. I build internal tools with Meta APIs and scraping pipelines for data grounding.",
