@@ -17,9 +17,21 @@ const UNIT = 20; // px por unidad local de la fuente
 const PAD = 12; // margen para que el glow no se recorte
 const STAR_R = 2.3;
 
-function StarWord({ word, color }: { word: string; color: string }) {
+function StarWord({
+  word,
+  color,
+  gap = 0.42,
+  linesClass = "cc-lines",
+  starsClass = "cc-stars",
+}: {
+  word: string;
+  color: string;
+  gap?: number;
+  linesClass?: string;
+  starsClass?: string;
+}) {
   const { points, edges, w, h } = useMemo(() => {
-    const { nodes, edges } = buildWord(word, { gap: 0.42 });
+    const { nodes, edges } = buildWord(word, { gap });
     const xs = nodes.map((n) => n[0]);
     const minX = Math.min(...xs);
     const maxX = Math.max(...xs);
@@ -30,7 +42,7 @@ function StarWord({ word, color }: { word: string; color: string }) {
       ([x, y]) => [(x - minX) * UNIT + PAD, (1 - y) * UNIT + PAD] as [number, number]
     );
     return { points, edges, w, h };
-  }, [word]);
+  }, [word, gap]);
 
   return (
     <svg
@@ -40,17 +52,31 @@ function StarWord({ word, color }: { word: string; color: string }) {
       style={{ maxWidth: "100%", height: "auto", overflow: "visible", display: "block" }}
       aria-hidden
     >
-      <g className="cc-lines" stroke={color} strokeWidth={1} strokeLinecap="round">
+      <g className={linesClass} stroke={color} strokeWidth={1} strokeLinecap="round">
         {edges.map(([a, b], i) => (
           <line key={i} x1={points[a][0]} y1={points[a][1]} x2={points[b][0]} y2={points[b][1]} />
         ))}
       </g>
-      <g className="cc-stars" fill={color}>
+      <g className={starsClass} fill={color}>
         {points.map((p, i) => (
           <circle key={i} cx={p[0]} cy={p[1]} r={STAR_R} />
         ))}
       </g>
     </svg>
+  );
+}
+
+
+/** La palabra del título de contacto escrita en estrellas (la misma fuente de
+    trazos que la constelación 3D). Estática: en teléfonos reemplaza al título
+    de texto sin sumar trabajo por frame. */
+export function ContactTitleStars() {
+  const { lang } = useI18n();
+  const word = lang === "es" ? "CHARLEMOS" : "LETS TALK";
+  return (
+    <span className="contact-title-stars" aria-hidden="true">
+      <StarWord word={word} color="#b9c4ff" gap={lang === "es" ? 0.3 : 0.22} linesClass="ct-lines" starsClass="ct-stars" />
+    </span>
   );
 }
 

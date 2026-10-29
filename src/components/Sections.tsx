@@ -4,7 +4,7 @@ import Link from "next/link";
 import { CV } from "@/data/cv";
 import { cvLocaleForLang, primaryCvPdfFile, primaryCvPdfPath } from "@/lib/primaryCv";
 import { useI18n } from "@/lib/i18n";
-import { ContactConstellations } from "@/components/ContactConstellations";
+import { ContactConstellations, ContactTitleStars } from "@/components/ContactConstellations";
 import { OrbitSelector } from "@/components/OrbitSelector";
 import { GsapHeroName } from "@/components/GsapHeroName";
 import { Magnetic } from "@/components/Magnetic";
@@ -205,6 +205,7 @@ export function Contact() {
         >
           <div className="contact-copy">
             <h2 className="h-display">{t("contact_title")}</h2>
+            <ContactTitleStars />
           </div>
 
           <div className="contact-constellations">

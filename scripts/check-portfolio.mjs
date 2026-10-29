@@ -532,7 +532,8 @@ async function main() {
       assert.equal(await page.locator("[data-rocket-loader]").count(), 0, "Launch loader shows once per browser session");
       const heading = page.locator("#contact h2");
       assert.equal(await heading.count(), 1, "Contact always has a semantic heading");
-      if (fallback || options.isMobile) assert.equal(await heading.evaluate((el) => el.getBoundingClientRect().width > 100), true, "Contact has a visible DOM heading without the 3D title");
+      if (options.isMobile) assert.equal(await page.locator("#contact .contact-title-stars svg").evaluate((el) => el.getBoundingClientRect().width > 100), true, "Contact shows the star title on phones");
+      else if (fallback) assert.equal(await heading.evaluate((el) => el.getBoundingClientRect().width > 100), true, "Contact has a visible DOM heading without the 3D title");
       const download = await page.locator("a[download]").getAttribute("href");
       const cv = await page.request.get(`${baseURL}${download}`);
       assert.equal(cv.status(), 200);
