@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { Nav } from "@/components/Nav";
-import { PROJECTS } from "@/data/projects";
+import { WORLDS } from "@/data/worlds";
 import { CursorTrail } from "@/components/CursorTrail";
 import { WarpTransition } from "@/components/WarpTransition";
 import { RocketLoader } from "@/components/RocketLoader";
@@ -25,7 +25,7 @@ function viewFor(pathname: string | null): BackdropView {
   if (pathname === "/") return { kind: "home" };
   // Each world has its own scene, only for real projects: a 404 or /me gets none.
   const slug = pathname?.replace(/^\/|\/$/g, "") ?? "";
-  return PROJECTS.some((p) => p.slug === slug) ? { kind: "world", slug } : { kind: "none" };
+  return WORLDS.some((p) => p.slug === slug) ? { kind: "world", slug } : { kind: "none" };
 }
 
 /**
@@ -40,7 +40,7 @@ function usePrefetchWorlds() {
   useEffect(() => {
     const warm = () => {
       router.prefetch("/");
-      for (const p of PROJECTS) router.prefetch(`/${p.slug}`);
+      for (const p of WORLDS) router.prefetch(`/${p.slug}`);
     };
     // Safari has no requestIdleCallback: a plain delay keeps it off the first paint.
     if (typeof window.requestIdleCallback !== "function") {

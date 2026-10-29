@@ -1,4 +1,56 @@
-import { PROJECTS } from "./projects";
+import type { Localized } from "./cv";
+
+export interface PlanetSpec {
+  /** Color base del cuerpo del planeta. */
+  body: string;
+  /** Color interior de la atmósfera fresnel. */
+  atmoA: string;
+  /** Color del borde (rim) de la atmósfera. */
+  atmoB: string;
+  /** Radio relativo del planeta. */
+  radius: number;
+  /** Anillo tenue (reservado para el proyecto destacado). */
+  ring?: string;
+}
+
+/** Mundo del portfolio con la información ligera que usan el selector y el chrome. */
+export interface WorldEntry {
+  slug: string;
+  name: string;
+  title?: Localized<string>;
+  planet: PlanetSpec;
+}
+
+/**
+ * Los cuatro mundos del portfolio, en orden, con solo el dato ligero: slug,
+ * nombre, título y planeta. El resto del contenido vive en projects.ts.
+ */
+export const WORLDS: WorldEntry[] = [
+  {
+    slug: "hackathons",
+    name: "Hackathones",
+    title: { es: "Hackathones", en: "Hackathons" },
+    planet: { body: "#2e5c38", atmoA: "#39ff14", atmoB: "#baffd0", radius: 1.15, ring: "#7ddc8f" },
+  },
+  {
+    slug: "teaching",
+    name: "Mentorías",
+    title: { es: "Mentorías", en: "Teaching & Mentorship" },
+    planet: { body: "#6b4a1d", atmoA: "#e9b949", atmoB: "#ffe6b0", radius: 0.95 },
+  },
+  {
+    slug: "projects",
+    name: "Proyectos Personales",
+    title: { es: "Proyectos Personales", en: "Personal Projects" },
+    planet: { body: "#1f4a66", atmoA: "#4fc3f7", atmoB: "#c5ecff", radius: 0.88 },
+  },
+  {
+    slug: "education",
+    name: "Educación",
+    title: { es: "Educación & Formación", en: "Education & Degree" },
+    planet: { body: "#3b2d6e", atmoA: "#8f7bff", atmoB: "#d4c9ff", radius: 1.02 },
+  },
+];
 
 /**
  * Cada ruta de proyecto tiene SU PROPIA escena 3D. Este archivo es el registro
@@ -31,9 +83,9 @@ export interface WorldSpec {
   camera: { dir: [number, number, number]; from: number; depth: number; fov: number };
 }
 
-/** Paleta del planeta tomada de projects.ts, para que 3D y DOM sean el mismo mundo. */
+/** Paleta del planeta tomada de WORLDS, para que 3D y DOM sean el mismo mundo. */
 function palette(slug: string) {
-  const planet = PROJECTS.find((p) => p.slug === slug)?.planet;
+  const planet = WORLDS.find((w) => w.slug === slug)?.planet;
   return {
     atmoA: planet?.atmoA ?? "#8f7bff",
     atmoB: planet?.atmoB ?? "#d4c9ff",
@@ -45,7 +97,7 @@ const teaching = palette("teaching");
 const projects = palette("projects");
 const education = palette("education");
 
-export const WORLDS: Record<string, WorldSpec> = {
+export const WORLD_SPECS: Record<string, WorldSpec> = {
   /* Consola de lanzamiento: se entra al planeta por arriba, como quien se asoma
      sobre una mesa de radar. Verde fosforescente. */
   "hackathons": {
@@ -107,5 +159,5 @@ export const DOSSIER_WORLD: WorldSpec = {
 };
 
 export function worldFor(slug: string): WorldSpec {
-  return WORLDS[slug] ?? DOSSIER_WORLD;
+  return WORLD_SPECS[slug] ?? DOSSIER_WORLD;
 }

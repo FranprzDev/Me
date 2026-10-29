@@ -24,7 +24,7 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 import { createPortal, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import type { WebGPURenderer } from "three/webgpu";
-import { WORLDS, type WorldSpec } from "@/data/worlds";
+import { WORLD_SPECS as WORLDS, type WorldSpec } from "@/data/worlds";
 import { SceneStatus, getSceneStatus, subscribeSceneStatus } from "@/lib/sceneStatus";
 import type { BackdropView } from "./Backdrop";
 import { WORLD_AMBIENT_LIGHT, WORLD_KEY_LIGHT, WorldBody } from "./PlanetScene";

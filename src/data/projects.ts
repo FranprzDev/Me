@@ -1,17 +1,7 @@
 import type { Localized } from "./cv";
+import { WORLDS, type PlanetSpec } from "./worlds";
 
-export interface PlanetSpec {
-  /** Color base del cuerpo del planeta. */
-  body: string;
-  /** Color interior de la atmósfera fresnel. */
-  atmoA: string;
-  /** Color del borde (rim) de la atmósfera. */
-  atmoB: string;
-  /** Radio relativo del planeta. */
-  radius: number;
-  /** Anillo tenue (reservado para el proyecto destacado). */
-  ring?: string;
-}
+export type { PlanetSpec } from "./worlds";
 
 /** Sub-proyecto dentro de un planeta (p.ej. cada Space Apps). */
 export interface ProjectItem {
@@ -45,15 +35,11 @@ export interface Project {
   items?: ProjectItem[];
 }
 
-/**
- * Los planetas del portfolio: cada uno ES un proyecto y al clickearlo se
- * visita su ruta /{slug} con la información completa.
- */
-export const PROJECTS: Project[] = [
-  {
-    slug: "hackathons",
-    name: "Hackathones",
-    title: { es: "Hackathones", en: "Hackathons" },
+/** Detalle por slug: todo lo que un mundo no lleva en su dato ligero (WORLDS). */
+type ProjectDetail = Omit<Project, "slug" | "name" | "title" | "planet">;
+
+const DETAILS: Record<string, ProjectDetail> = {
+  hackathons: {
     description: {
       es: "Espacios donde el tiempo, el equipo y el problema real mandan: desde NASA Space Apps (BeeAgro y ExoGames, ganador nacional 2024) hasta el hackathon n8n de Vortex IT y el Youth Hackathon 2025 de UNESCO.",
       en: "Spaces where time, team and a real problem matter: from NASA Space Apps (BeeAgro and national winner ExoGames 2024) to Vortex IT's n8n hackathon and UNESCO's Youth Hackathon 2025.",
@@ -61,13 +47,6 @@ export const PROJECTS: Project[] = [
     stack: ["Teamwork", "Open Data", "Rapid Prototyping", "n8n"],
     year: "2023 – 2026",
     featured: true,
-    planet: {
-      body: "#2e5c38",
-      atmoA: "#39ff14",
-      atmoB: "#baffd0",
-      radius: 1.15,
-      ring: "#7ddc8f",
-    },
     items: [
       {
         name: "ExoGames — Marshall Arg",
@@ -125,22 +104,13 @@ export const PROJECTS: Project[] = [
       },
     ],
   },
-  {
-    slug: "teaching",
-    name: "Mentorías",
-    title: { es: "Mentorías", en: "Teaching & Mentorship" },
+  teaching: {
     description: {
       es: "Espacios de formación práctica en desarrollo y automatización. El curso de n8n para el Poder Judicial de Tucumán es una de esas experiencias.",
       en: "Hands-on learning experiences in development and automation. The n8n course for the Tucumán Judiciary is one of them.",
     },
     stack: ["Mentorías", "Docencia", "n8n", "Automatización"],
     year: "2025",
-    planet: {
-      body: "#6b4a1d",
-      atmoA: "#e9b949",
-      atmoB: "#ffe6b0",
-      radius: 0.95,
-    },
     items: [
       {
         name: "Curso de Automatización de Procesos con n8n — Poder Judicial de Tucumán",
@@ -184,10 +154,7 @@ export const PROJECTS: Project[] = [
       },
     ],
   },
-  {
-    slug: "projects",
-    name: "Proyectos Personales",
-    title: { es: "Proyectos Personales", en: "Personal Projects" },
+  projects: {
     description: {
       es: "Una selección de herramientas que construí para resolver problemas concretos: automatización, agentes de IA, utilidades para desarrollo y productos web.",
       en: "A selection of tools I built to solve concrete problems: automation, AI agents, developer utilities and web products.",
@@ -195,12 +162,6 @@ export const PROJECTS: Project[] = [
     stack: ["TypeScript", "IA", "Web", "Open Source"],
     year: "2023 – en curso",
     link: "https://github.com/FranprzDev?tab=repositories",
-    planet: {
-      body: "#1f4a66",
-      atmoA: "#4fc3f7",
-      atmoB: "#c5ecff",
-      radius: 0.88,
-    },
     items: [
       {
         name: "apuntes-cli",
@@ -311,10 +272,7 @@ export const PROJECTS: Project[] = [
       },
     ],
   },
-  {
-    slug: "education",
-    name: "Educación",
-    title: { es: "Educación & Formación", en: "Education & Degree" },
+  education: {
     description: {
       es: "Mi base académica: Ingeniería en Sistemas de Información en la UTN-FRT (2022 – en curso) más certificaciones que complementan el perfil full-stack, data e IA.",
       en: "My academic base: Information Systems Engineering at UTN-FRT (2022 – in progress) plus certifications that round out my full-stack, data and AI profile.",
@@ -322,12 +280,6 @@ export const PROJECTS: Project[] = [
     stack: ["UTN-FRT", "Ingeniería", "2022 – en curso"],
     year: "2022 – en curso",
     featured: true,
-    planet: {
-      body: "#3b2d6e",
-      atmoA: "#8f7bff",
-      atmoB: "#d4c9ff",
-      radius: 1.02,
-    },
     items: [
       {
         name: "Ingeniería en Sistemas de Información — UTN-FRT",
@@ -475,4 +427,10 @@ export const PROJECTS: Project[] = [
       },
     ],
   },
-];
+};
+
+/**
+ * Los planetas del portfolio: cada uno ES un proyecto y al clickearlo se
+ * visita su ruta /{slug} con la información completa.
+ */
+export const PROJECTS: Project[] = WORLDS.map((world) => ({ ...world, ...DETAILS[world.slug] }));

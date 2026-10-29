@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent, type PointerEvent } from "react";
-import { PROJECTS, type Project } from "@/data/projects";
+import { WORLDS, type WorldEntry } from "@/data/worlds";
 import { useI18n } from "@/lib/i18n";
 import { IDENTITY, rotateBy, surfaceOf, type Quat } from "@/lib/worldSpin";
 import { WorldLanding } from "@/components/WorldLanding";
@@ -146,7 +146,7 @@ function wrap(i: number, count: number): number {
 export function OrbitSelector() {
   const { t, tl } = useI18n();
   const router = useRouter();
-  const count = PROJECTS.length;
+  const count = WORLDS.length;
   const [active, setActive] = useState(0);
   const [speed, setSpeed] = useState<StepSpeed>(StepSpeed.User);
   const [entering, setEntering] = useState<string | null>(null);
@@ -170,8 +170,8 @@ export function OrbitSelector() {
   const focusCenter = useRef(false);
   const centerRef = useRef<HTMLAnchorElement>(null);
 
-  const current = PROJECTS[active];
-  const nameOf = (p: Project) => (p.title ? tl(p.title) : p.name);
+  const current = WORLDS[active];
+  const nameOf = (p: WorldEntry) => (p.title ? tl(p.title) : p.name);
 
   const step = (delta: number, by: StepSpeed = StepSpeed.User, keepFocus = false) => {
     focusCenter.current = keepFocus;
@@ -209,7 +209,7 @@ export function OrbitSelector() {
         return;
       }
       setSpeed(StepSpeed.Auto);
-      setActive((a) => wrap(a + 1, PROJECTS.length));
+      setActive((a) => wrap(a + 1, WORLDS.length));
     }, AUTO_STEP_MS);
     return () => {
       observer.disconnect();
@@ -448,7 +448,7 @@ export function OrbitSelector() {
         }}
       >
         <span className="orbit-select__track" aria-hidden="true" />
-        {PROJECTS.map((p, i) => {
+        {WORLDS.map((p, i) => {
           const offset = wrap(i - active, count);
           const slot = SLOT_BY_OFFSET[offset];
           const isCenter = slot === OrbitSlot.Center;
