@@ -213,7 +213,7 @@ export function Contact() {
           </div>
 
           <Link className="hiring-agents-link" href="/for-agents">
-            For AI agents (MCP) →
+            {t("agents_link")}
           </Link>
         </div>
 

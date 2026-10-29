@@ -3,6 +3,8 @@
 import { useRef, useState } from "react";
 import { MCP_TOOLS } from "@/lib/mcp/tools";
 import { CANONICAL_SITE_URL as SITE_URL } from "@/lib/site";
+import { useI18n } from "@/lib/i18n";
+import type { Lang } from "@/data/cv";
 
 /** One-shot prompt handed to ChatGPT / Claude through their `?q=` links. */
 export const ASSISTANT_PROMPT = [
@@ -17,9 +19,25 @@ enum CopyState {
   Failed = "failed",
 }
 
+const COPY = {
+  open_chatgpt: { es: "Abrir en ChatGPT", en: "Open in ChatGPT" },
+  open_claude: { es: "Abrir en Claude", en: "Open in Claude" },
+  copy: { es: "Copiar prompt", en: "Copy prompt" },
+  copied: {
+    es: "Prompt copiado. Pegalo en cualquier asistente.",
+    en: "Prompt copied. Paste it into any assistant.",
+  },
+  failed: {
+    es: "La copia está bloqueada acá: seleccioná el prompt de abajo.",
+    en: "Copy is blocked here: select the prompt below instead.",
+  },
+  summary: { es: "Ver el prompt", en: "See the prompt" },
+  new_tab: { es: " (abre en una pestaña nueva)", en: " (opens in a new tab)" },
+} satisfies Record<string, Record<Lang, string>>;
+
 const ASSISTANTS = [
-  { id: "chatgpt", label: "Open in ChatGPT", href: `https://chatgpt.com/?q=${encodeURIComponent(ASSISTANT_PROMPT)}` },
-  { id: "claude", label: "Open in Claude", href: `https://claude.ai/new?q=${encodeURIComponent(ASSISTANT_PROMPT)}` },
+  { id: "chatgpt", label: COPY.open_chatgpt, href: `https://chatgpt.com/?q=${encodeURIComponent(ASSISTANT_PROMPT)}` },
+  { id: "claude", label: COPY.open_claude, href: `https://claude.ai/new?q=${encodeURIComponent(ASSISTANT_PROMPT)}` },
 ] as const;
 
 /**
@@ -28,6 +46,7 @@ const ASSISTANTS = [
  * for any other assistant (the prompt itself is readable below the buttons).
  */
 export function AskAssistant() {
+  const { tl } = useI18n();
   const [copy, setCopy] = useState<CopyState>(CopyState.Idle);
   const promptRef = useRef<HTMLDetailsElement>(null);
 
@@ -53,21 +72,21 @@ export function AskAssistant() {
             rel="noopener noreferrer"
             className={`moon-launch__btn moon-launch__btn--${assistant.id}`}
           >
-            <span>{assistant.label}</span>
+            <span>{tl(assistant.label)}</span>
             <span aria-hidden="true">↗</span>
-            <span className="sr-only"> (opens in a new tab)</span>
+            <span className="sr-only">{tl(COPY.new_tab)}</span>
           </a>
         ))}
         <button type="button" className="moon-launch__btn moon-launch__btn--copy" onClick={copyPrompt}>
-          Copy prompt
+          {tl(COPY.copy)}
         </button>
       </div>
       <p className="moon-launch__status" aria-live="polite">
-        {copy === CopyState.Copied ? "Prompt copied. Paste it into any assistant." : null}
-        {copy === CopyState.Failed ? "Copy is blocked here: select the prompt below instead." : null}
+        {copy === CopyState.Copied ? tl(COPY.copied) : null}
+        {copy === CopyState.Failed ? tl(COPY.failed) : null}
       </p>
       <details ref={promptRef} className="moon-launch__prompt">
-        <summary>See the prompt</summary>
+        <summary>{tl(COPY.summary)}</summary>
         <pre tabIndex={0}>
           <code>{ASSISTANT_PROMPT}</code>
         </pre>
