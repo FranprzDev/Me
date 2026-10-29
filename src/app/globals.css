@@ -630,9 +630,9 @@ button.chip,
 .chip--control {
   min-height: 44px;
   min-width: 44px;
+  justify-content: center;
 }
 .chip--control {
-  justify-content: center;
   text-decoration: none;
 }
 

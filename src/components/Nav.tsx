@@ -8,6 +8,45 @@ import { useI18n } from "@/lib/i18n";
 import { subscribeScroll } from "@/lib/scroll";
 import { cvCounterpartPath } from "@/content/cv/routes";
 
+
+/** Bandera de Argentina simplificada (SVG inline: los emoji de bandera no
+    renderizan en Androids viejos). */
+function FlagAr() {
+  return (
+    <svg width="15" height="11" viewBox="0 0 15 11" aria-hidden="true" focusable="false" style={{ borderRadius: 2, display: "block", flexShrink: 0 }}>
+      <rect width="15" height="11" fill="#74acdf" />
+      <rect y="3.5" width="15" height="4" fill="#ffffff" />
+      <circle cx="7.5" cy="5.5" r="1.4" fill="#f6b40e" />
+    </svg>
+  );
+}
+
+/** Bandera de Estados Unidos simplificada. */
+function FlagUs() {
+  return (
+    <svg width="15" height="11" viewBox="0 0 15 11" aria-hidden="true" focusable="false" style={{ borderRadius: 2, display: "block", flexShrink: 0 }}>
+      <rect width="15" height="11" fill="#ffffff" />
+      {[0, 2, 4, 6, 8, 10].map((y) => (
+        <rect key={y} y={y} width="15" height="1" fill="#b22234" />
+      ))}
+      <rect width="6.5" height="5.5" fill="#3c3b6e" />
+    </svg>
+  );
+}
+
+/** Etiqueta del selector de idioma: bandera del idioma actual + código. */
+function LangLabel({ lang }: { lang: "es" | "en" }) {
+  return lang === "es" ? (
+    <>
+      <FlagAr /> ES
+    </>
+  ) : (
+    <>
+      <FlagUs /> EN
+    </>
+  );
+}
+
 /** Scroll offset (px) after which the header gets its solid band. */
 const BAND_AFTER = 8;
 
@@ -100,7 +139,7 @@ export function Nav() {
               aria-label={tl({ es: "ES: cambiar a inglés", en: "EN: switch to Spanish" })}
               data-lang-switch
             >
-              {lang === "es" ? "ES" : "EN"}
+              <LangLabel lang={lang} />
             </Link>
           ) : (
             <button
@@ -109,7 +148,7 @@ export function Nav() {
               style={{ cursor: "pointer", color: "var(--fg)", background: "rgba(255,255,255,0.05)" }}
               aria-label={tl({ es: "ES: cambiar a inglés", en: "EN: switch to Spanish" })}
             >
-              {lang === "es" ? "ES" : "EN"}
+              <LangLabel lang={lang} />
             </button>
           )}
           <button
