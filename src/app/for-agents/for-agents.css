@@ -238,10 +238,9 @@
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
   animation: moon-panel-in 0.7s var(--moon-ease) both;
 }
-.moon-panel:nth-child(1) { animation-delay: 0.9s; }
-.moon-panel:nth-child(2) { animation-delay: 1.05s; }
-.moon-panel:nth-child(3) { animation-delay: 1.2s; }
+
 /* Corner brackets, like a viewfinder. */
+.moon-panel { animation-delay: 0.9s; }
 .moon-panel::before,
 .moon-panel::after {
   content: "";
@@ -296,10 +295,6 @@
   font-size: 1.5rem;
   font-weight: 400;
 }
-.moon-panel h3 {
-  margin: 1.4rem 0 0.4rem;
-  font-size: 1rem;
-}
 .moon-panel p {
   margin: 0.3rem 0;
   color: #c9cfe3;
@@ -322,39 +317,6 @@
   white-space: pre;
 }
 
-.agents-tools {
-  display: grid;
-  gap: 0.2rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.agents-tools li {
-  display: grid;
-  grid-template-columns: 3rem minmax(9rem, auto) 1fr;
-  gap: 0.8rem;
-  align-items: baseline;
-  padding: 0.55rem 0;
-  border-bottom: 1px solid rgba(190, 208, 255, 0.07);
-}
-.agents-tools .agents-tools__index {
-  color: var(--star);
-  white-space: nowrap;
-  font: 600 0.68rem/1 var(--font-mono, ui-monospace, monospace);
-  letter-spacing: 0.14em;
-}
-.agents-tools code {
-  color: #9dbbff;
-  font-size: 0.86rem;
-}
-.agents-tools span {
-  color: var(--fg);
-  font-size: 0.92rem;
-}
-.agents-note {
-  margin-top: 1rem !important;
-  font-size: 0.85rem;
-}
 
 /* ── Quick launch ──────────────────────────────────────────────────────── */
 .moon-launch {
@@ -483,13 +445,6 @@
   }
   .moon-hud {
     bottom: 2.6rem;
-  }
-  .agents-tools li {
-    grid-template-columns: 3.2rem 1fr;
-    gap: 0.2rem 0.6rem;
-  }
-  .agents-tools li > span:last-child {
-    grid-column: 2;
   }
   .moon-launch__btn {
     flex: 1 1 100%;

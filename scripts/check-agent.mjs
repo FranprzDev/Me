@@ -22,7 +22,6 @@ const agentsPage = await fetch(`${baseUrl}/for-agents`);
 assert.equal(agentsPage.status, 200);
 const agentsHtml = await agentsPage.text();
 assert.match(agentsHtml, /\/api\/mcp/, "/for-agents shows the MCP endpoint");
-assert.match(agentsHtml, /claude mcp add --transport http/);
 assert.match(agentsHtml, /href="https:\/\/chatgpt\.com\/\?q=[^"]+"/, "/for-agents opens ChatGPT with a prompt");
 assert.match(agentsHtml, /href="https:\/\/claude\.ai\/new\?q=[^"]+"/, "/for-agents opens Claude with a prompt");
 assert.doesNotMatch(agentsHtml, /EmbeddingGemma|Qwen/);
@@ -142,7 +141,7 @@ const del = await fetch(`${baseUrl}/api/mcp`, { method: "DELETE" });
 assert.equal(del.status, 405, "Stateless server has no session to delete");
 
 // Hardening (agent/mcp-hardening): capabilities, facts from src/content/cv, invalid args,
-// CORS, lenient Accept, body cap, llms.txt and the copy-paste configs.
+// CORS, lenient Accept, body cap and llms.txt.
 assert.equal(init.capabilities.tools?.listChanged, false, "A fixed, stateless tool set does not advertise listChanged");
 
 for (const language of ["en", "es"]) {
@@ -228,17 +227,6 @@ for (const [surface, text] of [["home", home], ["/for-agents", agentsHtml], ["ag
 }
 
 const endpoint = `${baseUrl}/api/mcp`;
-const decode = (html) => html.replace(/&quot;/g, '"').replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#x27;/g, "'");
-const codeBlocks = [...agentsHtml.matchAll(/<code>([\s\S]*?)<\/code>/g)].map((match) => decode(match[1].replace(/<[^>]+>/g, "")));
-const configs = codeBlocks.filter((block) => block.trim().startsWith("{")).map((block) => JSON.parse(block));
-assert.deepEqual(configs.find((config) => config.mcpServers)?.mcpServers["francisco-perez"], { type: "http", url: endpoint }, "mcpServers config");
-assert.deepEqual(configs.find((config) => config.servers)?.servers["francisco-perez"], { type: "http", url: endpoint }, "VS Code mcp.json config");
-assert.ok(codeBlocks.includes(`claude mcp add --transport http francisco-perez ${endpoint}`), "Claude Code command uses this deployment");
-assert.ok(
-  codeBlocks.includes(`npx @modelcontextprotocol/inspector --cli ${endpoint} --transport http --method tools/list`),
-  "Inspector command uses this deployment",
-);
-assert.doesNotMatch(codeBlocks.join("\n"), /github\.io/, "Configs never point to the old GitHub Pages host");
 
 // Rate limit: a client over the limit gets 429 + Retry-After, another client is unaffected.
 // A dedicated x-forwarded-for keeps this burst from counting against the checks above.

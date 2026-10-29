@@ -31,8 +31,8 @@ Guidance for coding agents working on this repo (Francisco Perez's portfolio, Ne
 
 - `src/lib/mcp/tools.ts` is the single source of the tool names, summaries, server name/version and endpoint path; the route, the agent card, `/for-agents`, `/llms.txt` and the assistant prompt all read it. CV versions always come from `src/content/cv` (`CvVariant`); the profile title (role part of the primary CV headline) and the full CV's education come from there too, so the MCP never states a fact the published CV does not.
 - The server is stateless Streamable HTTP with JSON responses. Keep the hardening in `src/app/api/mcp/route.ts`: CORS `*` on every response plus an `OPTIONS` preflight (`src/lib/mcp/http.ts`; public, read-only, no credentials), lenient `Accept` (JSON-only or missing is served), a 64 KiB body cap, `tools.listChanged: false`, `GET`/`DELETE` answer 405.
-- Copy-paste configs on `/for-agents` (Claude Code command, `mcpServers` JSON, VS Code `servers` JSON, Inspector CLI) are built from the request host and checked by `check:agent`; never hard-code another host.
-- Test with a real client before and after changes: `npx @modelcontextprotocol/inspector --cli <url>/api/mcp --transport http --method tools/list`, and `pnpm check:agent` (covers capabilities, invalid args, CORS, Accept, body cap, llms.txt and the configs).
+- `/for-agents` keeps only the one-click assistant launchers: the endpoint card and client configs were removed from the page at Francisco's request (2026-10-29). The MCP endpoint stays public through the agent card and `llms.txt`, and the launchers' prompt still points assistants at it.
+- Test with a real client before and after changes: `npx @modelcontextprotocol/inspector --cli <url>/api/mcp --transport http --method tools/list`, and `pnpm check:agent` (covers capabilities, invalid args, CORS, Accept, body cap and llms.txt).
 
 ## Home scrolling (no scroll-driven animation)
 
