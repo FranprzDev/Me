@@ -679,6 +679,35 @@ button.chip,
   font-size: clamp(2.5rem, 6vw, 4rem);
 }
 
+.contact-title-stars {
+  display: none;
+  margin: 0 auto;
+}
+.contact-title-stars .ct-lines line {
+  opacity: 0.55;
+}
+.contact-title-stars .ct-stars circle {
+  filter: drop-shadow(0 0 4px #b9c4ff);
+}
+
+/* Phones: no 3D canvas draws the CHARLEMOS word there, so the heading becomes
+   the same star word as a static SVG (no per-frame CPU); the h2 text stays
+   for assistive tech. */
+@media (max-width: 767px) {
+  .contact-copy h2 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .contact-title-stars {
+    display: block;
+  }
+}
+
 .hiring-agents-link {
   /* Above the contact constellation's overflow, which used to cover part of
      the link (Lighthouse target-size, desktop). */
