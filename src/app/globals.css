@@ -199,6 +199,15 @@ body:has([data-scene-root] canvas) .home-sky {
     animation: home-sky-breathe 26s ease-in-out infinite alternate;
   }
 }
+
+@media (pointer: coarse) and (max-width: 767px) {
+  .home-sky__stars,
+  .home-sky__stars--far,
+  .home-sky__stars--near,
+  .home-sky__nebula {
+    animation: none;
+  }
+}
 @keyframes home-sky-drift {
   to {
     transform: translate3d(0, var(--drift), 0);
