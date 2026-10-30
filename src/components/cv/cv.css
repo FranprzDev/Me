@@ -2,7 +2,7 @@
  * /cv — hosted résumés.
  *
  * Two looks from one markup, every selector scoped under .cv-root:
- * - screen: the portfolio's night sky (glass panels, Oxanium display type,
+ * - screen: the portfolio's night sky (glass panels, Space Grotesk display type,
  *   mono kickers, star palette) under the site nav;
  * - print: the clean light A4 résumé the committed PDFs are rendered from.
  * The two live in separate media blocks so neither leaks into the other.
