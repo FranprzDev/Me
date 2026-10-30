@@ -38,6 +38,56 @@ function segment(from: StarPoint, to: StarPoint, index: number, bulge: number): 
   return ` C ${c1x} ${from.y + dy * 0.45} ${c2x} ${to.y - dy * 0.45} ${to.x} ${to.y}`;
 }
 
+const CURVE_SAMPLES = 64;
+
+type Polyline = {
+  points: StarPoint[];
+  lengths: number[];
+  starLengths: number[];
+  total: number;
+};
+
+function sampleTrail(stars: StarPoint[], bulge: number): Polyline {
+  const points: StarPoint[] = [];
+  const lengths: number[] = [];
+  const starLengths: number[] = [];
+  let acc = 0;
+  const push = (x: number, y: number) => {
+    if (points.length > 0) {
+      const last = points[points.length - 1];
+      acc += Math.hypot(x - last.x, y - last.y);
+    }
+    points.push({ x, y });
+    lengths.push(acc);
+  };
+  push(stars[0].x, stars[0].y);
+  starLengths.push(acc);
+  for (let i = 1; i < stars.length; i += 1) {
+    const from = stars[i - 1];
+    const to = stars[i];
+    if (i === 1) {
+      push(to.x, to.y);
+    } else {
+      const dy = to.y - from.y;
+      const side = i % 2 === 0 ? 1 : -1;
+      const c1x = from.x + side * bulge;
+      const c1y = from.y + dy * 0.45;
+      const c2x = to.x + side * bulge;
+      const c2y = to.y - dy * 0.45;
+      for (let s = 1; s <= CURVE_SAMPLES; s += 1) {
+        const u = s / CURVE_SAMPLES;
+        const v = 1 - u;
+        push(
+          v * v * v * from.x + 3 * v * v * u * c1x + 3 * v * u * u * c2x + u * u * u * to.x,
+          v * v * v * from.y + 3 * v * v * u * c1y + 3 * v * u * u * c2y + u * u * u * to.y,
+        );
+      }
+    }
+    starLengths.push(acc);
+  }
+  return { points, lengths, starLengths, total: acc };
+}
+
 /**
  * Entry description clamped to a few lines with a Show more toggle. The full
  * text is always in the DOM (clamping is CSS only), and the toggle only
@@ -111,12 +161,18 @@ export function ExperienceTrail() {
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     let stars: StarPoint[] = [];
+    let polyline: StarPoint[] = [];
+    let polyLengths: number[] = [];
     let starLengths: number[] = [];
     let total = 0;
     let drawn = 0;
     let target = 0;
     let frame = 0;
     let listTop = 0;
+    let hint = 0;
+    let activeIndex = -2;
+    let lastWidth = -1;
+    let lastHeight = -1;
 
     const setStates = (length: number) => {
       let active = -1;
@@ -124,10 +180,27 @@ export function ExperienceTrail() {
       for (let i = 0; i < items.length; i += 1) {
         if (length >= starLengths[i + 1] - 0.5) active = i;
       }
+      if (active === activeIndex) return;
+      activeIndex = active;
       for (let i = 0; i < items.length; i += 1) {
         const state = i < active ? EntryState.Past : i === active ? EntryState.Active : EntryState.Upcoming;
         if (items[i].dataset.state !== state) items[i].dataset.state = state;
       }
+    };
+
+    const tipAt = (length: number): StarPoint => {
+      const last = polyline.length - 1;
+      if (length <= 0) return polyline[0];
+      if (length >= total) return polyline[last];
+      if (hint < 0) hint = 0;
+      if (hint > last) hint = last;
+      while (hint < last && polyLengths[hint + 1] < length) hint += 1;
+      while (hint > 0 && polyLengths[hint] > length) hint -= 1;
+      const a = polyline[hint];
+      const b = polyline[hint + 1];
+      const span = polyLengths[hint + 1] - polyLengths[hint];
+      const t = span > 0 ? (length - polyLengths[hint]) / span : 0;
+      return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
     };
 
     const paint = (length: number) => {
@@ -137,7 +210,7 @@ export function ExperienceTrail() {
       if (length <= 0.5 || length >= total - 0.5) {
         tip.style.opacity = "0";
       } else {
-        const point = line.getPointAtLength(length);
+        const point = tipAt(length);
         tip.style.opacity = "1";
         tip.style.transform = `translate(${point.x}px, ${point.y}px)`;
       }
@@ -175,6 +248,9 @@ export function ExperienceTrail() {
 
     const measure = () => {
       const box = list.getBoundingClientRect();
+      if (box.width === lastWidth && box.height === lastHeight) return;
+      lastWidth = box.width;
+      lastHeight = box.height;
       listTop = box.top + window.scrollY;
       svg.setAttribute("viewBox", `0 0 ${box.width} ${box.height}`);
       const centers = items.map((item) => {
@@ -187,20 +263,22 @@ export function ExperienceTrail() {
       const wide = window.matchMedia("(min-width: 900px)").matches;
       const bulge = wide ? 56 : 9;
       let d = `M ${stars[0].x} ${stars[0].y}`;
-      starLengths = [0];
       for (let i = 1; i < stars.length; i += 1) {
         d += i === 1 ? ` L ${stars[1].x} ${stars[1].y}` : segment(stars[i - 1], stars[i], i, bulge);
-        // Cumulative length up to this point: measure the prefix on the base path.
-        base.setAttribute("d", d);
-        starLengths.push(base.getTotalLength());
       }
       for (const path of [base, glow, line]) path.setAttribute("d", d);
-      total = starLengths[starLengths.length - 1] ?? 0;
+      const poly = sampleTrail(stars, bulge);
+      polyline = poly.points;
+      polyLengths = poly.lengths;
+      starLengths = poly.starLengths;
+      total = poly.total;
+      hint = 0;
       line.style.strokeDasharray = `${total}`;
       glow.style.strokeDasharray = `${total}`;
     };
 
     const apply = () => {
+      activeIndex = -2;
       measure();
       if (motionQuery.matches) {
         list.dataset.mode = TrailMode.Static;
