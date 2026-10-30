@@ -19,8 +19,13 @@
   --brain: #7aa2ff; /* alias -> azul claro */
   --brain-2: #b388ff; /* alias -> violeta claro */
 
-  /* Heading face: Space Grotesk (next/font, root layout). Body keeps system-ui. */
-  --font-heading: var(--font-heading-face), "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Heading face: Oxanium (next/font/local, root layout), split into a
+     preloaded core and a lazy extended file. Body keeps system-ui. */
+  --font-heading-core: "Oxanium";
+  --font-heading-ext: "Oxanium";
+  --font-heading-fallback: sans-serif;
+  --font-heading-face: var(--font-heading-core), var(--font-heading-ext);
+  --font-heading: var(--font-heading-face), var(--font-heading-fallback), "Oxanium", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 /* Every heading wears the display face on screen. Zero specificity, so any

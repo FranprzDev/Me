@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Space_Grotesk } from "next/font/google";
+import type { CSSProperties } from "react";
+import localFont from "next/font/local";
 import "./globals.css";
 import { I18nProvider } from "@/lib/i18n";
 import { ScrollProvider } from "@/lib/scroll";
@@ -7,14 +8,34 @@ import { SiteChrome } from "@/components/SiteChrome";
 import { SITE_URL } from "@/lib/site";
 import { SITE_OPEN_GRAPH } from "@/lib/seo";
 
-// Display face for every heading (OFL, self-hosted by next/font, latin subset,
-// variable weight axis). Body copy keeps the system UI stack.
-const headingFont = Space_Grotesk({
-  subsets: ["latin"],
-  weight: "variable",
-  variable: "--font-heading-face",
+// Display face for every heading (OFL, self-hosted, variable wght clamped to
+// 500..700). Core is preloaded; the extended file only downloads per missing
+// glyph, after the core family and before the automatic fallback metrics.
+const headingCore = localFont({
+  src: "../../public/fonts/oxanium-core-v1.woff2",
+  weight: "500 700",
   display: "swap",
+  preload: true,
+  adjustFontFallback: "Arial",
 });
+
+const headingExtended = localFont({
+  src: "../../public/fonts/oxanium-ext-v1.woff2",
+  weight: "500 700",
+  display: "swap",
+  preload: false,
+  adjustFontFallback: false,
+});
+
+const [headingCoreFamily, headingFallbackFamily] = headingCore.style.fontFamily
+  .split(",")
+  .map((family) => family.trim());
+const headingExtendedFamily = headingExtended.style.fontFamily.split(",")[0].trim();
+const headingVars = {
+  "--font-heading-core": headingCoreFamily,
+  "--font-heading-ext": headingExtendedFamily,
+  "--font-heading-fallback": headingFallbackFamily ?? "sans-serif",
+} as CSSProperties;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -39,7 +60,8 @@ export default function RootLayout({
     <html
       lang="es"
       data-scroll-behavior="smooth"
-      className={`h-full antialiased ${headingFont.variable}`}
+      className="h-full antialiased"
+      style={headingVars}
     >
       <body className="min-h-full">
         <I18nProvider>
