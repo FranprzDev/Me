@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { CSSProperties } from "react";
 import localFont from "next/font/local";
-import "./globals.css";
 import { I18nProvider } from "@/lib/i18n";
 import { ScrollProvider } from "@/lib/scroll";
 import { SiteChrome } from "@/components/SiteChrome";
@@ -39,11 +38,11 @@ const headingVars = {
 
 // Browser chrome / status bar matches the dark sky at the top of the page
 // (/me overrides this with its paper tone).
-export const viewport: Viewport = {
+export const rootViewport: Viewport = {
   themeColor: "#040612",
 };
 
-export const metadata: Metadata = {
+export const rootMetadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "Francisco Perez — AI Applied Engineer en Tucumán | Agentes de IA y Software",
   description:
@@ -59,12 +58,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export function RootShell({
+  lang,
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: {
+  lang: "en" | "es";
+  children: React.ReactNode;
+}) {
   return (
     <html
-      lang="es"
+      lang={lang}
       data-scroll-behavior="smooth"
       className="h-full antialiased"
       style={headingVars}
