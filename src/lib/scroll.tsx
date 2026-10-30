@@ -98,10 +98,24 @@ export function subscribeScroll(listener: ScrollListener): () => void {
 export function ScrollProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let raf = 0;
+    // Document height is read once per invalidation, never per scroll frame:
+    // a forced layout flush inside the shared scroll rAF was charging every
+    // subscriber's frame. ResizeObserver covers the real mutators of document
+    // height (content-visibility sections materializing, lazy media, i18n
+    // text swaps, expanded cards); resize/orientation cover viewport changes.
+    let docHeight = -1;
+    let dirty = true;
+    const measure = () => {
+      docHeight = document.documentElement.scrollHeight;
+      dirty = false;
+    };
+    const invalidate = () => {
+      dirty = true;
+    };
     const update = () => {
       raf = 0;
-      const doc = document.documentElement;
-      const max = doc.scrollHeight - window.innerHeight;
+      if (dirty) measure();
+      const max = docHeight - window.innerHeight;
       const y = window.scrollY;
       state.y = y;
       state.progress = max > 0 ? Math.min(1, Math.max(0, y / max)) : 0;
@@ -110,12 +124,23 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
     const onScroll = () => {
       if (!raf) raf = window.requestAnimationFrame(update);
     };
+    const onResize = () => {
+      invalidate();
+      onScroll();
+    };
     update();
+    const observer = new ResizeObserver(invalidate);
+    observer.observe(document.body);
+    observer.observe(document.documentElement);
+    document.fonts?.ready.then(invalidate).catch(() => {});
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
+    window.addEventListener("resize", onResize, { passive: true });
+    window.addEventListener("orientationchange", onResize);
     return () => {
+      observer.disconnect();
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onResize);
       if (raf) cancelAnimationFrame(raf);
     };
   }, []);
