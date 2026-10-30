@@ -207,8 +207,10 @@
   cursor: pointer;
 }
 
-.xp-card__more:hover {
+@media (hover: hover) and (pointer: fine) {
+  .xp-card__more:hover {
   text-decoration: underline;
+}
 }
 
 .xp-card__more:focus-visible {

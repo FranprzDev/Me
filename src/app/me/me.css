@@ -143,23 +143,29 @@ html:has(.me-root) body {
     color 0.32s var(--me-ease-out),
     box-shadow 0.32s var(--me-ease-out);
 }
-.me-pill:hover {
+@media (hover: hover) and (pointer: fine) {
+  .me-pill:hover {
   transform: translateY(-2px);
+}
 }
 .me-pill-light {
   background: var(--me-on-dark);
   color: var(--me-navy);
 }
-.me-pill-light:hover {
+@media (hover: hover) and (pointer: fine) {
+  .me-pill-light:hover {
   background: #fff;
   box-shadow: 0 10px 30px rgba(46, 107, 255, 0.35);
+}
 }
 .me-pill-dark {
   background: var(--me-navy);
   color: var(--me-on-dark);
 }
-.me-pill-dark:hover {
+@media (hover: hover) and (pointer: fine) {
+  .me-pill-dark:hover {
   background: var(--me-accent);
+}
 }
 .me-pill-ghost {
   margin-top: 1.4rem;
@@ -167,9 +173,11 @@ html:has(.me-root) body {
   box-shadow: inset 0 0 0 1px rgba(226, 235, 250, 0.45);
   color: var(--me-on-dark);
 }
-.me-pill-ghost:hover {
+@media (hover: hover) and (pointer: fine) {
+  .me-pill-ghost:hover {
   background: var(--me-on-dark);
   color: var(--me-navy);
+}
 }
 
 /* Scroll reveal */
@@ -234,9 +242,13 @@ html:has(.me-root) body {
 .me-lang button {
   transition: color 0.18s ease;
 }
-.me-lang button.is-active,
-.me-lang button:hover {
+.me-lang button.is-active {
   color: var(--me-on-dark);
+}
+@media (hover: hover) and (pointer: fine) {
+  .me-lang button:hover {
+  color: var(--me-on-dark);
+}
 }
 
 /* ---------- Hero ---------- */
@@ -298,8 +310,10 @@ html:has(.me-root) body {
   object-fit: cover;
   transition: transform 1.4s var(--me-ease-out);
 }
-.me-frame:hover img {
+@media (hover: hover) and (pointer: fine) {
+  .me-frame:hover img {
   transform: scale(1.03);
+}
 }
 
 /* ---------- Layers (pinned) ---------- */
@@ -493,8 +507,10 @@ html:has(.me-root) body {
   padding-bottom: 2px;
   transition: border-color 0.18s ease;
 }
-.me-small-link:hover {
+@media (hover: hover) and (pointer: fine) {
+  .me-small-link:hover {
   border-color: var(--me-accent);
+}
 }
 .me-accordion {
   margin-top: 2.4rem;
@@ -693,8 +709,10 @@ html:has(.me-root) body {
   object-position: top center;
   transition: transform 1.4s var(--me-ease-out);
 }
-.me-tile:hover .me-tile-img {
+@media (hover: hover) and (pointer: fine) {
+  .me-tile:hover .me-tile-img {
   transform: scale(1.05);
+}
 }
 .me-tile-shade {
   position: absolute;
@@ -772,8 +790,10 @@ html:has(.me-root) body {
   display: flex;
   gap: 1.4rem;
 }
-.me-footer-links a:hover {
+@media (hover: hover) and (pointer: fine) {
+  .me-footer-links a:hover {
   color: var(--me-on-dark);
+}
 }
 
 /* ---------- Responsive ---------- */

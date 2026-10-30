@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { CSSProperties } from "react";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -36,6 +36,12 @@ const headingVars = {
   "--font-heading-ext": headingExtendedFamily,
   "--font-heading-fallback": headingFallbackFamily ?? "sans-serif",
 } as CSSProperties;
+
+// Browser chrome / status bar matches the dark sky at the top of the page
+// (/me overrides this with its paper tone).
+export const viewport: Viewport = {
+  themeColor: "#040612",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

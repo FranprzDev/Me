@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import { MePage } from "@/components/me/MePage";
 import "./me.css";
@@ -23,6 +23,11 @@ const mono = IBM_Plex_Mono({
   variable: "--me-font-mono",
   display: "swap",
 });
+
+// The editorial page is light paper; the chrome color follows it.
+export const viewport: Viewport = {
+  themeColor: "#f6f8fc",
+};
 
 export const metadata: Metadata = {
   title: "Francisco Perez — AI Engineer",

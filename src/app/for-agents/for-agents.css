@@ -357,9 +357,11 @@
   border-color: rgba(233, 194, 112, 0.55);
   box-shadow: 0 0 22px rgba(233, 194, 112, 0.12);
 }
-.moon-launch__btn:hover {
+@media (hover: hover) and (pointer: fine) {
+  .moon-launch__btn:hover {
   background: rgba(26, 32, 62, 0.95);
   border-color: rgba(190, 208, 255, 0.6);
+}
 }
 .moon-launch__btn:focus-visible,
 .moon-launch__prompt summary:focus-visible {
