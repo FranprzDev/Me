@@ -60,19 +60,47 @@ export function MeLayers() {
       raf = 0;
       const el = sectionRef.current;
       if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const total = el.offsetHeight - window.innerHeight;
-      setProgress(clamp(-rect.top / Math.max(1, total)));
+      if (geomDirty) {
+        const rect = el.getBoundingClientRect();
+        // Absolute document position: -rect.top === window.scrollY - geomTop.
+        geomTop = rect.top + window.scrollY;
+        geomHeight = el.offsetHeight;
+        geomDirty = false;
+      }
+      const total = geomHeight - window.innerHeight;
+      setProgress(clamp((window.scrollY - geomTop) / Math.max(1, total)));
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update);
     };
+    // Section geometry is measured once per invalidation instead of every
+    // scroll frame (those per-frame gBR/offsetHeight reads forced sync
+    // layouts while scrolling). Size changes are caught by observing the
+    // section itself; position shifts caused by siblings are caught by
+    // observing body; viewport changes by resize/orientationchange.
+    let geomTop = 0;
+    let geomHeight = 0;
+    let geomDirty = true;
+    const invalidateGeom = () => {
+      geomDirty = true;
+    };
+    const onResize = () => {
+      invalidateGeom();
+      onScroll();
+    };
     update();
+    const geomObserver = new ResizeObserver(invalidateGeom);
+    if (sectionRef.current) geomObserver.observe(sectionRef.current);
+    geomObserver.observe(document.body);
+    document.fonts?.ready.then(invalidateGeom).catch(() => {});
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    window.addEventListener("resize", onResize);
+    window.addEventListener("orientationchange", onResize);
     return () => {
+      geomObserver.disconnect();
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onResize);
       if (raf) cancelAnimationFrame(raf);
     };
   }, [isStatic]);
