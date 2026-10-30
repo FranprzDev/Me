@@ -58,6 +58,10 @@ html {
   scroll-padding-top: 5rem;
   background: var(--scene-bg, var(--bg));
 
+  /* No gray/blue flash on tap (iOS Safari / Android Chrome); controls keep
+     their own :active press feedback, defined just below. */
+  -webkit-tap-highlight-color: transparent;
+
   /* Scrollbar integrado a la paleta estelar (Firefox). */
   scrollbar-width: thin;
   scrollbar-color: rgba(123, 150, 255, 0.4) transparent;
@@ -70,6 +74,18 @@ body {
   margin: 0;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Mobile-native baseline (rules from emilkowalski/skills "mobile-native"):
+   fire taps without the double-tap-zoom wait, and answer every press on
+   pointer-down instead of on release. Zero specificity: any component rule
+   with its own transition or opacity wins over these. */
+:where(a, button, [role="button"]) {
+  touch-action: manipulation;
+  transition: opacity 120ms ease-out;
+}
+:where(a, button, [role="button"]):active {
+  opacity: 0.8;
 }
 
 /* Scrollbar integrado (WebKit/Chromium): fino, translúcido y con la gradiente
@@ -620,10 +636,12 @@ body:has([data-scene-root] canvas) .home-sky {
 
 .hero-chip-teaching { --chip-dot: 122, 162, 255; }
 
-.hero-chip:hover {
+@media (hover: hover) and (pointer: fine) {
+  .hero-chip:hover {
   border-color: rgba(var(--chip-dot), 0.55);
   background: rgba(14, 19, 44, 0.62);
   color: #fff;
+}
 }
 
 .hero-scroll-cue {
@@ -682,8 +700,10 @@ button.chip,
   text-decoration: none;
 }
 
-.btn-cosmic-primary:hover {
+@media (hover: hover) and (pointer: fine) {
+  .btn-cosmic-primary:hover {
   background: #1c2844;
+}
 }
 
 .contact-copy {
@@ -739,9 +759,13 @@ button.chip,
   text-underline-offset: 0.25em;
 }
 
-.hiring-agents-link:hover,
 .hiring-agents-link:focus-visible {
   color: var(--fg);
+}
+@media (hover: hover) and (pointer: fine) {
+  .hiring-agents-link:hover {
+  color: var(--fg);
+}
 }
 /* Phones: the scaled contact constellation overflows its box by a few px;
    keep this link clear of it (WCAG 2.2 target spacing). */
@@ -955,7 +979,9 @@ button:focus-visible {
   padding: 0.25rem 0 3rem;
 }
 
-.edu-project a:hover { color: #fff; }
+@media (hover: hover) and (pointer: fine) {
+  .edu-project a:hover { color: #fff; }
+}
 
 .edu-hero {
   display: grid;
@@ -1054,7 +1080,9 @@ button:focus-visible {
 }
 
 .edu-chapters a + a { border-left: 1px solid rgba(218, 206, 255, 0.12); }
-.edu-chapters a:hover { color: white; background: rgba(161, 132, 255, 0.1); }
+@media (hover: hover) and (pointer: fine) {
+  .edu-chapters a:hover { color: white; background: rgba(161, 132, 255, 0.1); }
+}
 .edu-chapters a span { color: #b9a4ff; font: 0.7rem ui-monospace, monospace; }
 .edu-chapters a b { margin-left: auto; color: #eac984; font-size: 1rem; font-weight: 400; }
 
@@ -1100,7 +1128,9 @@ button:focus-visible {
 
 .edu-certificates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; }
 .edu-certificate { position: relative; display: grid; grid-template-columns: 2.3rem minmax(0,1fr) auto; align-items: center; gap: 0.9rem; min-height: 126px; padding: 1.15rem 1.2rem; border: 1px solid rgba(190, 174, 236, 0.18); border-radius: 0.95rem; background: linear-gradient(135deg, rgba(34, 29, 57, 0.83), rgba(16, 16, 31, 0.74)); transition: transform 180ms ease, border-color 180ms ease, background 180ms ease; }
-.edu-certificate:hover { transform: translateY(-3px); border-color: rgba(193, 165, 255, 0.48); background: linear-gradient(135deg, rgba(52, 39, 83, 0.88), rgba(19, 18, 38, 0.82)); }
+@media (hover: hover) and (pointer: fine) {
+  .edu-certificate:hover { transform: translateY(-3px); border-color: rgba(193, 165, 255, 0.48); background: linear-gradient(135deg, rgba(52, 39, 83, 0.88), rgba(19, 18, 38, 0.82)); }
+}
 .edu-certificate__index { color: #b9a4ff; font: 0.75rem ui-monospace, monospace; }
 .edu-certificate__period { color: #eac984; font: 0.66rem ui-monospace, monospace; }
 .edu-certificate h3 { margin: 0.45rem 0 0; color: #f4f0ff; font-size: 1rem; line-height: 1.35; }
@@ -1207,7 +1237,9 @@ button:focus-visible {
   text-decoration: none;
   transition: color 160ms ease, gap 160ms ease;
 }
-.story-link:hover { color: #fff; gap: 0.6rem; }
+@media (hover: hover) and (pointer: fine) {
+  .story-link:hover { color: #fff; gap: 0.6rem; }
+}
 
 .arena-page .story-link { color: #ffd08a; }
 .aula-page .story-link { color: #f3d18d; }
@@ -1390,11 +1422,13 @@ button:focus-visible {
   background: linear-gradient(135deg, rgba(12, 30, 20, 0.55), rgba(9, 12, 22, 0.72));
   transition: transform 200ms ease, border-color 200ms ease, background 200ms ease;
 }
-.mission:hover .mission__body {
+@media (hover: hover) and (pointer: fine) {
+  .mission:hover .mission__body {
   transform: translateX(4px);
   border-color: color-mix(in srgb, var(--planet) 45%, transparent);
   border-left-color: var(--planet);
   background: linear-gradient(135deg, rgba(16, 40, 26, 0.66), rgba(10, 14, 24, 0.76));
+}
 }
 
 .mission__meta {
@@ -1656,9 +1690,11 @@ button:focus-visible {
   -webkit-mask-image: linear-gradient(90deg, #000 var(--row-wipe), transparent var(--row-wipe));
   mask-image: linear-gradient(90deg, #000 var(--row-wipe), transparent var(--row-wipe));
 }
-.atlas-row:hover {
+@media (hover: hover) and (pointer: fine) {
+  .atlas-row:hover {
   border-left-color: var(--planet);
   background: linear-gradient(90deg, rgba(21, 50, 70, 0.66), rgba(13, 16, 30, 0) 78%);
+}
 }
 
 .atlas-row__main h3 {
@@ -1723,7 +1759,9 @@ button:focus-visible {
   background: linear-gradient(135deg, rgba(31, 27, 49, 0.7), rgba(13, 15, 30, 0.68));
   transition: transform 200ms ease, border-color 200ms ease;
 }
-.dossier-row:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--planet) 40%, transparent); }
+@media (hover: hover) and (pointer: fine) {
+  .dossier-row:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--planet) 40%, transparent); }
+}
 .dossier-row h3 { margin: 0; color: #f3f0fa; font-size: 1.05rem; line-height: 1.35; }
 .dossier-row p { max-width: 60ch; margin: 0.45rem 0 0; color: #c2bed1; font-size: 0.88rem; line-height: 1.7; }
 .dossier-row__aside { display: flex; flex-direction: column; align-items: flex-end; gap: 0.4rem; text-align: right; }
@@ -1767,13 +1805,19 @@ button:focus-visible {
   transition: border-color 180ms ease, background 180ms ease;
 }
 .planet-nav__side--next { justify-content: flex-end; text-align: right; }
-.planet-nav__side:hover {
+@media (hover: hover) and (pointer: fine) {
+  .planet-nav__side:hover {
   border-color: rgba(255, 255, 255, 0.14);
   background: rgba(255, 255, 255, 0.04);
 }
+}
 .planet-nav__side > span { color: var(--muted); font-size: 1.05rem; transition: transform 180ms ease; }
-.planet-nav__side--prev:hover > span { transform: translateX(-4px); }
-.planet-nav__side--next:hover > span { transform: translateX(4px); }
+@media (hover: hover) and (pointer: fine) {
+  .planet-nav__side--prev:hover > span { transform: translateX(-4px); }
+}
+@media (hover: hover) and (pointer: fine) {
+  .planet-nav__side--next:hover > span { transform: translateX(4px); }
+}
 .planet-nav__side div { display: grid; gap: 0.2rem; min-width: 0; }
 .planet-nav__side small {
   color: var(--muted);
@@ -1815,8 +1859,10 @@ button:focus-visible {
   opacity: 0.32;
   transition: width 220ms ease, opacity 220ms ease;
 }
-.planet-nav__orbit a:hover::before,
 .planet-nav__orbit a:focus-visible::before { opacity: 0.75; }
+@media (hover: hover) and (pointer: fine) {
+  .planet-nav__orbit a:hover::before { opacity: 0.75; }
+}
 .planet-nav__orbit a[aria-current="page"]::before {
   width: 20px;
   opacity: 1;
@@ -2041,15 +2087,25 @@ button:focus-visible {
 .story-back__icon svg {
   transition: transform 260ms cubic-bezier(0.3, 1.4, 0.5, 1);
 }
-.story-back:hover,
 .story-back:focus-visible {
   border-color: var(--planet, #8fb3ff);
   box-shadow: var(--glass-shadow), 0 0 40px color-mix(in srgb, var(--planet, #5b8cff) 38%, transparent);
   transform: translateY(-2px);
 }
-.story-back:hover .story-back__icon svg,
+@media (hover: hover) and (pointer: fine) {
+  .story-back:hover {
+  border-color: var(--planet, #8fb3ff);
+  box-shadow: var(--glass-shadow), 0 0 40px color-mix(in srgb, var(--planet, #5b8cff) 38%, transparent);
+  transform: translateY(-2px);
+}
+}
 .story-back:focus-visible .story-back__icon svg {
   transform: translate(3px, -3px) rotate(-8deg);
+}
+@media (hover: hover) and (pointer: fine) {
+  .story-back:hover .story-back__icon svg {
+  transform: translate(3px, -3px) rotate(-8deg);
+}
 }
 .story-back:focus-visible {
   outline: 2px solid var(--planet-2, #dfe8ff);
@@ -2140,16 +2196,25 @@ button:focus-visible {
     width: 1.75rem;
     background: var(--planet, #8f7bff);
   }
-  .entry-index a:hover i,
   .entry-index a:focus-visible i {
     background: var(--planet-2, #dfe8ff);
   }
-  /* Hovering the column reveals every name: a jump list on demand. */
-  .entry-index:hover span,
+  @media (hover: hover) and (pointer: fine) {
+    .entry-index a:hover i {
+    background: var(--planet-2, #dfe8ff);
+  }
+  }
   .entry-index a:focus-visible span {
     visibility: visible;
     opacity: 1;
     transition: opacity 200ms ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .entry-index:hover span {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 200ms ease;
+  }
   }
 }
 /* Wide screens have room to keep the current entry named at all times. */
