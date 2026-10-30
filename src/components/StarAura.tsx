@@ -41,10 +41,25 @@ function crossesZones(x0: number, y0: number, x1: number, y1: number, zones: Box
   return false;
 }
 
-function opacityAt(o: number): number {
-  if (o <= 0.2) return 0.9 * (o / 0.2);
-  if (o <= 0.6) return 0.9;
-  return 0.9 * (1 - (o - 0.6) / 0.4);
+/**
+ * Effective envelope of the GSAP tween this replaces: GSAP's keyframes plus
+ * top-level duration keep the streak dark for the first stretch of the tween,
+ * then fade in, hold and fade out linearly. Segments measured from the
+ * original build across the 0.9-1.7s duration range.
+ */
+function envelopeCuts(durMs: number): [number, number, number] {
+  const dark = 261 + 0.3375 * durMs;
+  const fadeIn = Math.max(40, 0.18 * durMs - 82);
+  const hold = 0.281 * durMs - 126;
+  return [dark / durMs, (dark + fadeIn) / durMs, (dark + fadeIn + hold) / durMs];
+}
+
+function envelope(o: number, durMs: number): number {
+  const [f0, f1, f2] = envelopeCuts(durMs);
+  if (o <= f0) return 0;
+  if (o <= f1) return 0.9 * ((o - f0) / (f1 - f0));
+  if (o <= f2) return 0.9;
+  return 0.9 * (1 - (o - f2) / (1 - f2));
 }
 
 export function StarAura() {
@@ -105,10 +120,12 @@ export function StarAura() {
         el.style.transform = `translate(${startX}px, ${startY}px) rotate(${rot}deg) scaleX(${scaleX})`;
         el.style.opacity = "0";
 
-        const keyframes: Keyframe[] = KEYFRAME_OFFSETS.map((o) => ({
+        const durMs = dur * 1000;
+        const offsets = [...new Set([...KEYFRAME_OFFSETS, ...envelopeCuts(durMs)])].sort((a, b) => a - b);
+        const keyframes: Keyframe[] = offsets.map((o) => ({
           offset: o,
           transform: `translate(${startX + dx * o * o}px, ${startY + dy * o * o}px) rotate(${rot}deg) scaleX(${scaleX})`,
-          opacity: opacityAt(o),
+          opacity: envelope(o, durMs),
           easing: "linear",
         }));
 
