@@ -127,7 +127,7 @@ export const ME = {
         stack: ["LangChain", "LangGraph", "Multi-Agent", "RAG", "Meta APIs"],
       },
       {
-        org: "Freelance · con Thiago Kuperman",
+        org: "Freelance",
         role: {
           es: "Sistema de automatización para un estudio contable",
           en: "Automation system for an accounting firm",
