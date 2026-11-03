@@ -2815,6 +2815,7 @@ button:focus-visible {
   transform: translateX(-50%);
   font-size: 1.35rem;
   font-weight: 600;
+  font-style: italic;
   line-height: 1.2;
   text-align: center;
   text-shadow: 0 0 18px color-mix(in srgb, var(--tone) 45%, transparent);
@@ -3015,4 +3016,5 @@ button:focus-visible {
     transform: translateY(calc(var(--orb-d) * 0.14));
   }
 }
+
 
