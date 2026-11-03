@@ -343,7 +343,6 @@ body:has([data-scene-root] canvas) .home-sky {
   }
 
   .contact-stage {
-    min-height: calc(100svh - 4.5rem);
     row-gap: 0.4rem;
     overflow-x: hidden;
   }
