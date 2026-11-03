@@ -316,7 +316,6 @@ body:has([data-scene-root] canvas) .home-sky {
 }
 
 .section {
-  min-height: 100svh;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -334,7 +333,6 @@ body:has([data-scene-root] canvas) .home-sky {
 
 @media (max-width: 767px) {
   .section {
-    min-height: 100svh;
     overflow-x: hidden;
   }
 
@@ -520,6 +518,7 @@ body:has([data-scene-root] canvas) .home-sky {
 }
 
 .hero-section {
+  min-height: 100svh;
   align-items: center;
   text-align: left;
   padding-top: 6rem;
