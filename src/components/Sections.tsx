@@ -181,12 +181,11 @@ export function Contact() {
     <section
       id="contact"
       className="section"
-      style={{ minHeight: "100svh", justifyContent: "flex-start" }}
+      style={{ justifyContent: "flex-start" }}
     >
       <div
         className="wrap contact-stage"
         style={{
-          minHeight: "calc(100svh - 6rem)",
           display: "grid",
           gridTemplateRows: "1fr auto",
           textAlign: "center",
