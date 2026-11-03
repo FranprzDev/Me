@@ -367,7 +367,7 @@ body:has([data-scene-root] canvas) .home-sky {
 .hero-actions-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 15rem));
-  justify-content: center;
+  justify-content: start;
   gap: 0.9rem;
   width: 100%;
   margin-top: 2.1rem;
@@ -521,7 +521,7 @@ body:has([data-scene-root] canvas) .home-sky {
 
 .hero-section {
   align-items: center;
-  text-align: center;
+  text-align: left;
   padding-top: 6rem;
   /* The scrim bleeds past the column; never let it widen the page. */
   overflow-x: clip;
@@ -591,7 +591,7 @@ body:has([data-scene-root] canvas) .home-sky {
 
 .hero-summary {
   max-width: 34em;
-  margin: 0.95rem auto 0;
+  margin: 0.95rem 0 0;
   color: #c9cde4;
   font-size: clamp(1rem, 1.8vw, 1.12rem);
   line-height: 1.7;
@@ -602,10 +602,10 @@ body:has([data-scene-root] canvas) .home-sky {
 .hero-proof {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.6rem;
   max-width: 680px;
-  margin: 1.35rem auto 0;
+  margin: 1.35rem 0 0;
 }
 
 .hero-chip {

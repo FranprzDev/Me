@@ -162,8 +162,8 @@ export function Education() {
 export function Projects() {
   const { t } = useI18n();
   return (
-    <section id="projects" className="section" style={{ position: "relative", textAlign: "center" }}>
-      <div className="wrap" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.9rem" }}>
+    <section id="projects" className="section" style={{ position: "relative" }}>
+      <div className="wrap" style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
         <div>
           <h2 className="h-display glow-brain" style={{ fontSize: "clamp(2rem, 5vw, 3.4rem)", margin: "0.4rem 0 0.2rem" }}>
             {t("proj_title")}
@@ -189,7 +189,6 @@ export function Contact() {
           minHeight: "calc(100svh - 6rem)",
           display: "grid",
           gridTemplateRows: "1fr auto",
-          textAlign: "center",
           rowGap: "1rem",
         }}
       >
@@ -198,7 +197,6 @@ export function Contact() {
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            alignItems: "center",
             paddingTop: "clamp(4.5rem, 11vh, 7rem)",
           }}
         >
@@ -207,7 +205,7 @@ export function Contact() {
             <ContactTitleStars />
           </div>
 
-          <div className="contact-constellations">
+          <div className="contact-constellations" style={{ marginInline: "auto", width: "fit-content" }}>
             <ContactConstellations />
           </div>
 
