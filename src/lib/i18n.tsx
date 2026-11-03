@@ -36,7 +36,7 @@ const UI = {
   proj_title: { es: "Construir cosas que importan.", en: "Ship things that matter." },
   proj_back: { es: "← Volver al universo", en: "← Back to the universe" },
 
-  agents_link: { es: "Para agentes de IA (MCP) →", en: "For AI agents (MCP) →" },
+  agents_link: { es: "Para agentes de IA (MCP)", en: "For AI agents (MCP)" },
 
   career_path: { es: "TRAYECTORIA PROFESIONAL", en: "CAREER PATH" },
 
