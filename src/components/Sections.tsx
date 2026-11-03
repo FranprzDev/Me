@@ -189,6 +189,7 @@ export function Contact() {
           minHeight: "calc(100svh - 6rem)",
           display: "grid",
           gridTemplateRows: "1fr auto",
+          textAlign: "center",
           rowGap: "1rem",
         }}
       >
@@ -197,6 +198,7 @@ export function Contact() {
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
+            alignItems: "center",
             paddingTop: "clamp(4.5rem, 11vh, 7rem)",
           }}
         >
