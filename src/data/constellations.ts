@@ -258,9 +258,11 @@ export const CONSTELLATIONS: Constellation[] = [
 function makeContactConstellation(lang: Lang): Constellation {
   const word = lang === "es" ? "CHARLEMOS" : "LETS TALK";
   const layout =
+    // Low in the frame: the word rests just above the contact links at the
+    // end of the scroll, clear of the worlds slider above them.
     lang === "es"
-      ? { y: 1.36, scale: 0.6, gap: 0.3 }
-      : { y: 1.62, scale: 0.52, gap: 0.22 };
+      ? { y: 0.44, scale: 0.6, gap: 0.3 }
+      : { y: 0.44, scale: 0.52, gap: 0.22 };
   return {
     id: "charlemos",
     sectionIndex: 3,
@@ -277,3 +279,4 @@ export function getConstellations(lang: Lang): Constellation[] {
   constellations[3] = makeContactConstellation(lang);
   return constellations;
 }
+
