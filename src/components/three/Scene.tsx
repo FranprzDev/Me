@@ -12,7 +12,7 @@ import "@/lib/silenceR3FClockWarning";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef, useEffect, type RefObject } from "react";
 import * as THREE from "three";
-import { getScrollProgress, measuredSectionCenter, bumpWeight } from "@/lib/scroll";
+import { getScrollProgress, measuredSectionCenter, bumpWeight, contactLinksRestTop } from "@/lib/scroll";
 import { getConstellations, type Constellation } from "@/data/constellations";
 import { useI18n } from "@/lib/i18n";
 import { Nebula, Planet } from "./Cosmos";
@@ -172,8 +172,7 @@ function ConstellationGroup({
   const sleeping = useRef(false);
 
   useFrame((state) => {
-    // Side decor stays beside the centred copy on any aspect ratio; the
-    // centred "CHARLEMOS" title keeps its own placement.
+    // Side decor stays beside the centred copy on any aspect ratio.
     if (!hero) {
       group.position.x = clearOfContentX(
         state.camera as THREE.PerspectiveCamera,
@@ -183,6 +182,22 @@ function ConstellationGroup({
         extent,
         data.world.x
       );
+    } else {
+      const anchorPx = contactLinksRestTop();
+      if (anchorPx != null) {
+        const cam = state.camera as THREE.PerspectiveCamera;
+        const ih = Math.max(1, state.size.height);
+        const gapPx = 28;
+        const ny = 1 - (2 * (anchorPx - gapPx)) / ih;
+        const k = ny * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
+        const cy = cam.position.y;
+        const dz = data.world.z - cam.position.z;
+        const denom = 9 + k * cy;
+        if (Math.abs(denom) > 0.5) {
+          const bottomWorldY = cy + (dz * (cy - 9 * k)) / denom;
+          group.position.y = bottomWorldY + data.world.scale;
+        }
+      }
     }
     // Ambientales: siempre ensambladas (w = 1). El hero ("CHARLEMOS") tiene
     // curva propia: sube de a poco y QUEDA encendida al final del viaje (no se

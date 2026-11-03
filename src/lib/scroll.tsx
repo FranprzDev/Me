@@ -49,6 +49,23 @@ export function measuredSectionCenter(index: number): number {
   return centersCache[index] ?? sectionCenter(index);
 }
 
+let contactAnchorKey = "";
+let contactAnchorPx: number | null = null;
+
+export function contactLinksRestTop(): number | null {
+  if (typeof document === "undefined") return null;
+  const doc = document.documentElement;
+  const key = `${doc.scrollHeight}:${window.innerWidth}:${window.innerHeight}`;
+  if (key !== contactAnchorKey) {
+    contactAnchorKey = key;
+    const el = document.querySelector(".contact-constellations");
+    const max = doc.scrollHeight - window.innerHeight;
+    contactAnchorPx =
+      el && max > 0 ? el.getBoundingClientRect().top + window.scrollY - max : null;
+  }
+  return contactAnchorPx;
+}
+
 /**
  * Peso [0..1] de una constelación: 1 en el centro de su sección, cae a 0 a
  * ±halfWidth. Con halfWidth ~ 1/SECTION_COUNT las constelaciones contiguas se
