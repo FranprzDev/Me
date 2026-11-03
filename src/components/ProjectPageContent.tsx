@@ -728,7 +728,7 @@ function ProjectAtlas({ project }: { project: Project }) {
                   {item.year}
                   {item.category ? ` · ${tl(item.category)}` : ""}
                 </span>
-                {item.highlight && <span className="atlas-row__flag">★ {tl(item.highlight)}</span>}
+                {item.highlight && <span className="atlas-row__flag">{tl(item.highlight)}</span>}
                 {item.link && <ExternalLink href={item.link} />}
               </div>
             </li>
@@ -924,7 +924,7 @@ function UniversityJourney({ project }: { project: Project }) {
                 <h3>{tl(certification.name)}</h3>
                 <p>{certification.school}</p>
               </div>
-              {certification.highlight && <span className="edu-certificate__highlight">✦ {tl(certification.highlight)}</span>}
+              {certification.highlight && <span className="edu-certificate__highlight">{tl(certification.highlight)}</span>}
             </article>
           ))}
         </div>
@@ -994,7 +994,7 @@ function DossierJourney({ project }: { project: Project }) {
       <StoryBack />
       <header className="dossier-hero">
         <p className="hud-kicker">
-          {project.year}{project.featured ? ` ★ ${tl({ es: "MUNDO DESTACADO", en: "FEATURED WORLD" })}` : ""}
+          {project.year}{project.featured ? ` ${tl({ es: "MUNDO DESTACADO", en: "FEATURED WORLD" })}` : ""}
         </p>
         <h1>{project.title ? tl(project.title) : project.name}</h1>
         <p className="dossier-hero__body">{tl(project.description)}</p>

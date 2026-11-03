@@ -55,7 +55,7 @@ const DETAILS: Record<string, ProjectDetail> = {
         },
         year: "2024",
         link: "https://github.com/FranprzDev/NASASpaceApp-Marshall-Arg",
-        highlight: { es: "Ganador Nacional ★", en: "National Winner ★" },
+        highlight: { es: "Ganador Nacional", en: "National Winner" },
       },
       {
         name: "BeeAgro",
@@ -247,7 +247,7 @@ const DETAILS: Record<string, ProjectDetail> = {
         },
         year: "2024",
         link: "https://github.com/FranprzDev/Psichomatch-No-Country-",
-        highlight: { es: "Seleccionado No Country ★", en: "Selected No Country ★" },
+        highlight: { es: "Seleccionado No Country", en: "Selected No Country" },
         pitch: {
           es: "Plataforma de matching y salud mental hecha en equipo, seleccionada por No Country.",
           en: "Team-built mental health and matching platform, selected by No Country.",
@@ -296,7 +296,7 @@ const DETAILS: Record<string, ProjectDetail> = {
           en: "RollingCode School — November 2022 to September 2023. Outstanding Student.",
         },
         year: "2022 – 2023",
-        highlight: { es: "Alumno Destacado ★", en: "Outstanding Student ★" },
+        highlight: { es: "Alumno Destacado", en: "Outstanding Student" },
         category: { es: "Certificaciones", en: "Certifications" },
       },
       {

@@ -128,7 +128,7 @@ export function ContactConstellations() {
         >
           <StarWord word={it.word} color={it.color} />
           <span style={{ fontSize: "0.85rem", color: "var(--fg)", maxWidth: "100%", overflowWrap: "anywhere" }}>
-            {it.word === "EMAIL" ? CV.email : it.word === "LINKEDIN" ? "in/franprzdev" : lang === "es" ? "Mensaje directo ↗" : "Direct message ↗"}
+            {it.word === "EMAIL" ? CV.email : it.word === "LINKEDIN" ? "in/franprzdev" : lang === "es" ? "Mensaje directo" : "Direct message"}
           </span>
         </a>
       ))}

@@ -56,7 +56,6 @@ export function Hero() {
               >
                 <span className="btn-badge">{tl({ es: "CURRICULUM // PDF", en: "RESUME // PDF" })}</span>
                 <span className="btn-text-row">
-                  <span className="btn-icon" aria-hidden="true">↓</span>
                   <span>{t("hero_cta_cv")}</span>
                 </span>
               </a>
@@ -70,7 +69,7 @@ export function Hero() {
                       <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
                     </svg>
                   </span>
-                  <span>GitHub ↗</span>
+                  <span>GitHub</span>
                 </span>
               </a>
             </Magnetic>
@@ -79,8 +78,8 @@ export function Hero() {
 
         <div>
           <div className="hero-proof">
-            <Link href="/hackathons" className="hero-chip hero-chip-award">{tl({ es: "NASA Space Apps · Ganador nacional 2024", en: "NASA Space Apps · National winner 2024" })} ↗</Link>
-            <Link href="/teaching" className="hero-chip hero-chip-teaching">{tl({ es: "Docente n8n · Poder Judicial de Tucumán", en: "n8n instructor · Tucumán Judiciary" })} ↗</Link>
+            <Link href="/hackathons" className="hero-chip hero-chip-award">{tl({ es: "NASA Space Apps · Ganador nacional 2024", en: "NASA Space Apps · National winner 2024" })}</Link>
+            <Link href="/teaching" className="hero-chip hero-chip-teaching">{tl({ es: "Docente n8n · Poder Judicial de Tucumán", en: "n8n instructor · Tucumán Judiciary" })}</Link>
           </div>
         </div>
 
@@ -147,7 +146,7 @@ export function Education() {
               <div className="glass-soft tilt-card" style={{ padding: "1rem 1.2rem", height: "100%" }}>
                 <strong style={{ fontSize: "0.98rem" }}>{tl(c.name)}</strong>
                 {c.highlight && (
-                  <span className="chip" style={{ marginLeft: "0.4rem", color: "var(--japan-2,#e9b949)" }}>★ {tl(c.highlight)}</span>
+                  <span className="chip" style={{ marginLeft: "0.4rem", color: "var(--japan-2,#e9b949)" }}>{tl(c.highlight)}</span>
                 )}
                 <p style={{ margin: "0.4rem 0 0", color: "var(--muted)", fontSize: "0.82rem" }}>{c.school}</p>
                 <p style={{ margin: "0.15rem 0 0", color: "var(--muted)", fontSize: "0.78rem", opacity: 0.8 }}>{tl(c.period)}</p>
@@ -163,8 +162,8 @@ export function Education() {
 export function Projects() {
   const { t } = useI18n();
   return (
-    <section id="projects" className="section" style={{ position: "relative", textAlign: "center" }}>
-      <div className="wrap" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.9rem" }}>
+    <section id="projects" className="section" style={{ position: "relative" }}>
+      <div className="wrap" style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
         <div>
           <h2 className="h-display glow-brain" style={{ fontSize: "clamp(2rem, 5vw, 3.4rem)", margin: "0.4rem 0 0.2rem" }}>
             {t("proj_title")}
@@ -190,7 +189,6 @@ export function Contact() {
           minHeight: "calc(100svh - 6rem)",
           display: "grid",
           gridTemplateRows: "1fr auto",
-          textAlign: "center",
           rowGap: "1rem",
         }}
       >
@@ -199,7 +197,6 @@ export function Contact() {
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            alignItems: "center",
             paddingTop: "clamp(4.5rem, 11vh, 7rem)",
           }}
         >
@@ -208,7 +205,7 @@ export function Contact() {
             <ContactTitleStars />
           </div>
 
-          <div className="contact-constellations">
+          <div className="contact-constellations" style={{ marginInline: "auto", width: "fit-content" }}>
             <ContactConstellations />
           </div>
 
