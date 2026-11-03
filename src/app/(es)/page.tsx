@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { Hero, Experience, Projects, Contact } from "@/components/Sections";
 import { StarAura } from "@/components/StarAura";
-import { SITE_OPEN_GRAPH } from "@/lib/seo";
+import { SITE_OPEN_GRAPH, SITE_OG_IMAGE } from "@/lib/seo";
 import { homeStructuredData } from "@/lib/structuredData";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
-  openGraph: { ...SITE_OPEN_GRAPH, url: "/" },
+  openGraph: { ...SITE_OPEN_GRAPH, url: "/", images: [SITE_OG_IMAGE] },
 };
 
 /** JSON-LD is static data; `<` is escaped so the payload can never close the script tag. */
