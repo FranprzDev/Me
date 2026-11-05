@@ -498,13 +498,6 @@ html:has(.cv-root) {
     color: #fff;
     text-shadow: 0 0 34px rgba(91, 140, 255, 0.45);
   }
-  .cv-index__intro {
-    margin-top: 1.1rem;
-    max-width: 40rem;
-    font-size: 1.08rem;
-    line-height: 1.7;
-    color: var(--cv-text);
-  }
   .cv-index__list {
     margin-top: 2.6rem;
     display: grid;

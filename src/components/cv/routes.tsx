@@ -43,7 +43,7 @@ export function cvIndexRoute(locale: CvLocale) {
       return <CvIndex locale={locale} />;
     },
     OgImage: function CvIndexOgImage() {
-      return cvOgImage(CV_UI.indexTitle[locale], CV_UI.indexIntro[locale]);
+      return cvOgImage(CV_UI.indexTitle[locale], CV_UI.indexTitle[locale]);
     },
   };
 }

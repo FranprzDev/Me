@@ -19,7 +19,6 @@ export function CvIndex({ locale }: { locale: CvLocale }) {
         <header className="cv-index__head cv-rise" style={riseStyle(1)}>
           <p className="cv-index__eyebrow">{CV_NAME}</p>
           <h1>{CV_UI.indexTitle[locale]}</h1>
-          <p className="cv-index__intro">{CV_UI.indexIntro[locale]}</p>
         </header>
         <ul className="cv-index__list">
           {CV_VARIANTS.map((variant, index) => (

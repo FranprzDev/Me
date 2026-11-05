@@ -187,7 +187,7 @@ function summarizeCvVersion(resolved: ResolvedCv, origin: string): CvVersionSumm
 export function listCvVersions(language: Language, origin: string): CvVersionList {
   const locale = cvLocale(language);
   const versions = CV_VARIANTS.map((variant) => summarizeCvVersion(getCv(variant, locale), origin));
-  return { language, about: CV_UI.indexIntro[locale], versions };
+  return { language, about: CV_UI.indexTitle[locale], versions };
 }
 
 type CvSectionBase<S extends CvSection> = { id: S; title: string };
