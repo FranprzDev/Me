@@ -57,7 +57,8 @@ function SectionBody({ cv, section }: { cv: ResolvedCv; section: CvSection }) {
               <p>
                 <strong>{project.name}</strong>
                 {project.qualifier ? ` (${project.qualifier})` : ""}
-                <span className="cv-project__sep"> - </span>
+                {" "}
+                <span className="cv-project__sep">- </span>
                 {project.detail}
               </p>
             </li>
