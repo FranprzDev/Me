@@ -49,7 +49,7 @@ export function cvPageMetadata(variant: CvVariant, locale: CvLocale): Metadata {
 
 export function cvIndexMetadata(locale: CvLocale): Metadata {
   const title = `${CV_NAME} — ${CV_UI.indexTitle[locale]}`;
-  const description = CV_UI.indexIntro[locale];
+  const description = CV_UI.indexTitle[locale];
   return {
     title,
     description,

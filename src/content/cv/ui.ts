@@ -9,12 +9,6 @@ export const CV_UI = {
   download: { [CvLocale.En]: "Download PDF", [CvLocale.Es]: "Descargar PDF" },
   pdfBadge: { [CvLocale.En]: "PDF · A4", [CvLocale.Es]: "PDF · A4" },
   indexTitle: { [CvLocale.En]: "Curriculum Vitae", [CvLocale.Es]: "Currículums" },
-  indexIntro: {
-    [CvLocale.En]:
-      "The same experience, ordered for five kinds of role. Pick a version to download its one-page PDF.",
-    [CvLocale.Es]:
-      "La misma experiencia, ordenada para cinco tipos de puesto. Elegí una versión para descargar su PDF de una página.",
-  },
   cvWord: { [CvLocale.En]: "CV", [CvLocale.Es]: "CV" },
 } satisfies Record<string, Record<CvLocale, string>>;
 
