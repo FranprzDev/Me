@@ -11,7 +11,7 @@
 /* One A4 page per résumé (enforced by `pnpm cv:pdf`). */
 @page {
   size: A4;
-  margin: 10mm 12mm;
+  margin: 11mm 16mm 9mm;
 }
 
 html:has(.cv-root) {
@@ -280,6 +280,11 @@ html:has(.cv-root) {
     text-transform: uppercase;
     color: var(--cv-blue);
   }
+  .cv-head__location a {
+    color: inherit;
+    text-transform: none;
+    letter-spacing: 0.08em;
+  }
   .cv-head__contacts {
     margin-top: 1.4rem;
     display: flex;
@@ -346,22 +351,15 @@ html:has(.cv-root) {
     line-height: 1.78;
   }
 
-  .cv-skills__row {
+  .cv-stack {
     display: grid;
-    grid-template-columns: 13rem minmax(0, 1fr);
-    gap: 1.25rem;
-    padding: 0.7rem 0;
-    border-top: 1px solid var(--cv-line);
+    gap: 0.6rem;
   }
-  .cv-skills__row:first-child {
-    border-top: 0;
-    padding-top: 0;
+  .cv-stack p {
+    line-height: 1.7;
   }
-  .cv-skills dt {
-    padding-top: 0.2rem;
-    font: 600 0.7rem/1.6 var(--cv-mono);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+  .cv-stack strong {
+    font-weight: 600;
     color: var(--cv-violet);
   }
 
@@ -369,25 +367,14 @@ html:has(.cv-root) {
     display: grid;
     gap: 1.1rem;
   }
-  .cv-entry__head {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 0.2rem 1rem;
-  }
   .cv-entry h3 {
     font-size: 1.06rem;
     font-weight: 600;
     line-height: 1.4;
     color: var(--cv-fg);
   }
-  .cv-entry__org {
-    font-weight: 500;
-    color: var(--cv-violet);
-  }
   .cv-entry__meta {
-    font: 0.74rem/1.6 var(--cv-mono);
+    font: 400 0.74rem/1.6 var(--cv-mono);
     letter-spacing: 0.04em;
     color: var(--cv-gold);
   }
@@ -453,52 +440,44 @@ html:has(.cv-root) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.75rem;
   }
-  .cv-section--projects .cv-entry {
+  .cv-project {
     min-width: 0;
     padding: 1rem 1.15rem;
     border-left: 2px solid rgba(174, 150, 239, 0.55);
     border-radius: 0.3rem 0.8rem 0.8rem 0.3rem;
     background: rgba(19, 19, 40, 0.6);
-  }
-  .cv-section--projects .cv-entry h3 {
-    font-size: 0.98rem;
-  }
-  .cv-section--projects .cv-entry p {
-    margin-top: 0.35rem;
     font-size: 0.88rem;
     line-height: 1.65;
     color: var(--cv-mute);
   }
-  .cv-section--projects .cv-entry a {
-    font-family: var(--cv-mono);
-    font-size: 0.78rem;
-    overflow-wrap: anywhere;
-  }
-
-  .cv-section--education .cv-entry h3 {
-    font: 400 1.25rem/1.3 var(--cv-display);
-  }
-
-  .cv-certs {
-    display: grid;
-  }
-  .cv-certs li {
-    padding: 0.6rem 0;
-    border-top: 1px solid var(--cv-line);
-    color: var(--cv-mute);
-    font-size: 0.93rem;
-  }
-  .cv-certs li:first-child {
-    border-top: 0;
-    padding-top: 0;
-  }
-  .cv-certs__name {
+  .cv-project strong {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-size: 0.98rem;
     font-weight: 600;
     color: var(--cv-fg);
   }
-  .cv-certs__period {
-    font: 0.74rem var(--cv-mono);
-    color: var(--cv-gold);
+  /* The print run's " - " separator is noise under a block title. */
+  .cv-project__sep {
+    display: none;
+  }
+
+  .cv-edu {
+    display: grid;
+    gap: 0.55rem;
+  }
+  .cv-edu__degree {
+    font: 400 1.15rem/1.4 var(--cv-display);
+    color: var(--cv-fg);
+  }
+  .cv-edu__certs,
+  .cv-edu__langs {
+    color: var(--cv-mute);
+    font-size: 0.95rem;
+  }
+  .cv-edu__langs strong {
+    font-weight: 600;
+    color: var(--cv-violet);
   }
 
   /* ---------- Index ---------- */
@@ -617,10 +596,6 @@ html:has(.cv-root) {
     .cv-index {
       padding-top: 5.5rem;
     }
-    .cv-skills__row {
-      grid-template-columns: 1fr;
-      gap: 0.15rem;
-    }
     .cv-section--projects .cv-list {
       grid-template-columns: 1fr;
     }
@@ -713,254 +688,11 @@ html:has(.cv-root) {
     display: none !important;
   }
 
-  .cv-root {
-    --cv-paper: #eef2f8;
-    --cv-sheet: #ffffff;
-    --cv-ink: #0c2546;
-    --cv-ink-soft: #2b3b55;
-    --cv-mute: #56657d;
-    --cv-hairline: #d3dbe7;
-    --cv-accent: #1f56d8;
-    --cv-display: var(--cv-font-display), Georgia, "Times New Roman", serif;
-    --cv-sans: var(--cv-font-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
-
-    min-height: 100vh;
-    background: var(--cv-paper);
-    color: var(--cv-ink-soft);
-    font-family: var(--cv-sans);
-    font-size: 0.97rem;
-    line-height: 1.55;
-    -webkit-font-smoothing: antialiased;
-    overflow-wrap: break-word;
-  }
-
-  :where(.cv-root) :where(h1, h2, h3, p, ul, ol, dl, dd) {
-    margin: 0;
-  }
-  :where(.cv-root) :where(ul, ol) {
-    list-style: none;
-    padding: 0;
-  }
-
-  .cv-root a {
-    color: var(--cv-accent);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 2px;
-  }
-  .cv-root a:focus-visible {
-    outline: 2px solid var(--cv-accent);
-    outline-offset: 2px;
-    border-radius: 2px;
-  }
-
-  /* ---------- Sheet ---------- */
-
-  .cv-sheet {
-    padding: 2rem 1rem 3rem;
-  }
-  .cv-sheet:focus {
-    outline: none;
-  }
-  .cv-doc {
-    max-width: 52rem;
-    margin: 0 auto;
-    background: var(--cv-sheet);
-    border: 1px solid var(--cv-hairline);
-    border-radius: 4px;
-    box-shadow: 0 18px 40px -28px rgba(12, 37, 70, 0.35);
-    padding: 3rem 3.25rem;
-  }
-
-  .cv-head {
-    padding-bottom: 1.1rem;
-    border-bottom: 2px solid var(--cv-ink);
-  }
-  .cv-head h1 {
-    font-family: var(--cv-display);
-    font-weight: 500;
-    font-size: clamp(1.9rem, 4vw, 2.5rem);
-    line-height: 1.1;
-    color: var(--cv-ink);
-    letter-spacing: -0.01em;
-  }
-  .cv-head__headline {
-    margin-top: 0.45rem;
-    font-size: 1.02rem;
-    font-weight: 500;
-    color: var(--cv-accent);
-  }
-  .cv-head__location {
-    margin-top: 0.4rem;
-    font-size: 0.9rem;
-    color: var(--cv-mute);
-  }
-  .cv-head__contacts {
-    margin-top: 0.35rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.2rem 1.1rem;
-    font-size: 0.9rem;
-  }
-  .cv-head__contacts a {
-    overflow-wrap: anywhere;
-  }
-
-  .cv-section {
-    margin-top: 1.35rem;
-  }
-  .cv-section h2 {
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--cv-ink);
-    padding-bottom: 0.3rem;
-    margin-bottom: 0.6rem;
-    border-bottom: 1px solid var(--cv-hairline);
-  }
-
-  .cv-summary {
-    color: var(--cv-ink-soft);
-  }
-
-  .cv-skills {
-    display: grid;
-    gap: 0.25rem;
-  }
-  .cv-skills__row {
-    display: grid;
-    grid-template-columns: 12.5rem 1fr;
-    gap: 1rem;
-  }
-  .cv-skills dt {
-    font-weight: 600;
-    color: var(--cv-ink);
-  }
-
-  .cv-list {
-    display: grid;
-    gap: 0.85rem;
-  }
-  .cv-entry--compact + .cv-entry--compact {
-    margin-top: -0.25rem;
-  }
-  .cv-entry__head {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 0 1rem;
-  }
-  .cv-entry h3 {
-    font-size: 0.98rem;
-    font-weight: 600;
-    color: var(--cv-ink);
-  }
-  .cv-entry__org {
-    font-weight: 500;
-    color: var(--cv-ink-soft);
-  }
-  .cv-entry__meta {
-    font-size: 0.86rem;
-    color: var(--cv-mute);
-    white-space: nowrap;
-  }
-  .cv-bullets {
-    margin-top: 0.3rem;
-    display: grid;
-    gap: 0.2rem;
-  }
-  .cv-bullets li {
-    position: relative;
-    padding-left: 1rem;
-  }
-  .cv-bullets li::before {
-    content: "";
-    position: absolute;
-    left: 0.15rem;
-    top: 0.68em;
-    width: 0.32rem;
-    height: 0.32rem;
-    border-radius: 50%;
-    background: var(--cv-accent);
-  }
-  .cv-entry--compact p {
-    margin-top: 0.1rem;
-  }
-
-  .cv-certs {
-    display: grid;
-    gap: 0.2rem;
-  }
-  .cv-certs__name {
-    font-weight: 600;
-    color: var(--cv-ink);
-  }
-  .cv-certs__period {
-    color: var(--cv-mute);
-  }
-
-  /* ---------- Index ---------- */
-
-  .cv-index {
-    max-width: 52rem;
-    margin: 0 auto;
-    padding: 3rem 1.25rem 4rem;
-  }
-  .cv-index:focus {
-    outline: none;
-  }
-  .cv-index__eyebrow {
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--cv-mute);
-  }
-  .cv-index__head h1 {
-    margin-top: 0.4rem;
-    font-family: var(--cv-display);
-    font-weight: 500;
-    font-size: clamp(2.2rem, 6vw, 3.2rem);
-    line-height: 1.05;
-    color: var(--cv-ink);
-  }
-  .cv-index__intro {
-    margin-top: 0.8rem;
-    max-width: 38rem;
-    font-size: 1.05rem;
-  }
-  .cv-index__list {
-    margin-top: 2rem;
-    display: grid;
-    gap: 0.9rem;
-  }
-  .cv-card {
-    background: var(--cv-sheet);
-    border: 1px solid var(--cv-hairline);
-    border-radius: 6px;
-    padding: 1.1rem 1.3rem;
-  }
-  .cv-card__title {
-    font-family: var(--cv-display);
-    font-weight: 500;
-    font-size: 1.35rem;
-    color: var(--cv-ink);
-  }
-  .cv-root .cv-card {
-    display: block;
-    color: inherit;
-    text-decoration: none;
-  }
-  .cv-card__headline {
-    margin-top: 0.3rem;
-    font-size: 0.92rem;
-    color: var(--cv-mute);
-  }
-
-
-  /* Paper sizes and spacing. */
+  /*
+   * The approved one-page layout (Francisco's approved CV, 2026-11-04):
+   * Liberation Sans metrics (Arial substitutes it 1:1), 10pt body, 10.5pt
+   * blue section headers over a hairline, 19pt name, single column.
+   */
   html:has(.cv-root),
   html:has(.cv-root) body,
   .cv-root {
@@ -968,117 +700,106 @@ html:has(.cv-root) {
   }
   .cv-root {
     min-height: 0;
-    /* Body never below 9.5pt: one page comes from content choices, not tiny type. */
-    font-size: 9.6pt;
-    line-height: 1.32;
-    color: #1d2a3f;
-  }
-  .cv-bar {
-    display: none;
-  }
-  .cv-sheet {
-    padding: 0;
-  }
-  .cv-doc {
-    max-width: none;
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
-    padding: 0;
-  }
-  .cv-head {
-    padding-bottom: 7pt;
-  }
-  .cv-head h1 {
-    font-size: 21pt;
-  }
-  .cv-head__headline {
-    margin-top: 3pt;
-    font-size: 10.5pt;
-  }
-  .cv-head__location,
-  .cv-head__contacts,
-  .cv-entry__meta {
-    font-size: 9pt;
+    color: #000000;
+    font-family: Arial, "Liberation Sans", "Helvetica Neue", Helvetica, sans-serif;
+    font-size: 10pt;
+    line-height: 1.2;
+    overflow-wrap: break-word;
   }
   .cv-root a {
     color: inherit;
     text-decoration: none;
   }
-  .cv-head__contacts a {
-    color: var(--cv-accent);
+
+  .cv-sheet {
+    padding: 0;
   }
-  .cv-section {
-    margin-top: 6pt;
-  }
-  .cv-section h2 {
-    font-size: 8.5pt;
-    margin-bottom: 4pt;
-    padding-bottom: 2pt;
-    break-after: avoid;
-  }
-  .cv-entry h3 {
-    font-size: 9.8pt;
-  }
-  .cv-list {
-    gap: 5pt;
-  }
-  .cv-skills__row {
-    grid-template-columns: 33mm 1fr;
-    gap: 3mm;
-  }
-  .cv-entry,
-  .cv-skills__row,
-  .cv-certs li {
-    break-inside: avoid;
-  }
-  .cv-entry__head {
-    break-after: avoid;
-  }
-  .cv-bullets {
-    margin-top: 1.5pt;
-    gap: 1pt;
-  }
-  /* The closing short sections share rows: education and languages side by
-     side, certifications after them across the full width. */
   .cv-doc {
-    display: grid;
-    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
-    column-gap: 8mm;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
   }
-  .cv-doc > * {
-    grid-column: 1 / -1;
+
+  /* ---------- Header ---------- */
+
+  .cv-head h1 {
+    font-size: 19pt;
+    line-height: 1.16;
+    font-weight: 700;
+    color: #000000;
   }
-  .cv-doc > .cv-section--education,
-  .cv-doc > .cv-section--languages {
-    grid-column: auto;
+  .cv-head__headline {
+    margin-top: 2pt;
+    font-size: 10pt;
+    line-height: 1.3;
+    color: #333333;
   }
-  .cv-doc > .cv-section--certifications {
-    order: 1;
+  .cv-head__location {
+    margin-top: 1pt;
+    font-size: 10pt;
   }
-  /* Projects: name and detail on one run of text. */
-  .cv-section--projects .cv-entry h3,
-  .cv-section--projects .cv-entry p {
+  .cv-head__contacts {
+    font-size: 10pt;
+  }
+  .cv-head__contacts li {
     display: inline;
   }
-  .cv-section--projects .cv-entry h3::after {
-    content: ": ";
+  .cv-head__contacts li + li::before {
+    content: " · ";
   }
-  .cv-entry--compact + .cv-entry--compact {
-    margin-top: 0;
+
+  /* ---------- Sections ---------- */
+
+  .cv-section h2 {
+    margin: 4pt 0 3pt;
+    padding-bottom: 1pt;
+    font-size: 10.5pt;
+    line-height: 1.19;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #1f3a8a;
+    border-bottom: 0.5pt solid #9aa7c7;
+    break-after: avoid;
   }
-  .cv-section--projects .cv-list {
-    gap: 2pt;
-  }
-  /* Certifications run as one compact line-wrapped list. */
-  .cv-certs {
+
+  .cv-list {
     display: block;
   }
-  .cv-certs li {
-    display: inline;
+  .cv-entry {
+    break-inside: avoid;
   }
-  .cv-certs li + li::before {
-    content: "  ·  ";
-    color: var(--cv-mute);
+  .cv-entry h3 {
+    margin-top: 2.2pt;
+    font-size: 10pt;
+    font-weight: 700;
+    break-after: avoid;
+  }
+  .cv-entry__meta {
+    font-weight: 400;
+  }
+  .cv-bullets li,
+  .cv-project {
+    position: relative;
+    padding-left: 9pt;
+  }
+  .cv-bullets li::before,
+  .cv-project::before {
+    content: "\2022";
+    position: absolute;
+    left: 0;
+  }
+  .cv-project {
+    break-inside: avoid;
+  }
+  .cv-project strong,
+  .cv-stack strong,
+  .cv-edu__langs strong {
+    font-weight: 700;
+  }
+  .cv-edu {
+    display: block;
   }
 }

@@ -146,7 +146,7 @@ async function checkCvPages(browser) {
         assert.equal(file.status(), 200, `${route}: PDF ${pdf}`);
         assert.match(file.headers()["content-type"], /pdf/);
         assert.equal((await file.body()).subarray(0, 4).toString(), "%PDF");
-        assert.equal(await page.locator(".cv-section h2").count() >= 6, true, `${route}: résumé sections`);
+        assert.equal(await page.locator(".cv-section h2").count(), 5, `${route}: résumé sections`);
         assert.equal(await page.locator(`.cv-bar__versions a[aria-current='page']`).getAttribute("href"), route);
         await page.emulateMedia({ media: "print" });
         if (name === "cv-desktop") {
