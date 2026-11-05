@@ -33,8 +33,8 @@ async function main() {
         const response = await page.goto(`${baseURL}${route}`, { waitUntil: "networkidle" });
         assert.equal(response?.status(), 200, route);
         await page.emulateMedia({ media: "print" });
-        // The print families are not preloaded (screen never uses them): load
-        // every declared face before rendering so the PDF never falls back.
+        // Load every declared face before rendering so the PDF never falls
+        // back (the print layout itself uses the system stack).
         await page.evaluate(async () => {
           // allSettled: the local() fallback faces next/font declares may not exist here.
           await Promise.allSettled(Array.from(document.fonts, (face) => face.load()));

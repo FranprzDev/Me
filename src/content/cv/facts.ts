@@ -1,17 +1,19 @@
 import {
   CvSection,
-  type CertificationEntry,
+  type CertificationGroup,
   type ContactLink,
   type EducationEntry,
   type Localized,
   type ProjectEntry,
+  type SkillRow,
 } from "./types";
 import { CANONICAL_SITE_HOST, CANONICAL_SITE_URL } from "@/lib/site";
 
 /**
- * Facts shared by every résumé variant. Everything here comes from
- * Francisco's own CVs (full-stack, backend, frontend, AI engineer and
- * software engineer PDFs); variants only reorder and re-emphasise them.
+ * Facts shared by every résumé variant. They follow the CV Francisco
+ * approved on 2026-11-04 (the one-page Applied AI CV): variants only reorder
+ * and re-emphasise them for their role type. Never invent roles, dates,
+ * metrics or skills.
  *
  * Privacy: the web pages and PDFs publish email, GitHub, LinkedIn and the
  * portfolio URL only. Never add a phone number or a home address here.
@@ -22,16 +24,17 @@ export const CV_NAME = "Francisco Miguel Perez";
 /** Printed on every CV page and PDF; the domain itself lives in src/lib/site.ts. */
 export const PORTFOLIO_URL = CANONICAL_SITE_URL;
 
+export const CV_EMAIL = "franciscoperezdeveloper@gmail.com";
+
 export const CV_CONTACTS: ContactLink[] = [
-  { label: "franciscoperezdeveloper@gmail.com", href: "mailto:franciscoperezdeveloper@gmail.com" },
   { label: "linkedin.com/in/franprzdev", href: "https://linkedin.com/in/franprzdev" },
-  { label: "github.com/franprzdev", href: "https://github.com/franprzdev" },
+  { label: "github.com/franprzdev", href: "https://github.com/FranprzDev" },
   { label: CANONICAL_SITE_HOST, href: PORTFOLIO_URL },
 ];
 
 export const CV_LOCATION: Localized = {
-  en: "Tucumán, Argentina (GMT-3) · On-site, hybrid or remote",
-  es: "Tucumán, Argentina (GMT-3) · Presencial, híbrido o remoto",
+  en: "Tucumán, Argentina (GMT-3)",
+  es: "Tucumán, Argentina (GMT-3)",
 };
 
 export const SECTION_TITLES: Record<CvSection, Localized> = {
@@ -39,161 +42,209 @@ export const SECTION_TITLES: Record<CvSection, Localized> = {
   [CvSection.Skills]: { en: "Tech stack", es: "Tecnologías" },
   [CvSection.Experience]: { en: "Experience", es: "Experiencia" },
   [CvSection.Projects]: { en: "Projects & awards", es: "Proyectos y premios" },
-  [CvSection.Education]: { en: "Education", es: "Educación" },
+  [CvSection.Education]: { en: "Education & certifications", es: "Educación y certificaciones" },
   [CvSection.Certifications]: { en: "Certifications", es: "Certificaciones" },
   [CvSection.Languages]: { en: "Languages", es: "Idiomas" },
 };
 
+/** Shown inside the education section, under the "Languages"/"Idiomas" label. */
 export const LANGUAGES: Localized = {
-  en: "Spanish (native) · English (fluent) · Russian (basic)",
-  es: "Español (nativo) · Inglés (fluido) · Ruso (básico)",
+  en: "Spanish (native) · English (B1) · Russian (A1)",
+  es: "español (nativo) · inglés (B1) · ruso (A1)",
 };
 
 export const EDUCATION: EducationEntry[] = [
   {
-    institution: "Universidad Tecnológica Nacional (UTN-FRT)",
+    institution: "UTN-FRT",
     degree: { en: "B.S. Information Systems Engineering", es: "Ingeniería en Sistemas de Información" },
-    period: { en: "Feb 2022 – Dec 2027 (expected)", es: "feb 2022 – dic 2027 (estimado)" },
+    period: { en: "2022 - Dec 2027, expected", es: "2022 - dic 2027, estimado" },
   },
 ];
 
-export const CERT_MERN: CertificationEntry = {
+export const CERTS_ROLLINGCODE: CertificationGroup = {
   school: "RollingCode School",
-  name: { en: "Full-Stack Developer (MERN) — Outstanding Student", es: "Desarrollador Full-Stack (MERN) — Alumno destacado" },
-  period: { en: "Nov 2022 – Sep 2023", es: "nov 2022 – sep 2023" },
-};
-export const CERT_REACT: CertificationEntry = {
-  school: "RollingCode School",
-  name: { en: "Advanced React", es: "React avanzado" },
-  period: { en: "May 2024 – Sep 2024", es: "may 2024 – sep 2024" },
-};
-export const CERT_NEXT: CertificationEntry = {
-  school: "RollingCode School",
-  name: { en: "Advanced Next.js", es: "Next.js avanzado" },
-  period: { en: "Jun 2025 – Nov 2025", es: "jun 2025 – nov 2025" },
-};
-export const CERT_DATA: CertificationEntry = {
-  school: "RollingCode School",
-  name: { en: "Data Engineer", es: "Data Engineer" },
-  period: { en: "Jun 2025 – Oct 2025", es: "jun 2025 – oct 2025" },
-};
-/** Three OpenAI Academy certificates, grouped to keep every CV on one page. */
-export const CERT_OPENAI_ACADEMY: CertificationEntry = {
-  school: "OpenAI Academy",
-  name: {
-    en: "AI Foundations · Applied AI Foundations · Agents and Workflows",
-    es: "AI Foundations · Applied AI Foundations · Agents and Workflows",
+  items: {
+    en: "Full-Stack MERN (Outstanding Student, 2022-2023) · Advanced React (2024) · Advanced Next.js (2025) · Data Engineer (2025)",
+    es: "Full-Stack MERN (alumno destacado, 2022-2023) · React avanzado (2024) · Next.js avanzado (2025) · Data Engineer (2025)",
   },
-  period: { en: "Aug – Sep 2026", es: "ago – sep 2026" },
 };
-/** Google AI Essentials and Google Prompting Essentials (certificates + Google badges), taken on Coursera. */
-export const CERT_GOOGLE_AI: CertificationEntry = {
-  school: "Google (Coursera)",
-  name: { en: "AI Essentials · Prompting Essentials", es: "AI Essentials · Prompting Essentials" },
-  period: { en: "Sep – Oct 2025", es: "sep – oct 2025" },
+export const CERTS_OPENAI: CertificationGroup = {
+  school: "OpenAI Academy",
+  items: {
+    en: "Agents and Workflows (Sep 2026) · Applied AI Foundations (Aug 2026) · AI Foundations (Aug 2026)",
+    es: "Agents and Workflows (sep 2026) · Applied AI Foundations (ago 2026) · AI Foundations (ago 2026)",
+  },
 };
+export const CERTS_GOOGLE: CertificationGroup = {
+  school: "Google",
+  items: {
+    en: "AI Essentials (Oct 2025) · Prompting Essentials (Oct 2025)",
+    es: "AI Essentials (oct 2025) · Prompting Essentials (oct 2025)",
+  },
+};
+/** Approved order: school first, then the AI academies. */
+export const CERT_GROUPS: CertificationGroup[] = [CERTS_ROLLINGCODE, CERTS_OPENAI, CERTS_GOOGLE];
+
+/* Projects & awards, shared by every variant. */
 
 export const PROJECT_NASA: ProjectEntry = {
-  name: { en: "NASA Space Apps 2024 — National Winner", es: "NASA Space Apps 2024 — Ganador nacional" },
+  name: { en: "NASA Space Apps 2024", es: "NASA Space Apps 2024" },
   detail: {
-    en: "ExoGames, national winning project (Buenos Aires hackathon, virtual). National competitor again in 2025.",
-    es: "ExoGames, proyecto ganador nacional (hackathon de Buenos Aires, virtual). Competidor nacional nuevamente en 2025.",
+    en: "National winner (ExoGames); national competitor again in 2025.",
+    es: "Ganador nacional (ExoGames); competidor nacional nuevamente en 2025.",
   },
 };
 export const PROJECT_PROOFY: ProjectEntry = {
-  name: { en: "Proofy — Solana hackathon, 2026", es: "Proofy — hackathon Solana, 2026" },
+  name: { en: "Proofy", es: "Proofy" },
+  qualifier: { en: "Solana hackathon 2026, prototype", es: "hackathon Solana 2026, prototipo" },
   detail: {
-    en: "Web app with an AI agent that turns a contract's scope into verifiable milestones and releases escrow payments on CI/CD evidence.",
-    es: "App web con un agente de IA que convierte el alcance de un contrato en hitos verificables y libera pagos en escrow según evidencia de CI/CD.",
+    en: "AI agent that turns a contract scope into verifiable milestones and releases escrow payments based on CI/CD evidence.",
+    es: "agente de IA que convierte el alcance de un contrato en hitos verificables y libera pagos en escrow según evidencia de CI/CD.",
   },
-  href: "https://proofyai.vercel.app",
 };
+export const PROJECT_PRESU: ProjectEntry = {
+  name: { en: "Presu", es: "Presu" },
+  qualifier: { en: "2026, prototype", es: "2026, prototipo" },
+  detail: {
+    en: "ChatGPT app (MCP server) that turns a product idea into a clear scope and a PDF quote through guided Q&A; credits and BNB testnet payments. Presented at the BNB Builder Session Tucumán (Oct 2026, participant).",
+    es: "app de ChatGPT (servidor MCP) que convierte una idea de producto en un alcance claro y una cotización en PDF mediante preguntas guiadas; créditos y pagos BNB en testnet. Presentado en el BNB Builder Session Tucumán (oct 2026, participante).",
+  },
+};
+export const PROJECT_REELSMITH: ProjectEntry = {
+  name: { en: "Reelsmith", es: "Reelsmith" },
+  qualifier: { en: "2026", es: "2026" },
+  detail: {
+    en: "MCP server in Rust that lets an AI assistant render short promo videos from gameplay clips, with automatic QA (loudness, black frames).",
+    es: "servidor MCP en Rust que permite a un asistente de IA renderizar videos promocionales cortos a partir de clips de juego, con QA automático (loudness, frames negros).",
+  },
+};
+export const PROJECT_VORTEX: ProjectEntry = {
+  name: { en: "Vortex Software n8n Hackathon 2025", es: "Hackathon de n8n de Vortex Software 2025" },
+  detail: { en: "competitor (Tucumán).", es: "competidor (Tucumán)." },
+};
+
 /* Experience periods and organisations, shared by every variant. */
 
 export const REPUESTOSHOP = {
   org: { en: "RepuestoShop", es: "RepuestoShop" },
-  period: { en: "Dec 2025 – Oct 2026", es: "dic 2025 – oct 2026" },
+  period: { en: "Dec 2025 - Oct 2026", es: "dic 2025 - oct 2026" },
   place: { en: "Remote", es: "Remoto" },
-} as const;
-
-/** Freelance work is grouped as projects; clients are never named, only described by what they are. */
-export const FREELANCE_PROJECTS = {
-  org: { en: "Freelance Projects", es: "Proyectos freelance" },
-  period: { en: "Nov 2025 – Aug 2026", es: "nov 2025 – ago 2026" },
 } as const;
 
 export const ROLLINGCODE_STUDIO = {
   org: { en: "RollingCode Studio", es: "RollingCode Studio" },
-  period: { en: "Oct 2024 – Dec 2025", es: "oct 2024 – dic 2025" },
-} as const;
-
-export const FLA = {
-  org: { en: "Fundación Líderes de Ansenuza", es: "Fundación Líderes de Ansenuza" },
-  period: { en: "Apr 2025 – Present", es: "abr 2025 – actualidad" },
+  period: { en: "Oct 2024 - Dec 2025", es: "oct 2024 - dic 2025" },
 } as const;
 
 export const JUDICIARY = {
   org: { en: "Poder Judicial de Tucumán", es: "Poder Judicial de Tucumán" },
-  period: { en: "Sep 2025 – Oct 2025", es: "sep 2025 – oct 2025" },
+  period: { en: "Sep - Oct 2025", es: "sep - oct 2025" },
+} as const;
+
+export const FLA = {
+  org: { en: "Fundación Líderes de Ansenuza", es: "Fundación Líderes de Ansenuza" },
+  period: { en: "Apr 2025 - Present", es: "abr 2025 - Actualidad" },
+} as const;
+
+export const SCHOOL = {
+  org: { en: "RollingCode School", es: "RollingCode School" },
+  period: { en: "Nov 2023 - Aug 2024", es: "nov 2023 - ago 2024" },
 } as const;
 
 /* Roles and bullets reused verbatim across variants. */
 
-export const ROLE_SOFTWARE_AI: Localized = { en: "Software / AI Engineer", es: "Desarrollador de Software / IA" };
 export const ROLE_AI: Localized = { en: "AI Engineer", es: "AI Engineer" };
-export const ROLE_FREELANCE: Localized = {
-  en: "Full-Stack & Automation Developer",
-  es: "Desarrollador Full-Stack y Automatización",
-};
 export const ROLE_PRODUCT: Localized = { en: "Product Engineer", es: "Product Engineer" };
-export const ROLE_FLA: Localized = { en: "Full-Stack Developer (Volunteer)", es: "Desarrollador Full-Stack (voluntario)" };
 export const ROLE_INSTRUCTOR: Localized = {
   en: "Instructor, Process Automation with n8n",
-  es: "Capacitador en Automatización con n8n",
+  es: "Docente de Automatización con n8n",
 };
+export const ROLE_FLA: Localized = { en: "Full-Stack Developer (Volunteer)", es: "Desarrollador Full-Stack (voluntario)" };
+export const ROLE_ASSISTANT: Localized = { en: "Teaching Assistant, Web & Backend", es: "Ayudante docente Web y Backend" };
 
-export const B_REPUESTO_TOOLS: Localized = {
-  en: "Build and maintain internal tools and customer-facing automation for an auto-parts e-commerce, integrating Meta APIs and the product catalog.",
-  es: "Desarrollo y mantengo herramientas internas y automatizaciones de atención para un e-commerce de repuestos, integrando APIs de Meta y el catálogo de productos.",
+export const B_REPUESTO_SYSTEM: Localized = {
+  en: "Built the whole system end to end: an AI that processed over 50 leads a day with their likely purchase case, and a CRM built from scratch that displayed that information.",
+  es: "Construí todo el sistema de punta a punta: una IA que procesaba más de 50 leads por día con su posible caso de compra y un CRM desde cero que mostraba esa información.",
 };
 export const B_REPUESTO_AGENT: Localized = {
-  en: "Designed a multi-agent assistant (LangGraph) with RAG over scraped catalog data to answer customer questions.",
-  es: "Diseñé un asistente multiagente (LangGraph) con RAG sobre el catálogo para responder consultas de clientes.",
+  en: "Designed and deployed a multi-agent assistant (LangGraph) with tool calling and retrieval over scraped catalog data via SQL full-text search to answer customer questions.",
+  es: "Diseñé y desplegué un asistente multiagente (LangGraph) con tool calling y retrieval sobre catálogo scrapeado mediante búsqueda full-text en SQL para responder consultas de clientes.",
+};
+export const B_REPUESTO_TOOLS: Localized = {
+  en: "Built internal tools and automations for other parts of the business, integrating Meta APIs and scraping pipelines that feed the agents with data.",
+  es: "Construí herramientas internas y automatizaciones para otras áreas del negocio, integrando APIs de Meta y pipelines de scraping que alimentan a los agentes con datos.",
+};
+export const B_REPUESTO_BENCH: Localized = {
+  en: "Benchmarked LLM providers for the best cost/quality trade-off in production; used Codex and Claude Code to ship POCs fast.",
+  es: "Comparé proveedores de LLM para elegir la mejor relación costo/calidad en producción; usé Codex y Claude Code para entregar POCs rápido.",
 };
 
-export const B_ACCOUNTING_PLATFORM: Localized = {
-  en: "Co-built a tax-deadline management platform for an accounting firm: approval flows, change history and Google Calendar/Gmail integration. Running in production.",
-  es: "Co-desarrollé una plataforma de gestión de vencimientos impositivos para un estudio contable: flujos de aprobación, historial de cambios e integración con Google Calendar y Gmail. En producción.",
+export const B_STUDIO_FEATURES: Localized = {
+  en: "Built frontend and backend features for client web products (React, Next.js, Node.js); automated internal tasks with n8n; Scrum, Git Flow and code review.",
+  es: "Desarrollé funcionalidades frontend y backend para productos web de clientes (React, Next.js, Node.js); automaticé tareas internas con n8n; Scrum, Git Flow y code review.",
 };
-export const B_ACCOUNTING_HANDOVER: Localized = {
-  en: "Delivered full handover: technical report, executive summary and user guide.",
-  es: "Entregué documentación completa: informe técnico, resumen ejecutivo y guía de usuario.",
-};
-
-export const B_FLA: Localized = {
-  en: "Leading the foundation's digital transformation: rebuilt its web platform (Next.js, Prisma, PostgreSQL) and internal tools.",
-  es: "Lidero la digitalización de la fundación: rehice su web (Next.js, Prisma, PostgreSQL) y herramientas internas.",
+export const B_STUDIO_AUTOMATION: Localized = {
+  en: "Reduced, together with the team, the time of a bureaucratic procedure by 90%: from over 12 months to under a month. Another certificate process went from one month to one week.",
+  es: "Reduje, junto al equipo, un 90% el tiempo de un trámite burocrático: de más de 12 meses a menos de un mes. Otro trámite de certificado pasó de un mes a una semana.",
 };
 
 export const B_JUDICIARY: Localized = {
-  en: "Designed and taught a 20-hour course on n8n, APIs and automation workflows for court staff; presented the automation strategy to leadership.",
-  es: "Diseñé y dicté un curso de 20 horas sobre n8n, APIs y flujos de automatización para personal judicial; presenté la estrategia de automatización a las autoridades.",
+  en: "Designed and taught a 20-hour course on n8n, APIs/webhooks and RAG workflows; presented the automation strategy to the Judiciary leadership.",
+  es: "Diseñé y dicté un curso de 20 horas sobre n8n, APIs/webhooks y flujos RAG; presenté la estrategia de automatización a las autoridades.",
 };
 
-/* Skill rows reused across variants. */
+export const B_FLA: Localized = {
+  en: "Rebuilt the foundation's web platform and internal tools (Next.js, Prisma, PostgreSQL).",
+  es: "Rehice la plataforma web y las herramientas internas de la fundación (Next.js, Prisma, PostgreSQL).",
+};
 
-export const SKILL_LANGUAGES = {
+/* Skill groups reused across variants; each variant picks its own order. */
+
+export const SKILL_AI: SkillRow = {
+  label: { en: "AI", es: "IA" },
+  value: {
+    en: "LangGraph, multi-agent systems, MCP (Model Context Protocol) servers, tool calling / function calling, RAG, LLM APIs (OpenAI, Anthropic, Gemini)",
+    es: "LangGraph, sistemas multiagente, servidores MCP (Model Context Protocol), tool calling / function calling, RAG, APIs de LLM (OpenAI, Anthropic, Gemini)",
+  },
+};
+export const SKILL_LANGUAGES: SkillRow = {
   label: { en: "Languages", es: "Lenguajes" },
   value: { en: "TypeScript, JavaScript, Python, SQL", es: "TypeScript, JavaScript, Python, SQL" },
 };
-export const SKILL_DATA_CLOUD = {
-  label: { en: "Databases & Cloud", es: "BBDD y cloud" },
+export const SKILL_FRONTEND: SkillRow = {
+  label: { en: "Frontend", es: "Frontend" },
+  value: { en: "React, Next.js, Tailwind", es: "React, Next.js, Tailwind" },
+};
+export const SKILL_BACKEND: SkillRow = {
+  label: { en: "Backend", es: "Backend" },
+  value: { en: "Node.js, Express, REST, webhooks", es: "Node.js, Express, REST, webhooks" },
+};
+export const SKILL_DATA_CLOUD: SkillRow = {
+  label: { en: "Data/Cloud", es: "Datos/Cloud" },
   value: { en: "PostgreSQL, MongoDB, Supabase, AWS, Vercel, Netlify", es: "PostgreSQL, MongoDB, Supabase, AWS, Vercel, Netlify" },
 };
-export const SKILL_PRACTICES = {
+export const SKILL_AUTOMATION: SkillRow = {
+  label: { en: "Automation", es: "Automatización" },
+  value: { en: "n8n, Google Workspace APIs, Meta APIs", es: "n8n, APIs de Google Workspace y Meta" },
+};
+export const SKILL_PRACTICES: SkillRow = {
   label: { en: "Practices", es: "Prácticas" },
+  value: { en: "Git, Git Flow, CI/CD, Scrum, code review", es: "Git, Git Flow, CI/CD, Scrum, code review" },
+};
+/** FDE leads with client-facing delivery. */
+export const SKILL_DELIVERY: SkillRow = {
+  label: { en: "Client delivery", es: "Entrega a clientes" },
   value: {
-    en: "Git, Git Flow, code review, CI/CD, Scrum, clean code",
-    es: "Git, Git Flow, code review, CI/CD, Scrum, clean code",
+    en: "requirements gathering, handover documentation, user training, working with non-technical users",
+    es: "relevamiento, documentación de entrega, capacitación y trabajo con usuarios no técnicos",
+  },
+};
+
+/** Low-prominence closing keywords, same on every variant. */
+export const SKILL_EXTRA: SkillRow = {
+  label: { en: "Also", es: "Además" },
+  value: {
+    en: "Vector search / embeddings (working knowledge) · SQL · ISO 9001 and ISO 27001 (university coursework) · Cybersecurity (university coursework) · Data analytics · Logical thinking",
+    es: "Búsqueda vectorial / embeddings (conocimiento) · SQL · ISO 9001 e ISO 27001 (formación universitaria) · Ciberseguridad (formación universitaria) · Data analytics · Pensamiento lógico",
   },
 };

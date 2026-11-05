@@ -1,7 +1,7 @@
+import { Fragment } from "react";
 import { CvSection, type ResolvedCv } from "@/content/cv";
 import { CvBar } from "./CvBar";
 import { CvCosmos } from "./CvCosmos";
-import { cvFontClassName } from "./fonts";
 import { riseStyle } from "./motion";
 import "./cv.css";
 
@@ -15,49 +15,50 @@ function SectionBody({ cv, section }: { cv: ResolvedCv; section: CvSection }) {
       return <p className="cv-summary">{cv.summary}</p>;
     case CvSection.Skills:
       return (
-        <dl className="cv-skills">
-          {cv.skills.map((row) => (
-            <div key={row.label} className="cv-skills__row">
-              <dt>{row.label}</dt>
-              <dd>{row.value}</dd>
-            </div>
-          ))}
-        </dl>
+        <div className="cv-stack">
+          <p>
+            {cv.skills.map((row, index) => (
+              <Fragment key={row.label}>
+                {index > 0 ? " · " : null}
+                <strong>{row.label}:</strong> {row.value}
+              </Fragment>
+            ))}
+          </p>
+          <p>
+            <strong>{cv.skillsExtra.label}:</strong> {cv.skillsExtra.value}
+          </p>
+        </div>
       );
     case CvSection.Experience:
       return (
         <ol className="cv-list">
           {cv.experience.map((entry) => (
             <li key={`${entry.org}-${entry.role}`} className="cv-entry">
-              <div className="cv-entry__head">
-                <h3>
-                  {entry.role} <span className="cv-entry__org">— {entry.org}</span>
-                </h3>
-                <p className="cv-entry__meta">{entry.meta}</p>
-              </div>
-              <ul className="cv-bullets">
-                {entry.bullets.map((bullet) => (
-                  <li key={bullet}>{bullet}</li>
-                ))}
-              </ul>
+              <h3>
+                {entry.role} - {entry.org}
+                <span className="cv-entry__meta"> | {entry.meta}</span>
+              </h3>
+              {entry.bullets.length > 0 ? (
+                <ul className="cv-bullets">
+                  {entry.bullets.map((bullet) => (
+                    <li key={bullet}>{bullet}</li>
+                  ))}
+                </ul>
+              ) : null}
             </li>
           ))}
         </ol>
       );
     case CvSection.Projects:
       return (
-        <ul className="cv-list">
+        <ul className="cv-list cv-projects">
           {cv.projects.map((project) => (
-            <li key={project.name} className="cv-entry cv-entry--compact">
-              <h3>{project.name}</h3>
+            <li key={project.name} className="cv-project">
               <p>
+                <strong>{project.name}</strong>
+                {project.qualifier ? ` (${project.qualifier})` : ""}
+                <span className="cv-project__sep"> - </span>
                 {project.detail}
-                {project.href ? (
-                  <>
-                    {" "}
-                    <a href={project.href}>{project.href.replace(/^https:\/\//, "")}</a>
-                  </>
-                ) : null}
               </p>
             </li>
           ))}
@@ -65,42 +66,36 @@ function SectionBody({ cv, section }: { cv: ResolvedCv; section: CvSection }) {
       );
     case CvSection.Education:
       return (
-        <ul className="cv-list">
+        <div className="cv-edu">
           {cv.education.map((entry) => (
-            <li key={entry.institution} className="cv-entry cv-entry--compact">
-              <div className="cv-entry__head">
-                <h3>
-                  {entry.degree} <span className="cv-entry__org">— {entry.institution}</span>
-                </h3>
-                <p className="cv-entry__meta">{entry.period}</p>
-              </div>
-            </li>
+            <p key={entry.institution} className="cv-edu__degree">
+              {entry.degree}, {entry.institution} ({entry.period})
+            </p>
           ))}
-        </ul>
+          {cv.certifications.map((group) => (
+            <p key={group.school} className="cv-edu__certs">
+              {group.school}: {group.items}
+            </p>
+          ))}
+          <p className="cv-edu__langs">
+            <strong>{cv.sectionTitles[CvSection.Languages]}:</strong> {cv.languages}
+          </p>
+        </div>
       );
     case CvSection.Certifications:
-      return (
-        <ul className="cv-certs">
-          {cv.certifications.map((cert) => (
-            <li key={cert.name}>
-              <span className="cv-certs__name">{cert.name}</span> · {cert.school} · <span className="cv-certs__period">{cert.period}</span>
-            </li>
-          ))}
-        </ul>
-      );
     case CvSection.Languages:
-      return <p>{cv.languages}</p>;
+      return null;
   }
 }
 
 /**
  * The résumé itself: real text and semantic headings. On screen it wears the
- * portfolio's night-sky look (cv.css, `@media screen`); on paper it is a clean
- * light A4 document (`@media print`).
+ * portfolio's night-sky look (cv.css, `@media screen`); on paper it is the
+ * approved one-page A4 layout (`@media print`) the PDFs are rendered from.
  */
 export function CvDocument({ cv }: { cv: ResolvedCv }) {
   return (
-    <div className={`cv-root ${cvFontClassName}`} lang={cv.locale} data-cv-variant={cv.variant}>
+    <div className="cv-root" lang={cv.locale} data-cv-variant={cv.variant}>
       <CvCosmos />
       <main id="main-content" className="cv-sheet" tabIndex={-1}>
         <CvBar locale={cv.locale} variant={cv.variant} />
@@ -108,7 +103,9 @@ export function CvDocument({ cv }: { cv: ResolvedCv }) {
           <header className="cv-head cv-rise" style={riseStyle(1)}>
             <h1>{cv.name}</h1>
             <p className="cv-head__headline">{cv.headline}</p>
-            <p className="cv-head__location">{cv.location}</p>
+            <p className="cv-head__location">
+              {cv.location} · <a href={`mailto:${cv.email}`}>{cv.email}</a>
+            </p>
             <ul className="cv-head__contacts">
               {cv.contacts.map((contact) => (
                 <li key={contact.href}>

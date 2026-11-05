@@ -2,7 +2,6 @@ import { CV_NAME, CV_VARIANTS, cvHeadline, cvLabel, cvPdfFile, cvPdfPath, type C
 import { CV_UI, cvDownloadLabel } from "@/content/cv/ui";
 import { CvBar } from "./CvBar";
 import { CvCosmos } from "./CvCosmos";
-import { cvFontClassName } from "./fonts";
 import { riseStyle } from "./motion";
 import "./cv.css";
 
@@ -13,7 +12,7 @@ import "./cv.css";
  */
 export function CvIndex({ locale }: { locale: CvLocale }) {
   return (
-    <div className={`cv-root ${cvFontClassName}`} lang={locale}>
+    <div className="cv-root" lang={locale}>
       <CvCosmos />
       <main id="main-content" className="cv-index" tabIndex={-1}>
         <CvBar locale={locale} />

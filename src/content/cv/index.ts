@@ -1,4 +1,4 @@
-import { CV_CONTACTS, CV_LOCATION, CV_NAME, EDUCATION, LANGUAGES, SECTION_TITLES } from "./facts";
+import { CV_CONTACTS, CV_EMAIL, CV_LOCATION, CV_NAME, EDUCATION, LANGUAGES, SECTION_TITLES, SKILL_EXTRA } from "./facts";
 import { CvSection, type CvLocale, type CvVariant, type ResolvedCv } from "./types";
 import { CV_DEFINITIONS } from "./variants";
 
@@ -27,31 +27,32 @@ export function getCv(variant: CvVariant, locale: CvLocale): ResolvedCv {
     label: def.label[locale],
     headline: def.headline[locale],
     location: CV_LOCATION[locale],
+    email: CV_EMAIL,
     contacts: CV_CONTACTS,
     summary: def.summary[locale],
     sections: def.sections,
     sectionTitles,
     skills: def.skills.map((row) => ({ label: row.label[locale], value: row.value[locale] })),
+    skillsExtra: { label: SKILL_EXTRA.label[locale], value: SKILL_EXTRA.value[locale] },
     experience: def.experience.map((entry) => ({
       role: entry.role[locale],
       org: entry.org[locale],
-      meta: entry.place ? `${entry.period[locale]} · ${entry.place[locale]}` : entry.period[locale],
+      meta: entry.place ? `${entry.place[locale]} · ${entry.period[locale]}` : entry.period[locale],
       bullets: entry.bullets.map((bullet) => bullet[locale]),
     })),
     projects: def.projects.map((project) => ({
       name: project.name[locale],
+      qualifier: project.qualifier?.[locale],
       detail: project.detail[locale],
-      href: project.href,
     })),
     education: EDUCATION.map((entry) => ({
       institution: entry.institution,
       degree: entry.degree[locale],
       period: entry.period[locale],
     })),
-    certifications: def.certifications.map((cert) => ({
-      school: cert.school,
-      name: cert.name[locale],
-      period: cert.period[locale],
+    certifications: def.certifications.map((group) => ({
+      school: group.school,
+      items: group.items[locale],
     })),
     languages: LANGUAGES[locale],
   };
