@@ -24,6 +24,8 @@ function alternates(pathFor: (locale: CvLocale) => string, locale: CvLocale): Me
       es: pathFor(CvLocale.Es),
       "x-default": pathFor(CvLocale.En),
     },
+    // Markdown twin served by /api/md (see src/middleware.ts)
+    types: { "text/markdown": `${pathFor(locale)}.md` },
   };
 }
 
