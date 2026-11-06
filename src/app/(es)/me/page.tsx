@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   title: "Francisco Perez — AI Engineer",
   description:
     "Francisco Perez, AI engineer and full-stack developer from Tucumán, Argentina. Multi-agent systems, RAG pipelines and automations shipped to production.",
-  alternates: { canonical: "/me" },
+  alternates: { canonical: "/me", types: { "text/markdown": "/me.md" } },
   openGraph: {
     title: "Francisco Perez — AI Engineer",
     description: "AI agents that do real work. Multi-agent systems, RAG and automation from Tucumán, Argentina.",

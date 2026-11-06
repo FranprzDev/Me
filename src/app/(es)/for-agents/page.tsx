@@ -6,7 +6,7 @@ import "./for-agents.css";
 export const metadata: Metadata = {
   title: "For AI agents (MCP) | Francisco Perez",
   description: "Open ChatGPT or Claude with a ready prompt that reads Francisco Perez's portfolio and its public, read-only MCP server.",
-  alternates: { canonical: "/for-agents" },
+  alternates: { canonical: "/for-agents", types: { "text/markdown": "/for-agents.md" } },
   openGraph: {
     title: "For AI agents (MCP) | Francisco Perez",
     description: "A public, read-only MCP server with Francisco Perez's portfolio data: profile, experience, CV versions, projects and contact.",

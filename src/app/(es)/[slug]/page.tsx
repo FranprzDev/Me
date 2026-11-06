@@ -22,7 +22,7 @@ export async function generateMetadata({
   return {
     title: `${p.name} — Francisco Miguel Perez`,
     description: p.description.es,
-    alternates: { canonical: `/${slug}` },
+    alternates: { canonical: `/${slug}`, types: { "text/markdown": `/${slug}.md` } },
     openGraph: {
       title: `${p.name} — Francisco Perez`,
       description: p.description.es,

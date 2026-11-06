@@ -5,7 +5,7 @@ import { SITE_OPEN_GRAPH, SITE_OG_IMAGE } from "@/lib/seo";
 import { homeStructuredData } from "@/lib/structuredData";
 
 export const metadata: Metadata = {
-  alternates: { canonical: "/" },
+  alternates: { canonical: "/", types: { "text/markdown": "/index.md" } },
   openGraph: { ...SITE_OPEN_GRAPH, url: "/", images: [SITE_OG_IMAGE] },
 };
 
