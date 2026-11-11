@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { CSSProperties } from "react";
 import localFont from "next/font/local";
+import Script from "next/script";
 import { I18nProvider } from "@/lib/i18n";
 import { ScrollProvider } from "@/lib/scroll";
 import { SiteChrome } from "@/components/SiteChrome";
@@ -73,6 +74,7 @@ export function RootShell({
       style={headingVars}
     >
       <body className="min-h-full">
+        <Script src="/_vercel/insights/script.js" strategy="afterInteractive" />
         <I18nProvider>
           <ScrollProvider>
             <SiteChrome />
