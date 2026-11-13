@@ -570,7 +570,8 @@ async function main() {
       }
       assert.equal(await page.locator(".aula-book h3", { hasText: "platzi-hydratation-demo" }).count(), 1, "Platzi demo entry");
       await page.goto(`${baseURL}/projects`);
-      assert.equal(await page.locator(".atlas-row").count(), 13);
+      assert.equal(await page.locator(".atlas-row").count(), 12);
+      assert.equal(await page.getByText("PDV-Basic", { exact: true }).count(), 0, "Removed project stays out of the catalogue");
       assert.equal(await page.locator(".atlas-specs, .atlas-category").count(), 0, "Projects page is one short catalogue");
       const projectYears = await page.locator(".atlas-row__year").allTextContents();
       assert.deepEqual(projectYears, [...projectYears].sort((a, b) => Number(b.slice(0, 4)) - Number(a.slice(0, 4))), "Projects run newest to oldest");
