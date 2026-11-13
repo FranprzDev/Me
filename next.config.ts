@@ -19,6 +19,10 @@ const nextConfig: NextConfig = {
   // prerender -> "Expected workStore to be initialized". Forzar la raíz al
   // proyecto evita ese cruce.
   outputFileTracingRoot: path.resolve(__dirname),
+  images: {
+    // YouTube thumbnails for the mission-video facades on project pages.
+    remotePatterns: [{ protocol: "https", hostname: "i.ytimg.com" }],
+  },
   // Renamed world routes: old links keep working (308, permanent).
   async redirects() {
     return [
