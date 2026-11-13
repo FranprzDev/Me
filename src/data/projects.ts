@@ -97,6 +97,7 @@ const DETAILS: Record<string, ProjectDetail> = {
         year: "2026",
         link: "https://proofyai.vercel.app",
         extraLinks: ["https://github.com/FranprzDev/Proofy", "https://colosseum.com/arena/projects/proofy-1"],
+        video: "https://www.youtube.com/watch?v=XOkaruNivJk",
       },
       {
         name: "Contar con Datos 2026 — UdeSA × SSCyT Tucumán",

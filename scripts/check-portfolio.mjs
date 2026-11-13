@@ -556,6 +556,13 @@ async function main() {
         "Proofy — Superteam Argentina × Colosseum (Solana)",
         "Contar con Datos 2026 — UdeSA × SSCyT Tucumán",
       ], "Hackathon entries in chronological order");
+      const proofyVideo = page.getByRole("button", { name: "Reproducir video: Proofy — Superteam Argentina × Colosseum (Solana)" });
+      assert.equal(await proofyVideo.count(), 1, "Proofy demo video facade");
+      assert.equal(await page.locator('.mission__video iframe[title="Proofy — Superteam Argentina × Colosseum (Solana)"]').count(), 0, "Proofy player stays unloaded before click");
+      await proofyVideo.click();
+      const proofyPlayer = page.locator('.mission__video iframe[title="Proofy — Superteam Argentina × Colosseum (Solana)"]');
+      await proofyPlayer.waitFor({ state: "attached" });
+      assert.match(await proofyPlayer.getAttribute("src"), /youtube-nocookie\.com\/embed\/XOkaruNivJk\?autoplay=1/, "Proofy player uses the requested demo video");
       await page.goto(`${baseURL}/teaching`);
       assert.equal(await page.locator("h1").textContent(), "Cursos dictados");
       for (const gone of ["ENSEÑAR · ACOMPAÑAR · COMPARTIR", "Espacios de formación práctica", "El aula sigue abierta"]) {
