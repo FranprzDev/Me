@@ -248,21 +248,6 @@ const DETAILS: Record<string, ProjectDetail> = {
         category: { es: "Developer Tools", en: "Developer Tools" },
       },
       {
-        name: "PDV-Basic",
-        description: {
-          es: "Punto de venta en español rioplatense para comercios de barrio: escáner de códigos de barras, atajos de teclado para vender rápido, stock que se descuenta en la misma transacción atómica que la venta y el pago, fiado con límite por cliente e impresora térmica con protocolo ESC/POS propio, sin librerías. Basado en FinOpenPOS (MIT), rehecho para el mercado argentino.",
-          en: "Point of sale in rioplatense Spanish for neighborhood stores: barcode scanning, keyboard shortcuts for fast selling, stock decremented in the same atomic transaction as the sale and payment, store credit with per-customer limits and a thermal printer speaking its own ESC/POS protocol, no libraries. Based on FinOpenPOS (MIT), reworked for the Argentine market.",
-        },
-        year: "2026",
-        link: "https://github.com/FranprzDev/PDV-Basic",
-        pitch: {
-          es: "Punto de venta para comercios de barrio: escáner, fiado con límite por cliente e impresora térmica ESC/POS propia.",
-          en: "Point of sale for neighborhood stores: scanner, store credit with per-customer limits and a custom ESC/POS thermal printer.",
-        },
-        stack: ["TypeScript", "Retail"],
-        category: { es: "Productos Web", en: "Web Products" },
-      },
-      {
         name: "apuntes-cli",
         description: {
           es: "CLI y servidor MCP para buscar en mis apuntes de la carrera (FranNotes) y generar FAQs y apuntes finales compactos por materia.",
