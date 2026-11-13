@@ -3,7 +3,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import { chromium, devices } from "playwright";
 import AxeBuilder from "@axe-core/playwright";
 import { privateClientLeaks, privateClientMentions, privateClientPdfLeaks } from "./client-privacy.mjs";
-import { CV_LOCALES, CV_VARIANTS, MANIFEST, PDF_DIR, cvPdfFile, cvRoute, cvSourceHash, pdfPageCount, pdfVersion } from "./cv-pdf-shared.mjs";
+import { CV_LOCALES, CV_VARIANTS, MANIFEST, PDF_DIR, cvDriveDownloadUrl, cvPdfFile, cvRoute, cvSourceHash, pdfPageCount, pdfVersion } from "./cv-pdf-shared.mjs";
 
 const baseURL = process.env.PORTFOLIO_URL || "http://localhost:3000";
 const output = `artifacts/portfolio-quality/${process.env.HEADFUL === "1" ? "headful" : "headless"}`;
@@ -79,6 +79,8 @@ async function checkCvPages(browser) {
     const file = cvPdfFile(variant, locale);
     return `/cv/files/${file}?v=${versions.get(file)}`;
   };
+  /** Where a version's PDF downloads from: the public Drive copy when there is one, else the committed versioned PDF. */
+  const expectedCvDownload = (variant, locale) => cvDriveDownloadUrl(variant, locale) ?? versionedPdf(variant, locale);
   // Versioned URLs are content-addressed and cached for good; a bare URL always revalidates.
   {
     const file = cvPdfFile(CV_VARIANTS[0], "en");
@@ -140,12 +142,18 @@ async function checkCvPages(browser) {
       assert.equal(await toggle.getAttribute("href"), locale === "es" ? enRoute : `/es${enRoute}`, `${route}: EN/ES toggle`);
       if (variant) {
         const pdf = await page.locator("a[data-cv-pdf]").getAttribute("href");
-        assert.equal(pdf, versionedPdf(variant, locale), `${route}: PDF button links the current manifest version`);
-        assert.equal(await page.locator("a[data-cv-pdf]").getAttribute("download"), cvPdfFile(variant, locale), `${route}: clean download filename`);
-        const file = await page.request.get(`${baseURL}${pdf}`);
-        assert.equal(file.status(), 200, `${route}: PDF ${pdf}`);
-        assert.match(file.headers()["content-type"], /pdf/);
-        assert.equal((await file.body()).subarray(0, 4).toString(), "%PDF");
+        const expected = expectedCvDownload(variant, locale);
+        assert.equal(pdf, expected, `${route}: PDF button links the current CV download`);
+        if (expected.startsWith("https://")) {
+          // Drive serves the file with its own attachment name; a cross-origin download attribute is ignored.
+          assert.equal(await page.locator("a[data-cv-pdf]").getAttribute("download"), null, `${route}: Drive PDF button keeps no download name`);
+        } else {
+          assert.equal(await page.locator("a[data-cv-pdf]").getAttribute("download"), cvPdfFile(variant, locale), `${route}: clean download filename`);
+          const file = await page.request.get(`${baseURL}${pdf}`);
+          assert.equal(file.status(), 200, `${route}: PDF ${pdf}`);
+          assert.match(file.headers()["content-type"], /pdf/);
+          assert.equal((await file.body()).subarray(0, 4).toString(), "%PDF");
+        }
         assert.equal(await page.locator(".cv-section h2").count(), 5, `${route}: résumé sections`);
         assert.equal(await page.locator(`.cv-bar__versions a[aria-current='page']`).getAttribute("href"), route);
         await page.emulateMedia({ media: "print" });
@@ -176,12 +184,12 @@ async function checkCvPages(browser) {
         );
         assert.deepEqual(
           cards.map(({ href }) => href),
-          CV_VARIANTS.map((variant) => versionedPdf(variant, locale)),
-          `${route}: cards link to the current manifest version of each PDF`,
+          CV_VARIANTS.map((variant) => expectedCvDownload(variant, locale)),
+          `${route}: cards link to the current download of each version`,
         );
         for (const card of cards) {
           assert.equal(card.tag, "A", `${route}: card is a link`);
-          assert.equal(card.download, true, `${route}: card downloads`);
+          assert.equal(card.download, !card.href.startsWith("https://"), `${route}: committed-PDF cards carry a download name, Drive cards download from Drive`);
           assert.match(card.label, locale === "es" ? /^Descargar el CV .+ \(PDF\)$/ : /^Download .+ CV \(PDF\)$/, `${route}: card label`);
           assert.equal(card.inner, 0, `${route}: no nested links or buttons in a card`);
         }
@@ -347,16 +355,23 @@ async function assertExperienceTrail(page, name, reduced) {
 }
 
 /**
- * The hero CV button downloads the generated Applied AI PDF in the page
- * language, at its current manifest version (never the retired hand-committed file).
+ * The hero CV button downloads the Applied AI CV in the page language: from
+ * its always-public Drive copy when there is one, else the generated PDF at
+ * its current manifest version (never the retired hand-committed file).
  */
 async function assertHeroCvLink(page, locale) {
+  const link = page.locator("#top [data-hero-cv]");
+  assert.equal(await link.count(), 1, "Hero has one CV download link");
+  const drive = cvDriveDownloadUrl("applied-ai", locale);
+  if (drive) {
+    assert.equal(await link.getAttribute("href"), drive, `Hero CV (${locale}) links the public Drive copy`);
+    assert.equal(await link.getAttribute("download"), null, `Hero CV (${locale}) downloads from Drive under its own file name`);
+    return;
+  }
   const manifest = JSON.parse(await readFile(MANIFEST, "utf8"));
   const file = cvPdfFile("applied-ai", locale);
   const entry = manifest.files.find((item) => item.file === file);
   assert.ok(entry, `${file}: listed in the manifest`);
-  const link = page.locator("#top [data-hero-cv]");
-  assert.equal(await link.count(), 1, "Hero has one CV download link");
   assert.equal(await link.getAttribute("href"), `/cv/files/${file}?v=${entry.version}`, `Hero CV (${locale}) links the current manifest version`);
   assert.equal(await link.getAttribute("download"), file, `Hero CV (${locale}) downloads under a clean file name`);
 }
@@ -534,10 +549,11 @@ async function main() {
       assert.equal(await heading.count(), 1, "Contact always has a semantic heading");
       if (options.isMobile) assert.equal(await page.locator("#contact .contact-title-stars svg").evaluate((el) => el.getBoundingClientRect().width > 100), true, "Contact shows the star title on phones");
       else if (fallback) assert.equal(await heading.evaluate((el) => el.getBoundingClientRect().width > 100), true, "Contact has a visible DOM heading without the 3D title");
-      const download = await page.locator("a[download]").getAttribute("href");
-      const cv = await page.request.get(`${baseURL}${download}`);
+      const download = await page.locator("[data-hero-cv]").getAttribute("href");
+      const cv = await page.request.get(download.startsWith("https://") ? download : `${baseURL}${download}`);
       assert.equal(cv.status(), 200);
-      assert.match(cv.headers()["content-type"], /pdf/);
+      if (download.startsWith("https://")) assert.match(cv.headers()["content-disposition"] ?? "", /attachment/i, "Drive serves the CV as an attachment");
+      else assert.match(cv.headers()["content-type"], /pdf/);
       assert.equal((await cv.body()).subarray(0, 4).toString(), "%PDF");
       await page.goto(`${baseURL}/hackathons`);
       assert.equal(await page.locator("h1").textContent(), "Ideas contra el reloj.");

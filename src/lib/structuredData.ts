@@ -15,6 +15,7 @@ export const HERO_ROLE = "AI Applied Engineer";
 export function homeStructuredData() {
   const site = absoluteUrl("/");
   const personId = `${site}#person`;
+  const primaryCv = primaryCvPdfPath(CvLocale.En);
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -44,7 +45,7 @@ export function homeStructuredData() {
         subjectOf: {
           "@type": "DigitalDocument",
           name: "CV (PDF)",
-          url: absoluteUrl(primaryCvPdfPath(CvLocale.En)),
+          url: primaryCv.startsWith("https://") ? primaryCv : absoluteUrl(primaryCv),
         },
       },
       {

@@ -50,7 +50,7 @@ export function Hero() {
             <Magnetic strength={0.3}>
               <a
                 href={primaryCvPdfPath(cvLocale)}
-                download={primaryCvPdfFile(cvLocale)}
+                download={primaryCvPdfFile(cvLocale) ?? undefined}
                 className="hero-console-btn btn-theme-cv"
                 data-hero-cv=""
               >

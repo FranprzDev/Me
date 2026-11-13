@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { privateClientMentions } from "./client-privacy.mjs";
+import { cvDriveDownloadUrl } from "./cv-pdf-shared.mjs";
 
 /**
  * Agent-facing surface: the home links to /for-agents, the old recruiter page
@@ -86,17 +87,29 @@ function assertVersionedPdfUrl(url, id, language) {
   assert.equal(parsed.searchParams.get("v"), entry.version, `${id} (${language}) pdf_url carries the manifest version`);
 }
 
+/** A version's pdf_url is its public Drive copy when there is one, else the committed PDF at its current manifest version. */
+function assertCvPdfUrl(url, id, language) {
+  const drive = cvDriveDownloadUrl(id, language);
+  if (drive) {
+    assert.equal(url, drive, `${id} (${language}) pdf_url is the public Drive copy`);
+    return;
+  }
+  assertVersionedPdfUrl(url, id, language);
+}
+
 async function assertPdf(url) {
   const response = await fetch(url);
   assert.equal(response.status, 200, `${url} answers 200`);
-  assert.match(response.headers.get("content-type") ?? "", /^application\/pdf/, `${url} is a PDF`);
-  await response.arrayBuffer();
+  const body = new Uint8Array(await response.arrayBuffer());
+  const type = response.headers.get("content-type") ?? "";
+  const looksPdf = body.length > 4 && body[0] === 0x25 && body[1] === 0x50 && body[2] === 0x44 && body[3] === 0x46;
+  assert.ok(/^application\/pdf/.test(type) || looksPdf, `${url} is a PDF`);
 }
 
 // The profile's CV link is the generated Applied AI PDF at its current manifest version.
 for (const language of ["en", "es"]) {
   const profile = JSON.parse((await rpc("tools/call", { name: "get_profile", arguments: { language } })).content[0].text);
-  assertVersionedPdfUrl(profile.links.cv_pdf, "applied-ai", language);
+  assertCvPdfUrl(profile.links.cv_pdf, "applied-ai", language);
   await assertPdf(profile.links.cv_pdf);
 }
 
@@ -115,7 +128,7 @@ for (const language of ["en", "es"]) {
     assert.equal(privateClientMentions(JSON.stringify(doc)), 0, `get_cv ${version.id} (${language}) names no private client`);
     assert.equal(doc.version.id, version.id, `get_cv returns ${version.id} (${language})`);
     assert.equal(doc.version.pdf_url, version.pdf_url);
-    assertVersionedPdfUrl(doc.version.pdf_url, version.id, language);
+    assertCvPdfUrl(doc.version.pdf_url, version.id, language);
     assert.ok(doc.sections.length > 0 && doc.sections.every((section) => section.title), `${version.id} (${language}) has titled sections`);
     await assertPdf(doc.version.pdf_url);
   }
