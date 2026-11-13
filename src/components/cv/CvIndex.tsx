@@ -1,5 +1,6 @@
 import { CV_NAME, CV_VARIANTS, cvHeadline, cvLabel, cvPdfFile, cvPdfPath, type CvLocale } from "@/content/cv";
 import { CV_UI, cvDownloadLabel } from "@/content/cv/ui";
+import { cvDriveDownloadUrl } from "@/lib/cvDrive";
 import { CvBar } from "./CvBar";
 import { CvCosmos } from "./CvCosmos";
 import { riseStyle } from "./motion";
@@ -21,20 +22,24 @@ export function CvIndex({ locale }: { locale: CvLocale }) {
           <h1>{CV_UI.indexTitle[locale]}</h1>
         </header>
         <ul className="cv-index__list">
-          {CV_VARIANTS.map((variant, index) => (
-            <li key={variant} className="cv-index__item cv-rise" style={riseStyle(index + 2)}>
-              <a
-                href={cvPdfPath(variant, locale)}
-                className="cv-card"
-                download={cvPdfFile(variant, locale)}
-                data-cv-card-pdf
-                aria-label={cvDownloadLabel(cvLabel(variant, locale), locale)}
-              >
-                <h2 className="cv-card__title">{cvLabel(variant, locale)}</h2>
-                <p className="cv-card__headline">{cvHeadline(variant, locale)}</p>
-              </a>
-            </li>
-          ))}
+          {CV_VARIANTS.map((variant, index) => {
+            // Versions with a public Drive copy download from Drive; the rest use the committed PDF.
+            const driveUrl = cvDriveDownloadUrl(variant, locale);
+            return (
+              <li key={variant} className="cv-index__item cv-rise" style={riseStyle(index + 2)}>
+                <a
+                  href={driveUrl ?? cvPdfPath(variant, locale)}
+                  className="cv-card"
+                  download={driveUrl === null ? cvPdfFile(variant, locale) : undefined}
+                  data-cv-card-pdf
+                  aria-label={cvDownloadLabel(cvLabel(variant, locale), locale)}
+                >
+                  <h2 className="cv-card__title">{cvLabel(variant, locale)}</h2>
+                  <p className="cv-card__headline">{cvHeadline(variant, locale)}</p>
+                </a>
+              </li>
+            );
+          })}
         </ul>
       </main>
     </div>

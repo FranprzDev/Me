@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CV_VARIANTS, CvLocale, cvIndexPath, cvLabel, cvPath, cvPdfFile, cvPdfPath, type CvVariant } from "@/content/cv";
+import { cvDriveDownloadUrl } from "@/lib/cvDrive";
 import { CV_UI } from "@/content/cv/ui";
 import { riseStyle } from "./motion";
 
@@ -30,6 +31,8 @@ function RocketIcon() {
  * nav. Hidden in print.
  */
 export function CvBar({ locale, variant }: CvBarProps) {
+  // Versions with a public Drive copy download from Drive; the rest use the committed PDF.
+  const driveUrl = variant ? cvDriveDownloadUrl(variant, locale) : null;
   return (
     <div className="cv-bar cv-rise" style={riseStyle(0)}>
       <div className="cv-bar__top">
@@ -40,7 +43,12 @@ export function CvBar({ locale, variant }: CvBarProps) {
           <span>{CV_UI.backHome[locale]}</span>
         </Link>
         {variant ? (
-          <a href={cvPdfPath(variant, locale)} className="cv-bar__pdf" download={cvPdfFile(variant, locale)} data-cv-pdf>
+          <a
+            href={driveUrl ?? cvPdfPath(variant, locale)}
+            className="cv-bar__pdf"
+            download={driveUrl === null ? cvPdfFile(variant, locale) : undefined}
+            data-cv-pdf
+          >
             <span className="cv-bar__pdf-badge" aria-hidden="true">
               {CV_UI.pdfBadge[locale]}
             </span>

@@ -5,13 +5,13 @@ import {
   CvVariant,
   cvHeadline,
   cvPath,
-  cvPdfPath,
   getCv,
   type ResolvedCv,
 } from "@/content/cv";
 import { EDUCATION } from "@/content/cv/facts";
 import { CV_UI } from "@/content/cv/ui";
 import { PRIMARY_CV_VARIANT, primaryCvPdfPath } from "@/lib/primaryCv";
+import { cvDownloadUrl } from "@/lib/cvDrive";
 import { CV, type Lang } from "@/data/cv";
 import { PROJECTS, type Project } from "@/data/projects";
 
@@ -43,6 +43,11 @@ function absolute(origin: string, path: string) {
   return new URL(path, origin).toString();
 }
 
+/** External URLs (the public Drive CV copies) stay as they are; site paths resolve against the origin. */
+function absoluteResource(origin: string, url: string) {
+  return url.startsWith("https://") ? url : absolute(origin, url);
+}
+
 /** Separator between the role and the focus areas in a CV headline. */
 const HEADLINE_SEPARATOR = " | ";
 
@@ -65,7 +70,7 @@ export function profile(language: Language, origin: string) {
     highlights: CV.highlights.map((item) => ({ title: item.title, year: item.year, detail: item.detail[l] })),
     links: {
       site: absolute(origin, "/"),
-      cv_pdf: absolute(origin, primaryCvPdfPath(cvLocale(language))),
+      cv_pdf: absoluteResource(origin, primaryCvPdfPath(cvLocale(language))),
       github: CV.github,
       linkedin: CV.linkedin,
     },
@@ -180,7 +185,7 @@ function summarizeCvVersion(resolved: ResolvedCv, origin: string): CvVersionSumm
     name: resolved.label,
     headline: resolved.headline,
     page_url: absolute(origin, cvPath(resolved.variant, resolved.locale)),
-    pdf_url: absolute(origin, cvPdfPath(resolved.variant, resolved.locale)),
+    pdf_url: absoluteResource(origin, cvDownloadUrl(resolved.variant, resolved.locale)),
   };
 }
 
