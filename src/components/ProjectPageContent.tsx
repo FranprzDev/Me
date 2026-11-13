@@ -2,6 +2,8 @@
 
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
+import { useState } from "react";
 import { CV } from "@/data/cv";
 import { PROJECTS, type Project, type ProjectItem } from "@/data/projects";
 import { useI18n } from "@/lib/i18n";
@@ -40,6 +42,11 @@ function byYear(items: ProjectItem[]) {
   return [...items].sort((a, b) => startYear(a) - startYear(b));
 }
 
+/** Newest first; ties keep the data order. */
+function byYearDesc(items: ProjectItem[]) {
+  return [...items].sort((a, b) => startYear(b) - startYear(a));
+}
+
 /** Stable DOM id for an index entry, derived from the entry name. */
 function nodeId(prefix: string, name: string) {
   return `${prefix}-${name.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
@@ -73,11 +80,59 @@ function StoryBack() {
   );
 }
 
+/**
+ * YouTube facade inside a mission card: thumbnail + play button, and the real
+ * player loads only on click (lighter first paint; YouTube's own markup stays
+ * out of the accessibility tree until requested). Non-YouTube URLs render null.
+ */
+function MissionVideo({ url, title }: { url: string; title: string }) {
+  const { tl } = useI18n();
+  const [playing, setPlaying] = useState(false);
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{6,})/);
+  if (!match) return null;
+  const id = match[1];
+  return (
+    <div className="mission__video">
+      {playing ? (
+        <iframe
+          src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1`}
+          title={title}
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen
+        />
+      ) : (
+        <button
+          type="button"
+          className="mission__video-facade"
+          onClick={() => setPlaying(true)}
+          aria-label={tl({ es: `Reproducir video: ${title}`, en: `Play video: ${title}` })}
+        >
+          <Image
+            src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`}
+            alt=""
+            fill
+            sizes="(max-width: 760px) 100vw, 620px"
+            style={{ objectFit: "cover", opacity: 0.85 }}
+          />
+          <span className="mission__video-play" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+              <path d="M8 5.5v13l11-6.5z" />
+            </svg>
+          </span>
+        </button>
+      )}
+    </div>
+  );
+}
+
 function ExternalLink({ href }: { href: string }) {
   const { tl } = useI18n();
   const isRepo = href.includes("github.com");
   const isColosseum = href.includes("colosseum.com");
   const isNpm = href.includes("npmjs.com");
+  const isPress = href.includes("cac.com.ar");
   return (
     <a className="story-link" href={href} target="_blank" rel="noreferrer">
       {isRepo
@@ -86,7 +141,9 @@ function ExternalLink({ href }: { href: string }) {
           ? tl({ es: "Ver en Colosseum", en: "View on Colosseum" })
           : isNpm
             ? tl({ es: "Ver en npm", en: "View on npm" })
-            : tl({ es: "Ver en vivo", en: "View live" })}{" "}↗
+            : isPress
+              ? tl({ es: "Nota de prensa", en: "Press coverage" })
+              : tl({ es: "Ver en vivo", en: "View live" })}{" "}↗
     </a>
   );
 }
@@ -336,6 +393,7 @@ function HackathonJourney({ project }: { project: Project }) {
             <h2 id="arena-trophy-title">{winner.name}</h2>
             <p>{tl(winner.description)}</p>
             {winner.link && <ExternalLink href={winner.link} />}
+            {winner.extraLinks?.map((href) => <ExternalLink key={href} href={href} />)}
           </div>
           <span className="arena-trophy__ribbon" aria-hidden="true">
             {tl({ es: "N°1 nacional", en: "N°1 national" })}
@@ -363,6 +421,7 @@ function HackathonJourney({ project }: { project: Project }) {
                 </div>
                 <h3>{item.name}</h3>
                 <p>{tl(item.description)}</p>
+                {item.video && <MissionVideo url={item.video} title={item.name} />}
                 {item.link && <ExternalLink href={item.link} />}
                 {item.extraLinks?.map((href) => <ExternalLink key={href} href={href} />)}
               </div>
@@ -615,8 +674,8 @@ function MentorshipJourney({ project }: { project: Project }) {
  */
 function ProjectAtlas({ project }: { project: Project }) {
   const { tl } = useI18n();
-  // One flat catalogue, oldest to newest: one line per project plus its tags.
-  const items = byYear(project.items ?? []);
+  // One flat catalogue, newest first: one line per project plus its tags.
+  const items = byYearDesc(project.items ?? []);
   const indexEntries: IndexEntry[] = items.map((item) => ({
     id: nodeId("atlas", item.name),
     label: item.name,

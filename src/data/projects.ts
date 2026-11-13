@@ -17,6 +17,8 @@ export interface ProjectItem {
   pitch?: Localized<string>;
   /** Stack tags taken from the item's own copy or repository metadata. */
   stack?: string[];
+  /** YouTube URL (watch or youtu.be) embedded lazily inside the entry. */
+  video?: string;
 }
 
 export interface Project {
@@ -55,6 +57,10 @@ const DETAILS: Record<string, ProjectDetail> = {
         },
         year: "2024",
         link: "https://github.com/FranprzDev/NASASpaceApp-Marshall-Arg",
+        extraLinks: [
+          "https://exogames.vercel.app",
+          "https://www.cac.com.ar/noticias/la-hackaton-nasa-space-apps-challenge-2024-ya-tiene-sus-ganadores-y-menciones",
+        ],
         highlight: { es: "Ganador Nacional", en: "National Winner" },
       },
       {
@@ -100,6 +106,7 @@ const DETAILS: Record<string, ProjectDetail> = {
         },
         year: "2026",
         link: "https://github.com/FranprzDev/donde-arde-argentina",
+        video: "https://youtu.be/MwW7YKrSNBU",
       },
     ],
   },
@@ -163,31 +170,123 @@ const DETAILS: Record<string, ProjectDetail> = {
     link: "https://github.com/FranprzDev?tab=repositories",
     items: [
       {
+        name: "vibe-latex",
+        description: {
+          es: "Plugin de Obsidian que convierte dictado en español en Markdown y LaTeX: narrás una resolución paso a paso y queda escrita con sus ecuaciones, sin dictar un solo comando. Corre local y gratis (whisper.cpp con un modelo local que el plugin instala solo) o contra la API de OpenAI, y la corrección por voz trabaja sobre la selección o toda la última sesión de dictado.",
+          en: "Obsidian plugin that turns Spanish dictation into Markdown and LaTeX: narrate a step-by-step solution and it lands written with its equations, without speaking a single command. Runs locally and free (whisper.cpp with a local model the plugin installs itself) or against the OpenAI API, and voice correction works over the selection or the whole last dictation session.",
+        },
+        year: "2026",
+        link: "https://github.com/FranprzDev/vibe-latex",
+        pitch: {
+          es: "Plugin de Obsidian: dictás en español y escribe la resolución en Markdown y LaTeX, local y gratis o con OpenAI.",
+          en: "Obsidian plugin: dictate in Spanish and it writes the solution in Markdown and LaTeX, local and free or via OpenAI.",
+        },
+        stack: ["TypeScript", "Obsidian", "whisper.cpp", "LLM"],
+        category: { es: "IA y Automatización", en: "AI & Automation" },
+      },
+      {
+        name: "ScopeProfit",
+        description: {
+          es: "Copiloto de alcance para freelancear, expuesto como servidor MCP: convierte la idea suelta de un cliente en un documento de alcance formal y versionado, con requisitos citados textualmente, preguntas bloqueantes, riesgos con semáforo y estimación en horas, exportable a Markdown, PDF y DOCX. Cualquier agente (ChatGPT, Claude, Cursor) lo maneja por MCP.",
+          en: "Scope copilot for freelancing, exposed as an MCP server: turns a client's loose idea into a formal, versioned scope document with verbatim-quoted requirements, blocking questions, traffic-light risks and an hour estimate, exportable to Markdown, PDF and DOCX. Any agent (ChatGPT, Claude, Cursor) drives it over MCP.",
+        },
+        year: "2026",
+        link: "https://github.com/FranprzDev/ScopeProfit",
+        extraLinks: ["https://scope-profit-web.vercel.app"],
+        pitch: {
+          es: "Servidor MCP que convierte la idea suelta de un cliente en un documento de alcance formal, con estimación en horas y export a PDF/DOCX.",
+          en: "MCP server that turns a client's loose idea into a formal scope document, with hour estimates and PDF/DOCX export.",
+        },
+        stack: ["NestJS", "MCP", "LangGraph", "PostgreSQL"],
+        category: { es: "IA y Automatización", en: "AI & Automation" },
+      },
+      {
+        name: "GeoArg",
+        description: {
+          es: "Servidor MCP de geodatos públicos de Argentina: descubre capas WFS, WMS y ArcGIS REST, consulta datos y geocodifica, con HTTP público y stdio local, solo lectura. Nació como GeoTucumán en la cursada de Sistemas de Información Geográfica.",
+          en: "MCP server for Argentina's public geodata: discovers WFS, WMS and ArcGIS REST layers, queries data and geocodes, over public HTTP and local stdio, read-only. Born as GeoTucumán during the GIS course.",
+        },
+        year: "2026",
+        link: "https://github.com/FranprzDev/geotucuman",
+        extraLinks: ["https://franprzdev.github.io/geotucuman/"],
+        pitch: {
+          es: "MCP de geodatos públicos de Argentina: descubre capas WFS/WMS/ArcGIS REST, consulta y geocodifica, solo lectura.",
+          en: "MCP for Argentina's public geodata: discovers WFS/WMS/ArcGIS REST layers, queries and geocodes, read-only.",
+        },
+        stack: ["TypeScript", "MCP", "GIS"],
+        category: { es: "IA y Automatización", en: "AI & Automation" },
+      },
+      {
+        name: "Reelsmith",
+        description: {
+          es: "Servidor MCP en un binario Rust local que convierte una carpeta de clips de gameplay en videos promo para Reels, TikTok o Shorts: tu asistente de IA escribe el brief, renderiza preview 360p, borrador 720p y final 1080p, y valida cada render (duración, loudness -14 LUFS, true peak, frames negros).",
+          en: "MCP server in a single local Rust binary that turns a folder of gameplay clips into promo videos for Reels, TikTok or Shorts: your AI assistant writes the brief, renders a 360p preview, a 720p draft and the 1080p final, and QA-checks each render (duration, -14 LUFS loudness, true peak, black frames).",
+        },
+        year: "2026",
+        link: "https://github.com/FranprzDev/reelsmith",
+        pitch: {
+          es: "MCP en Rust que renderiza videos promo a partir de clips, con QA automático de audio y frames.",
+          en: "Rust MCP that renders promo videos from clips, with automatic audio and frame QA.",
+        },
+        stack: ["Rust", "MCP", "FFmpeg"],
+        category: { es: "Developer Tools", en: "Developer Tools" },
+      },
+      {
+        name: "Intérprete",
+        description: {
+          es: "Traductor simultáneo español ↔ inglés para Windows, gratis y 100% local (Rust): hablás en español y sale la traducción al inglés en pantalla y en voz, y lo que suena en inglés se lee en español en tiempo real. Pensado para llamadas en Zoom o Meet; el audio nunca sale de la PC.",
+          en: "Simultaneous Spanish ↔ English translator for Windows, free and 100% local (Rust): speak Spanish and the English translation shows on screen and in voice; English audio reads back in Spanish in real time. Built for Zoom or Meet calls; audio never leaves the PC.",
+        },
+        year: "2026",
+        link: "https://github.com/FranprzDev/interprete",
+        pitch: {
+          es: "Traductor simultáneo español ↔ inglés, local y gratis, para llamadas: el audio nunca sale de la PC.",
+          en: "Simultaneous Spanish ↔ English translator, local and free, for calls: audio never leaves the PC.",
+        },
+        stack: ["Rust", "Desktop"],
+        category: { es: "Developer Tools", en: "Developer Tools" },
+      },
+      {
+        name: "PDV-Basic",
+        description: {
+          es: "Punto de venta en español rioplatense para comercios de barrio: escáner de códigos de barras, atajos de teclado para vender rápido, stock que se descuenta en la misma transacción atómica que la venta y el pago, fiado con límite por cliente e impresora térmica con protocolo ESC/POS propio, sin librerías. Basado en FinOpenPOS (MIT), rehecho para el mercado argentino.",
+          en: "Point of sale in rioplatense Spanish for neighborhood stores: barcode scanning, keyboard shortcuts for fast selling, stock decremented in the same atomic transaction as the sale and payment, store credit with per-customer limits and a thermal printer speaking its own ESC/POS protocol, no libraries. Based on FinOpenPOS (MIT), reworked for the Argentine market.",
+        },
+        year: "2026",
+        link: "https://github.com/FranprzDev/PDV-Basic",
+        pitch: {
+          es: "Punto de venta para comercios de barrio: escáner, fiado con límite por cliente e impresora térmica ESC/POS propia.",
+          en: "Point of sale for neighborhood stores: scanner, store credit with per-customer limits and a custom ESC/POS thermal printer.",
+        },
+        stack: ["TypeScript", "Retail"],
+        category: { es: "Productos Web", en: "Web Products" },
+      },
+      {
         name: "apuntes-cli",
         description: {
-          es: "CLI/plugin para generar FAQs y apuntes finales compactos por materia.",
-          en: "CLI/plugin for generating compact FAQs and final notes by subject.",
+          es: "CLI y servidor MCP para buscar en mis apuntes de la carrera (FranNotes) y generar FAQs y apuntes finales compactos por materia.",
+          en: "CLI and MCP server to search my degree notes (FranNotes) and generate compact FAQs and final notes by subject.",
         },
         year: "2025",
         link: "https://github.com/FranprzDev/apuntes-cli",
         pitch: {
-          es: "CLI/plugin que genera FAQs y apuntes finales compactos por materia.",
-          en: "CLI/plugin that generates compact FAQs and final notes by subject.",
+          es: "CLI/MCP que busca en mis apuntes (FranNotes) y genera FAQs y apuntes finales compactos por materia.",
+          en: "CLI/MCP that searches my notes (FranNotes) and generates compact FAQs and final notes by subject.",
         },
-        stack: ["Go", "CLI"],
+        stack: ["Go", "CLI", "MCP"],
         category: { es: "Developer Tools", en: "Developer Tools" },
       },
       {
         name: "mac-brainroot-cli",
         description: {
-          es: "CLI para abrir rápidamente flujos de trabajo con herramientas de IA desde macOS.",
-          en: "CLI for quickly launching AI tool workflows from macOS.",
+          es: "CLI de macOS que levanta con un solo comando el entorno para programar con agentes de IA: abre el agente que elijas (Claude Code o Codex) junto al contenido de fondo que uses para trabajar.",
+          en: "macOS CLI that spins up your AI-agent coding setup with one command: opens your agent of choice (Claude Code or Codex) plus the background content you like while working.",
         },
         year: "2025",
         link: "https://github.com/FranprzDev/mac-brainroot-cli",
         pitch: {
-          es: "CLI para abrir rápido flujos de trabajo con herramientas de IA desde macOS.",
-          en: "CLI to quickly launch AI tool workflows from macOS.",
+          es: "CLI de macOS que abre con un comando tu agente de IA (Claude Code o Codex) y el entorno para programar.",
+          en: "macOS CLI that opens your AI agent (Claude Code or Codex) and coding setup with one command.",
         },
         stack: ["Python", "CLI", "macOS"],
         category: { es: "Developer Tools", en: "Developer Tools" },
@@ -363,6 +462,15 @@ const DETAILS: Record<string, ProjectDetail> = {
         year: "2025",
         link: "https://github.com/FranprzDev/firms-fire-station-planner",
         category: { es: "Proyectos RollingCode School", en: "RollingCode School Projects" },
+      },
+      {
+        name: "CoNaIISI 2026 — Congreso Nacional de Ingeniería",
+        description: {
+          es: "Trabajo aceptado en CoNaIISI 2026 (Congreso Nacional de Ingeniería en Informática y Sistemas de Información, UTN Resistencia), categoría Trabajo de Cátedra: \"Planificar para abastecer: priorización de inversiones hídricas en Delfín Gallo\". Salimos al campo con la gente del CAPS y la SAT, proyectamos la demanda con validación RMSE y usamos optimización MILP con análisis de sensibilidad para decidir dónde invertir en la red de agua potable.",
+          en: "Paper accepted at CoNaIISI 2026 (National Congress on Computer Science and Information Systems Engineering, UTN Resistencia), Undergraduate Course Work category: \"Planificar para abastecer: prioritizing water investment in Delfín Gallo\". Fieldwork with the local water cooperative and utility, RMSE-validated demand projection and MILP optimization with sensitivity analysis to decide where to invest in the drinking-water network.",
+        },
+        year: "2026",
+        category: { es: "Proyectos Académicos UTN-FRT", en: "UTN-FRT Academic Projects" },
       },
       {
         name: "DueMovie",
