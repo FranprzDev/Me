@@ -2,27 +2,12 @@ import { cvPdfPath } from "@/content/cv/routes";
 import { CvLocale, CvVariant } from "@/content/cv/types";
 
 /**
- * CVs Francisco keeps as always-public files in his Google Drive (anyone with
- * the link can download). These versions download straight from Drive, so the
- * portfolio always hands out the current copy; every other version keeps the
- * committed, content-versioned PDF.
- *
- * Drive file IDs of the public copies (AI Engineer = the Applied AI version):
- * - Applied AI ES: Francisco_Perez_CV_AI_Engineer.pdf
- * - Applied AI EN: Francisco_Perez_CV_AI_Engineer_EN.pdf
- * - Full-Stack ES: Francisco_Perez_CV_Full_Stack_ES.pdf
- * - Full-Stack EN: Francisco_Perez_CV_Full_Stack_EN.pdf
+ * Every CV version downloads from the committed, content-versioned PDF in
+ * public/cv/files: a Drive link makes the visitor sign in to Google first, so
+ * no version hands one out. The map stays so a public Drive copy can come
+ * back for a version that needs it.
  */
-const CV_DRIVE_FILE_IDS: Partial<Record<CvVariant, Record<CvLocale, string>>> = {
-  [CvVariant.AppliedAi]: {
-    [CvLocale.Es]: "1PJFz6_0Z-OhBgkXFjEWBrxR6bueJo4rD",
-    [CvLocale.En]: "1jB3iZDumz3xgm8SLq9XGe1u5ds8MRFsa",
-  },
-  [CvVariant.Fullstack]: {
-    [CvLocale.Es]: "1yzklUrQuPkEPxcP7bjUkfkFIQHI1rqiB",
-    [CvLocale.En]: "1cAeo1cRaOStrygmyNJSvLD0ybMFNyG9n",
-  },
-};
+const CV_DRIVE_FILE_IDS: Partial<Record<CvVariant, Record<CvLocale, string>>> = {};
 
 /**
  * Direct-download URL of the public Drive copy, or null when the version only

@@ -18,11 +18,8 @@ export function cvPdfFile(variant, locale) {
   return `francisco-perez-cv-${variant}-${locale}.pdf`;
 }
 
-/** Mirrors src/lib/cvDrive.ts: versions that download from Francisco's always-public Google Drive copies. */
-export const CV_DRIVE_FILE_IDS = {
-  "applied-ai": { es: "1PJFz6_0Z-OhBgkXFjEWBrxR6bueJo4rD", en: "1jB3iZDumz3xgm8SLq9XGe1u5ds8MRFsa" },
-  fullstack: { es: "1yzklUrQuPkEPxcP7bjUkfkFIQHI1rqiB", en: "1cAeo1cRaOStrygmyNJSvLD0ybMFNyG9n" },
-};
+/** Mirrors src/lib/cvDrive.ts: every version downloads from the committed PDF (no Drive copies). */
+export const CV_DRIVE_FILE_IDS = {};
 
 /** Direct-download URL of the public Drive copy, or null when the version only exists as a committed PDF. */
 export function cvDriveDownloadUrl(variant, locale) {
