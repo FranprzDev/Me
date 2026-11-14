@@ -57,7 +57,7 @@ export const EDUCATION: EducationEntry[] = [
   {
     institution: "UTN-FRT",
     degree: { en: "B.S. Information Systems Engineering", es: "Ingeniería en Sistemas de Información" },
-    period: { en: "2022 - Dec 2027, expected", es: "2022 - dic 2027, estimado" },
+    period: { en: "Degree in progress", es: "Carrera en curso" },
   },
 ];
 
@@ -88,10 +88,10 @@ export const CERT_GROUPS: CertificationGroup[] = [CERTS_ROLLINGCODE, CERTS_OPENA
 /* Projects & awards, shared by every variant. */
 
 export const PROJECT_NASA: ProjectEntry = {
-  name: { en: "NASA Space Apps 2024", es: "NASA Space Apps 2024" },
+  name: { en: "NASA Space Apps", es: "NASA Space Apps" },
   detail: {
-    en: "National winner (ExoGames); national competitor again in 2025.",
-    es: "Ganador nacional (ExoGames); competidor nacional nuevamente en 2025.",
+    en: "2024: national winner (ExoGames). 2025: participant, with the project BeeAgro.",
+    es: "2024: ganador nacional (ExoGames). 2025: participante, con el proyecto BeeAgro.",
   },
 };
 export const PROJECT_PROOFY: ProjectEntry = {
@@ -102,12 +102,12 @@ export const PROJECT_PROOFY: ProjectEntry = {
     es: "agente de IA que convierte el alcance de un contrato en hitos verificables y libera pagos en escrow según evidencia de CI/CD.",
   },
 };
-export const PROJECT_PRESU: ProjectEntry = {
-  name: { en: "Presu", es: "Presu" },
-  qualifier: { en: "2026, prototype", es: "2026, prototipo" },
+export const PROJECT_SCOPEPROFIT: ProjectEntry = {
+  name: { en: "ScopeProfit", es: "ScopeProfit" },
+  qualifier: { en: "2026", es: "2026" },
   detail: {
-    en: "ChatGPT app (MCP server) that turns a product idea into a clear scope and a PDF quote through guided Q&A; credits and BNB testnet payments. Presented at the BNB Builder Session Tucumán (Oct 2026, participant).",
-    es: "app de ChatGPT (servidor MCP) que convierte una idea de producto en un alcance claro y una cotización en PDF mediante preguntas guiadas; créditos y pagos BNB en testnet. Presentado en el BNB Builder Session Tucumán (oct 2026, participante).",
+    en: "MCP tools that let an AI agent turn what a client asks for into a versioned scope document, with cited requirements, risks and estimated hours, exportable to PDF/Word. Born from the BNB Builder Session Tucumán (Oct 2026, participant). scopeprofit.vercel.app",
+    es: "herramientas MCP para que un agente de IA convierta lo que pide un cliente en un documento de alcance versionado, con requisitos citados, riesgos y horas orientativas, exportable a PDF/Word. Nace de la BNB Builder Session Tucumán (oct 2026, participante). scopeprofit.vercel.app",
   },
 };
 export const PROJECT_REELSMITH: ProjectEntry = {
@@ -156,15 +156,15 @@ export const SCHOOL = {
 export const ROLE_AI: Localized = { en: "AI Engineer", es: "AI Engineer" };
 export const ROLE_PRODUCT: Localized = { en: "Product Engineer", es: "Product Engineer" };
 export const ROLE_INSTRUCTOR: Localized = {
-  en: "Instructor, Process Automation with n8n",
-  es: "Docente de Automatización con n8n",
+  en: "Instructor, Automation and AI with n8n",
+  es: "Docente de Automatización e IA con n8n",
 };
 export const ROLE_FLA: Localized = { en: "Full-Stack Developer (Volunteer)", es: "Desarrollador Full-Stack (voluntario)" };
 export const ROLE_ASSISTANT: Localized = { en: "Teaching Assistant, Web & Backend", es: "Ayudante docente Web y Backend" };
 
 export const B_REPUESTO_SYSTEM: Localized = {
-  en: "Built the whole system end to end: an AI that processed over 50 leads a day with their likely purchase case, and a CRM built from scratch that displayed that information.",
-  es: "Construí todo el sistema de punta a punta: una IA que procesaba más de 50 leads por día con su posible caso de compra y un CRM desde cero que mostraba esa información.",
+  en: "Built the whole system end to end, from the moment a lead arrives to the end of their interaction: the AI agent layer and a CRM built from scratch.",
+  es: "Construí todo el sistema de punta a punta, desde que llega un lead hasta que termina su interacción: la capa de agentes de IA y un CRM desde cero.",
 };
 export const B_REPUESTO_AGENT: Localized = {
   en: "Designed and deployed a multi-agent assistant (LangGraph) with tool calling and retrieval over scraped catalog data via SQL full-text search to answer customer questions.",
@@ -174,9 +174,9 @@ export const B_REPUESTO_TOOLS: Localized = {
   en: "Built internal tools and automations for other parts of the business, integrating Meta APIs and scraping pipelines that feed the agents with data.",
   es: "Construí herramientas internas y automatizaciones para otras áreas del negocio, integrando APIs de Meta y pipelines de scraping que alimentan a los agentes con datos.",
 };
-export const B_REPUESTO_BENCH: Localized = {
-  en: "Benchmarked LLM providers for the best cost/quality trade-off in production; used Codex and Claude Code to ship POCs fast.",
-  es: "Comparé proveedores de LLM para elegir la mejor relación costo/calidad en producción; usé Codex y Claude Code para entregar POCs rápido.",
+export const B_REPUESTO_PRODUCT: Localized = {
+  en: "Worked to understand the product and what its customers needed, and took it to them: from a lead's first message to the end of the interaction. Compared LLM providers on cost and quality to choose what runs in production.",
+  es: "Trabajé para entender el producto y lo que necesitaban sus clientes, y llevarlo hasta ellos: desde el primer mensaje de un lead hasta el fin de la interacción. Comparé proveedores de LLM por costo y calidad para elegir cuál usar en producción.",
 };
 
 export const B_STUDIO_FEATURES: Localized = {
@@ -184,18 +184,18 @@ export const B_STUDIO_FEATURES: Localized = {
   es: "Desarrollé funcionalidades frontend y backend para productos web de clientes (React, Next.js, Node.js); automaticé tareas internas con n8n; Scrum, Git Flow y code review.",
 };
 export const B_STUDIO_AUTOMATION: Localized = {
-  en: "Reduced, together with the team, the time of a bureaucratic procedure by 90%: from over 12 months to under a month. Another certificate process went from one month to one week.",
-  es: "Reduje, junto al equipo, un 90% el tiempo de un trámite burocrático: de más de 12 meses a menos de un mes. Otro trámite de certificado pasó de un mes a una semana.",
+  en: "Automated, with the team, a bureaucratic procedure that took about a year; it now takes under a month. Another certificate process went from one month to one week.",
+  es: "Automatizamos, junto al equipo, un trámite burocrático que llevaba cerca de un año y hoy se resuelve en menos de un mes. Otro trámite de certificado pasó de un mes a una semana.",
 };
 
 export const B_JUDICIARY: Localized = {
-  en: "Designed and taught a 20-hour course on n8n, APIs/webhooks and RAG workflows; presented the automation strategy to the Judiciary leadership.",
-  es: "Diseñé y dicté un curso de 20 horas sobre n8n, APIs/webhooks y flujos RAG; presenté la estrategia de automatización a las autoridades.",
+  en: "Designed and taught a 10-class, 20-hour course on process automation with n8n for Judiciary staff: workflow modeling, APIs, webhooks and local LLMs.",
+  es: "Diseñé e impartí un curso de 10 clases (20 horas) de automatización de procesos con n8n para personal del Poder Judicial: modelado de flujos, APIs, webhooks y LLM locales.",
 };
 
 export const B_FLA: Localized = {
-  en: "Rebuilt the foundation's web platform and internal tools (Next.js, Prisma, PostgreSQL).",
-  es: "Rehice la plataforma web y las herramientas internas de la fundación (Next.js, Prisma, PostgreSQL).",
+  en: "Lead the digitalization of the foundation: website, online presence and internal management tools (Next.js).",
+  es: "Lidero la digitalización de la fundación: sitio web, presencia online y herramientas internas de gestión (Next.js).",
 };
 
 /* Skill groups reused across variants; each variant picks its own order. */
