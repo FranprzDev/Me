@@ -69,6 +69,8 @@ Guidance for coding agents working on this repo (Francisco Perez's portfolio, Ne
 
 ## Agent skills
 
+[Modern Web Guidance](https://github.com/GoogleChrome/modern-web-guidance) (Chrome/Firefox/Edge, vendored at [`.agents/skills/modern-web-guidance/`](.agents/skills/modern-web-guidance/SKILL.md)) is the standard for frontend work here: before any HTML/CSS or client-side JS task, run `npx -y modern-web-guidance@latest search "<2-5 word query>"` and `retrieve` the matching guide; use `npx -y modern-web-guidance@latest legacy-scan src --json` to find legacy patterns before modernizing. Update it with `npx modern-web-guidance@latest update`.
+
 Web quality skills from [addyosmani/web-quality-skills](https://github.com/addyosmani/web-quality-skills) are vendored in [`.agents/skills/`](.agents/skills/README.md). Load the matching one before working on that area:
 
 - Performance, bundle size, 3D/WebGPU cost: [`.agents/skills/performance/SKILL.md`](.agents/skills/performance/SKILL.md) and its [measurement workflow](.agents/skills/performance/references/MEASUREMENT.md)
