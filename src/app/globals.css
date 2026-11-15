@@ -398,7 +398,7 @@ body:has([data-scene-root] canvas) .home-sky {
   color: var(--fg);
   text-decoration: none;
   text-align: left;
-  transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+  transition: transform 200ms ease-out, border-color 200ms ease-out, box-shadow 200ms ease-out;
 }
 
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -619,7 +619,7 @@ body:has([data-scene-root] canvas) .home-sky {
   font-size: 0.8rem;
   line-height: 1.4;
   text-decoration: none;
-  transition: border-color 180ms ease, color 180ms ease, background-color 180ms ease;
+  transition: border-color 180ms ease-out, color 180ms ease-out, background-color 180ms ease-out;
 }
 
 .hero-chip::before {
@@ -830,7 +830,7 @@ body:has([data-contact-heading="true"] canvas) .contact-copy h2 {
   background: var(--scene-bg, #050817);
   box-shadow: 0 10px 30px rgba(2, 4, 12, 0.35);
   opacity: 0;
-  transition: opacity 220ms ease;
+  transition: opacity 220ms ease-out;
   pointer-events: none;
 }
 .site-nav[data-scrolled]::before {
@@ -932,7 +932,7 @@ button:focus-visible {
 /* Microinteracciones: las cards "levantan vuelo" al pasar el cursor. */
 .glass,
 .glass-soft {
-  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+  transition: transform 220ms ease-out, border-color 220ms ease-out, box-shadow 220ms ease-out;
 }
 @media (hover: hover) {
   .tilt-card:hover {
@@ -1077,7 +1077,7 @@ button:focus-visible {
   color: #e6e1f5;
   font-size: 0.82rem;
   text-decoration: none;
-  transition: background 160ms ease, color 160ms ease;
+  transition: background 160ms ease-out, color 160ms ease-out;
 }
 
 .edu-chapters a + a { border-left: 1px solid rgba(218, 206, 255, 0.12); }
@@ -1128,7 +1128,7 @@ button:focus-visible {
 .edu-degree__status i { width: 6px; height: 6px; border-radius: 50%; background: #75e2aa; box-shadow: 0 0 10px #75e2aa; }
 
 .edu-certificates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; }
-.edu-certificate { position: relative; display: grid; grid-template-columns: 2.3rem minmax(0,1fr) auto; align-items: center; gap: 0.9rem; min-height: 126px; padding: 1.15rem 1.2rem; border: 1px solid rgba(190, 174, 236, 0.18); border-radius: 0.95rem; background: linear-gradient(135deg, rgba(34, 29, 57, 0.83), rgba(16, 16, 31, 0.74)); transition: transform 180ms ease, border-color 180ms ease, background 180ms ease; }
+.edu-certificate { position: relative; display: grid; grid-template-columns: 2.3rem minmax(0,1fr) auto; align-items: center; gap: 0.9rem; min-height: 126px; padding: 1.15rem 1.2rem; border: 1px solid rgba(190, 174, 236, 0.18); border-radius: 0.95rem; background: linear-gradient(135deg, rgba(34, 29, 57, 0.83), rgba(16, 16, 31, 0.74)); transition: transform 180ms ease-out, border-color 180ms ease-out, background 180ms ease-out; }
 @media (hover: hover) and (pointer: fine) {
   .edu-certificate:hover { transform: translateY(-3px); border-color: rgba(193, 165, 255, 0.48); background: linear-gradient(135deg, rgba(52, 39, 83, 0.88), rgba(19, 18, 38, 0.82)); }
 }
@@ -1236,7 +1236,7 @@ button:focus-visible {
   font-size: 0.82rem;
   font-weight: 600;
   text-decoration: none;
-  transition: color 160ms ease, gap 160ms ease;
+  transition: color 160ms ease-out, gap 160ms ease-out;
 }
 @media (hover: hover) and (pointer: fine) {
   .story-link:hover { color: #fff; gap: 0.6rem; }
@@ -1421,7 +1421,7 @@ button:focus-visible {
   border-left: 2px solid color-mix(in srgb, var(--planet) 55%, transparent);
   border-radius: 0.9rem;
   background: linear-gradient(135deg, rgba(12, 30, 20, 0.55), rgba(9, 12, 22, 0.72));
-  transition: transform 200ms ease, border-color 200ms ease, background 200ms ease;
+  transition: transform 200ms ease-out, border-color 200ms ease-out, background 200ms ease-out;
 }
 @media (hover: hover) and (pointer: fine) {
   .mission:hover .mission__body {
@@ -1478,7 +1478,7 @@ button:focus-visible {
   color: #f4fbf6;
   background: color-mix(in srgb, var(--planet) 78%, #05070f);
   box-shadow: 0 0 22px color-mix(in srgb, var(--planet) 55%, transparent);
-  transition: transform 160ms ease;
+  transition: transform 160ms ease-out;
 }
 @media (hover: hover) and (pointer: fine) {
   .mission__video-facade:hover .mission__video-play { transform: scale(1.08); }
@@ -1719,7 +1719,7 @@ button:focus-visible {
   padding: 1.3rem 1.2rem 1.3rem 1.4rem;
   border-left: 2px solid transparent;
   background: linear-gradient(90deg, rgba(17, 38, 54, 0.5), rgba(13, 16, 30, 0) 70%);
-  transition: border-color 200ms ease, background 200ms ease;
+  transition: border-color 200ms ease-out, background 200ms ease-out;
 }
 /* Barrido de luz al entrar en viewport, ligado a --row-wipe (GSAP + scroll). */
 .atlas-row::before {
@@ -1798,7 +1798,7 @@ button:focus-visible {
   border-left: 3px solid var(--planet);
   border-radius: 0.9rem;
   background: linear-gradient(135deg, rgba(31, 27, 49, 0.7), rgba(13, 15, 30, 0.68));
-  transition: transform 200ms ease, border-color 200ms ease;
+  transition: transform 200ms ease-out, border-color 200ms ease-out;
 }
 @media (hover: hover) and (pointer: fine) {
   .dossier-row:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--planet) 40%, transparent); }
@@ -1843,7 +1843,7 @@ button:focus-visible {
   border: 1px solid transparent;
   border-radius: 0.85rem;
   text-decoration: none;
-  transition: border-color 180ms ease, background 180ms ease;
+  transition: border-color 180ms ease-out, background 180ms ease-out;
 }
 .planet-nav__side--next { justify-content: flex-end; text-align: right; }
 @media (hover: hover) and (pointer: fine) {
@@ -1852,7 +1852,7 @@ button:focus-visible {
   background: rgba(255, 255, 255, 0.04);
 }
 }
-.planet-nav__side > span { color: var(--muted); font-size: 1.05rem; transition: transform 180ms ease; }
+.planet-nav__side > span { color: var(--muted); font-size: 1.05rem; transition: transform 180ms ease-out; }
 @media (hover: hover) and (pointer: fine) {
   .planet-nav__side--prev:hover > span { transform: translateX(-4px); }
 }
@@ -1898,7 +1898,7 @@ button:focus-visible {
   border-radius: 999px;
   background: var(--dot);
   opacity: 0.32;
-  transition: width 220ms ease, opacity 220ms ease;
+  transition: width 220ms ease-out, opacity 220ms ease-out;
 }
 .planet-nav__orbit a:focus-visible::before { opacity: 0.75; }
 @media (hover: hover) and (pointer: fine) {
@@ -1984,10 +1984,10 @@ button:focus-visible {
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-duration: 150ms !important;
+    transition-duration: 150ms !important;
   }
 }
 
@@ -2107,7 +2107,7 @@ button:focus-visible {
   font-weight: 600;
   letter-spacing: 0.01em;
   text-decoration: none;
-  transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+  transition: border-color 200ms ease-out, box-shadow 200ms ease-out, transform 200ms ease-out;
 }
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .story-back {
@@ -2216,7 +2216,7 @@ button:focus-visible {
     height: 2px;
     border-radius: 2px;
     background: rgba(232, 236, 255, 0.28);
-    transition: width 240ms ease, background-color 240ms ease;
+    transition: width 240ms ease-out, background-color 240ms ease-out;
   }
   .entry-index span {
     visibility: hidden;
@@ -2231,7 +2231,7 @@ button:focus-visible {
     text-overflow: ellipsis;
     white-space: nowrap;
     opacity: 0;
-    transition: opacity 200ms ease, visibility 0s linear 200ms;
+    transition: opacity 200ms ease-out, visibility 0s linear 200ms;
   }
   .entry-index li.is-active i {
     width: 1.75rem;
@@ -2248,13 +2248,13 @@ button:focus-visible {
   .entry-index a:focus-visible span {
     visibility: visible;
     opacity: 1;
-    transition: opacity 200ms ease;
+    transition: opacity 200ms ease-out;
   }
   @media (hover: hover) and (pointer: fine) {
     .entry-index:hover span {
     visibility: visible;
     opacity: 1;
-    transition: opacity 200ms ease;
+    transition: opacity 200ms ease-out;
   }
   }
 }
@@ -2263,7 +2263,7 @@ button:focus-visible {
   .entry-index li.is-active span {
     visibility: visible;
     opacity: 1;
-    transition: opacity 200ms ease;
+    transition: opacity 200ms ease-out;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -2296,7 +2296,7 @@ button:focus-visible {
   background:
     radial-gradient(circle at 50% 120%, rgba(91, 140, 255, 0.12), transparent 55%),
     var(--scene-bg, #040612);
-  transition: opacity 600ms ease;
+  transition: opacity 600ms ease-out;
 }
 /* Iris: the veil opens from the burst point, revealing the planet behind. */
 .rocket-loader.is-burst .rocket-loader__veil {
@@ -2304,7 +2304,7 @@ button:focus-visible {
   mask-image: radial-gradient(circle at var(--burst-x, 50%) var(--burst-y, 20%), transparent var(--iris), #000 calc(var(--iris) + 12%));
   animation: rocket-iris 1000ms cubic-bezier(0.6, 0, 0.3, 1) 80ms both;
   opacity: 0;
-  transition: opacity 500ms ease 650ms; /* fallback where @property is missing */
+  transition: opacity 500ms ease-out 650ms; /* fallback where @property is missing */
 }
 .rocket-loader.is-burst {
   animation: rocket-shake 420ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
@@ -2326,7 +2326,7 @@ button:focus-visible {
   aspect-ratio: 40 / 84;
   opacity: 0;
   filter: drop-shadow(0 0 16px rgba(91, 140, 255, 0.7)) drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
-  transition: opacity 160ms ease;
+  transition: opacity 160ms ease-out;
   will-change: transform;
 }
 .rocket-loader__rocket svg {
@@ -2360,7 +2360,7 @@ button:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .rocket-loader.is-burst { animation: none; }
   .rocket-loader__veil {
-    transition: opacity 400ms ease !important;
+    transition: opacity 400ms ease-out !important;
   }
 }
 
@@ -2438,7 +2438,7 @@ button:focus-visible {
   box-shadow: 0 0 24px rgba(122, 162, 255, 0.08);
   transform: translate(-50%, -50%) rotate(4deg);
   pointer-events: none;
-  transition: opacity 300ms ease;
+  transition: opacity 300ms ease-out;
 }
 .orbit-select__slot {
   /* Defaults: the centre. */
@@ -2508,7 +2508,7 @@ button:focus-visible {
   opacity: 0;
   transition:
     scale 420ms cubic-bezier(0.5, 0, 0.75, 0),
-    opacity 300ms ease;
+    opacity 300ms ease-out;
 }
 
 /* ─── The world itself ────────────────────────────────────────────────────
@@ -2549,7 +2549,7 @@ button:focus-visible {
     0 0 0 1px color-mix(in srgb, var(--tone) 28%, transparent),
     0 0 calc(var(--orb-d) * 0.16) color-mix(in srgb, var(--tone) 24%, transparent),
     0 0 calc(var(--orb-d) * 0.42) color-mix(in srgb, var(--tone) 10%, transparent);
-  transition: box-shadow 220ms ease;
+  transition: box-shadow 220ms ease-out;
 }
 /* Drag pose (lib/worldSpin, set by the selector as CSS variables): the whole
    surface rolls about the view axis and its bands slide when a pole leans
@@ -2795,7 +2795,7 @@ button:focus-visible {
   mask-image: radial-gradient(closest-side, #000 34%, transparent 100%);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 600ms ease;
+  transition: opacity 600ms ease-out;
   animation: orb-halo 140s linear infinite;
 }
 .orbit-select__slot[data-slot="center"] .orbit-select__halo {
@@ -2862,7 +2862,7 @@ button:focus-visible {
   /* Size and offset follow the slot's scale with the same easing, so the
      label never jumps when an item changes slot. */
   transition:
-    opacity 260ms ease,
+    opacity 260ms ease-out,
     font-size var(--orbit-dur) var(--orbit-y-ease),
     top var(--orbit-dur) var(--orbit-y-ease);
 }
@@ -2910,13 +2910,13 @@ button:focus-visible {
 .orbit-select.is-entering .orbit-select__slot:not([data-slot="center"]),
 .orbit-select.is-entering .orbit-select__track {
   opacity: 0;
-  transition: opacity 300ms ease;
+  transition: opacity 300ms ease-out;
 }
 
 /* Reduced motion: no landing, the selector just fades before the jump. */
 .orbit-select[data-entry="fading"] {
   opacity: 0;
-  transition: opacity 160ms ease;
+  transition: opacity 160ms ease-out;
 }
 
 /* ─── Puppy landing ───────────────────────────────────────────────────────

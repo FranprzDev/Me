@@ -636,15 +636,15 @@ html:has(.cv-root) {
       animation-delay: calc(min(var(--cv-rise-index, 0), 8) * 65ms);
     }
     .cv-card::after {
-      transition: opacity 260ms ease;
+      transition: opacity 260ms ease-out;
     }
     .cv-root .cv-bar__versions a,
     .cv-root .cv-head__contacts a {
-      transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease, gap 160ms ease;
+      transition: color 160ms ease-out, border-color 160ms ease-out, background-color 160ms ease-out, gap 160ms ease-out;
     }
     .cv-root .cv-bar__pdf,
     .cv-card {
-      transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+      transition: transform 220ms ease-out, border-color 220ms ease-out, box-shadow 220ms ease-out;
     }
     @media (hover: hover) {
       .cv-root .cv-bar__pdf:hover {
