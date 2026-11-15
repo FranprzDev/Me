@@ -143,7 +143,7 @@ export function ContactConstellations() {
         }
         .cc-link .cc-lines line {
           opacity: 0.35;
-          transition: opacity 0.3s ease;
+          transition: opacity 0.3s ease-out;
         }
         .cc-link:hover .cc-lines line,
         .cc-link:focus-visible .cc-lines line {
@@ -151,7 +151,7 @@ export function ContactConstellations() {
         }
         .cc-link .cc-stars circle {
           filter: drop-shadow(0 0 3px var(--cc));
-          transition: filter 0.3s ease;
+          transition: filter 0.3s ease-out;
         }
         .cc-link:hover .cc-stars circle,
         .cc-link:focus-visible .cc-stars circle {

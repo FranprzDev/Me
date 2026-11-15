@@ -347,7 +347,7 @@
   text-decoration: none;
   text-shadow: none;
   cursor: pointer;
-  transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+  transition: border-color 180ms ease-out, background 180ms ease-out, box-shadow 180ms ease-out;
 }
 .moon-launch__btn--chatgpt {
   border-color: rgba(125, 255, 176, 0.5);

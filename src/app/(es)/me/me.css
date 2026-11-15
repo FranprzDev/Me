@@ -240,7 +240,7 @@ html:has(.me-root) body {
   opacity: 0.5;
 }
 .me-lang button {
-  transition: color 0.18s ease;
+  transition: color 0.18s ease-out;
 }
 .me-lang button.is-active {
   color: var(--me-on-dark);
@@ -505,7 +505,7 @@ html:has(.me-root) body {
   text-transform: none;
   border-bottom: 1px solid var(--me-hairline-strong);
   padding-bottom: 2px;
-  transition: border-color 0.18s ease;
+  transition: border-color 0.18s ease-out;
 }
 @media (hover: hover) and (pointer: fine) {
   .me-small-link:hover {
