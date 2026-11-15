@@ -229,6 +229,19 @@ body:has([data-scene-root] canvas) .home-sky {
     animation: none;
   }
 }
+/* Flotación del título del héroe: igual que el tween GSAP que reemplaza
+   (4px, 4.5s, sine.inOut = ease-in-out, yoyo), pero en el compositor. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-float {
+    animation: hero-float 4.5s ease-in-out infinite alternate;
+  }
+}
+@keyframes hero-float {
+  to {
+    transform: translateY(-4px);
+  }
+}
+
 @keyframes home-sky-drift {
   to {
     transform: translate3d(0, var(--drift), 0);

@@ -35,14 +35,10 @@ export function GsapHeroName({ text }: { text: string }) {
           "drop-shadow(0 0 22px rgba(91,140,255,0.35)) drop-shadow(0 0 6px rgba(233,194,112,0.18))",
       });
 
-      // Flotación lenta y de poca amplitud.
-      gsap.to(el, {
-        y: -4,
-        duration: 4.5,
-        ease: "sine.inOut",
-        repeat: -1,
-        yoyo: true,
-      });
+      // Flotación lenta y de poca amplitud: keyframe CSS en el compositor
+      // (mismo recorrido y easing), así el ticker de GSAP duerme en reposo.
+      el.classList.add("hero-float");
+      return () => el.classList.remove("hero-float");
     }, ref);
 
     return () => media.revert();
