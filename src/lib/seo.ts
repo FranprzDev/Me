@@ -5,7 +5,9 @@ export const SITE_OPEN_GRAPH = {
   title: "Francisco Perez — AI Applied Engineer en Tucumán",
   description: "Desarrollo de agentes de IA, automatización y productos web en Tucumán. Ganador nacional NASA Space Apps 2024.",
   type: "website",
-  siteName: "Francisco Perez — Portfolio",
+  // Matches the WebSite JSON-LD name: Google weighs og:site_name, the title
+  // and headings against the structured data when picking the site name.
+  siteName: "Francisco Perez",
   locale: "es_AR",
 } satisfies NonNullable<Metadata["openGraph"]>;
 
