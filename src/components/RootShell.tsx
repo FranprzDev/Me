@@ -54,6 +54,8 @@ export const rootMetadata: Metadata = {
   openGraph: SITE_OPEN_GRAPH,
   twitter: {
     card: "summary_large_image",
+    site: "@fprzdev",
+    creator: "@fprzdev",
     title: "Francisco Perez — AI Applied Engineer en Tucumán",
     description: "Desarrollo de agentes de IA, automatización y productos web en Tucumán.",
   },

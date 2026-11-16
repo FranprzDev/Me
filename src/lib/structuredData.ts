@@ -41,7 +41,7 @@ export function homeStructuredData() {
         award: "NASA Space Apps Challenge 2024 — National winner (Argentina), ExoGames",
         knowsAbout: ["AI agents", "Multi-agent systems", "RAG pipelines", "LangChain", "LangGraph", "n8n", "Next.js", "TypeScript", "Node.js", "Python"],
         knowsLanguage: ["es", "en"],
-        sameAs: [CV.github, CV.linkedin],
+        sameAs: [CV.github, CV.linkedin, "https://x.com/fprzdev"],
         subjectOf: {
           "@type": "DigitalDocument",
           name: "CV (PDF)",
@@ -52,7 +52,12 @@ export function homeStructuredData() {
         "@type": "WebSite",
         "@id": `${site}#website`,
         url: site,
-        name: "Francisco Perez — Portfolio",
+        // Preferred site name for Google Search. It currently falls back to
+        // the parent domain label ("Vercel"); the alternates give it a
+        // shorter brand and the bare subdomain (all lowercase, per Google's
+        // site-name guidance) to pick instead.
+        name: "Francisco Perez",
+        alternateName: ["Francisco Perez — Portfolio", "FranPrzDev", "franprz.vercel.app"],
         inLanguage: ["es", "en"],
         publisher: { "@id": personId },
       },
