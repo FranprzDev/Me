@@ -204,8 +204,8 @@ const DETAILS: Record<string, ProjectDetail> = {
       {
         name: "GeoArg",
         description: {
-          es: "Servidor MCP de geodatos públicos de Argentina: descubre capas WFS, WMS y ArcGIS REST, consulta datos y geocodifica, con HTTP público y stdio local, solo lectura. Nació como GeoTucumán en la cursada de Sistemas de Información Geográfica.",
-          en: "MCP server for Argentina's public geodata: discovers WFS, WMS and ArcGIS REST layers, queries data and geocodes, over public HTTP and local stdio, read-only. Born as GeoTucumán during the GIS course.",
+          es: "Servidor MCP de geodatos públicos de Argentina: descubre capas WFS, WMS y ArcGIS REST, consulta datos y geocodifica, con HTTP público y stdio local, solo lectura. Desarrollado en la cursada de Sistemas de Información Geográfica.",
+          en: "MCP server for Argentina's public geodata: discovers WFS, WMS and ArcGIS REST layers, queries data and geocodes, over public HTTP and local stdio, read-only. Developed during the GIS course.",
         },
         year: "2026",
         link: "https://github.com/FranprzDev/geotucuman",
