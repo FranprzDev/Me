@@ -1,3 +1,4 @@
+import { CV_NAME } from "@/content/cv";
 import { MCP_CORS_HEADERS } from "@/lib/mcp/http";
 import { Language, contact, listCvVersions, listProjects, primaryTitle, profile } from "@/lib/mcp/portfolio";
 import { MCP_ENDPOINT_PATH, MCP_TOOLS, MCP_TOOL_SUMMARIES } from "@/lib/mcp/tools";
@@ -17,6 +18,15 @@ export function GET(request: Request) {
     `# ${me.name}`,
     "",
     `> ${primaryTitle(Language.En)} in ${me.location}. ${me.summary}`,
+    "",
+    "## Identity",
+    "",
+    `- Full name: ${CV_NAME}`,
+    `- Alternate name: ${me.name}`,
+    `- Photo: ${origin}/me/francisco.webp`,
+    `- Role: ${primaryTitle(Language.En)}`,
+    `- Location: ${me.location}`,
+    "- Work model: remote; open to remote roles and freelance projects",
     "",
     "## MCP server",
     "",
