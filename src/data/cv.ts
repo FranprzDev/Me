@@ -104,18 +104,6 @@ export const CV: CV = {
       stack: ["LangChain", "LangGraph", "Multi-Agent", "RAG", "Web Scraping", "Meta APIs"],
     },
     {
-      role: { es: "Desarrollador Full-Stack y Automatización", en: "Full-Stack & Automation Developer" },
-      org: { es: "Proyectos freelance", en: "Freelance Projects" },
-      period: { es: "Noviembre 2025 – Agosto 2026", en: "November 2025 – August 2026" },
-      start: "2025-11",
-      current: false,
-      description: {
-        es: "Co-desarrollé una plataforma de gestión de vencimientos impositivos para un estudio contable: flujos de aprobación, historial de cambios e integración con Google Calendar y Gmail. En producción. Entregué documentación completa: informe técnico, resumen ejecutivo y guía de usuario.",
-        en: "Co-built a tax-deadline management platform for an accounting firm: approval flows, change history and Google Calendar/Gmail integration. Running in production. Delivered full handover: technical report, executive summary and user guide.",
-      },
-      stack: ["Full-Stack", "Automation", "Google Workspace APIs", "Approval Flows"],
-    },
-    {
       role: {
         es: "Docente — Curso de Automatización de Procesos con n8n (Poder Judicial de Tucumán)",
         en: "Instructor — Process Automation Course with n8n (Tucumán Judiciary)",

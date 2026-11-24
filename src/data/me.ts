@@ -127,19 +127,6 @@ export const ME = {
         stack: ["LangChain", "LangGraph", "Multi-Agent", "RAG", "Meta APIs"],
       },
       {
-        org: "Freelance",
-        role: {
-          es: "Sistema de automatización para un estudio contable",
-          en: "Automation system for an accounting firm",
-        },
-        period: { es: "2026", en: "2026" },
-        body: {
-          es: "Calendario de vencimientos impositivos para un estudio contable de Buenos Aires: aprobaciones, historial de cambios e integración con Google Calendar y Gmail. Del relevamiento a la entrega, con documentación técnica y guías de uso.",
-          en: "A tax due-date calendar for an accounting firm in Buenos Aires: approvals, change history and Google Calendar and Gmail integration. From discovery to handover, with technical documentation and user guides.",
-        },
-        stack: ["Automation", "Google Workspace APIs", "Approvals"],
-      },
-      {
         org: "Poder Judicial de Tucumán",
         role: { es: "Docente · Curso de n8n", en: "Instructor · n8n course" },
         period: { es: "Sep – Oct 2025", en: "Sep – Oct 2025" },
